@@ -1,31 +1,50 @@
 #!/bin/bash
 # runAbyssLocal.sh
-# $1 Path to working directory. Results will be put in abyss subdirectory
-# $2 Path to Read directory
-# $3 Prefix e.g. NCYC93
-# $4 First part of the paired end reads, relative to read directory
-# $5 Second part of the paired end reads, relative to read directory
-# $6 k k-mer size
-# $7 j number of processes
-WORKDIR=$1
-READDIR=$2
-PREFIX=$3
-READS1=$4
-READS2=$5
-KMER=$6
-PROCS=$7
+# $1 Prefix e.g. NCYC93
+# $2 First part of the paired end reads, relative to read directory
+# $3 Second part of the paired end reads, relative to read directory
+PREFIX=$1
+READS1=$2
+READS2=$3
 
+source /home/shepperp/datashare/Piers/github/ncycseqpipeHidden/ncycseq.cfg
+WORKDIR=$LOCAL_RESULT_PATH/$PREFIX/abyss-local
 mkdir -p $WORKDIR
-docker run -v $READDIR:/reads:ro -v $WORKDIR:/results abyss-pe k=$KMER j=$PROCS name=/results/$PREFIX in="/reads/$READS1 /reads/$READS2"
 
-# /home/shepperp/datashare/Piers/github/ncycseqpipe/abyss-1.9.0/runAbyssLocal.sh \
-#		/home/shepperp/datashare/Piers/assemblies/test/40NCYC93 \
-#		NCYC93 \
-#		/home/shepperp/datashare/Piers/Trim
-#		/home/shepperp/datashare/Piers/Trim/NCYC93/NCYC93.FP.fastq \
-#		/home/shepperp/datashare/Piers/Trim/NCYC93/NCYC93.RP.fastq \
-#		40 \
-#		12 
+echo about to run abyss
+echo Work directory=$WORKDIR
+echo Read directory=$READDIR
+echo Prefix=$PREFIX
+echo READS1=$READS1
+echo READS2=$READS2
+echo Kmer=$ABYSS_KMER
+echo Processors=$ABYSS_PROCS
+
+echo RUN RUN RUN
+#DEBUG docker run --name abysspe$PREFIX --entrypoint ls abyss-pe
+docker run --name abysspe$PREFIX  \
+	-v $READDIR:/reads:ro \
+	-v $WORKDIR:/results \
+	abyss-pe \
+		k=$ABYSS_KMER \
+		j=$ABYSS_PROCS \
+		name=/results/$PREFIX \
+		in="/reads/$READS1 /reads/$READS2" 
+ABYSS_LOCAL_DONE=$?
+
+#Copy results to result directrory
+cp $WORKDIR/$PREFIX-6.fa $LOCAL_RESULT_PATH/$PREFIX/ac${PREFIX}i.fasta
+cp $WORKDIR/$PREFIX-8.fa $LOCAL_RESULT_PATH/$PREFIX/as${PREFIX}i.fasta
+
+echo FINISHED!! abysspe$PREFIX FINISHED!!
+echo with return value $ABYSS_LOCAL_DONE
+
+docker rm -f abysspe$PREFIX 
+echo abysspe$PREFIX  stopped
+#/home/shepperp/datashare/Piers/github/ncycseqpipe/abyss-1.9.0/runAbyssLocal.sh \
+#	NCYC93 \
+#	NCYC93/NCYC93.FP.fastq \
+#		NCYC93/NCYC93.RP.fastq 
 #
 #WORKDIR=/home/shepperp/datashare/Piers/assemblies/test/70NCYC93
 #PREFIX=NCYC93

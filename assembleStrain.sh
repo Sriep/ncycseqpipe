@@ -1,26 +1,53 @@
 #!/bin/bash
-# $1 Path to working directory. Results will be put in abyss subdirectory
-# $2 Path to Read directory
-# $3 Prefix e.g. NCYC93
-# $4 First part of the paired end reads, relative to read directory
-# $5 Second part of the paired end reads, relative to read directory
-WORKDIR=$1/abyss
-READDIR=$2
-PREFIX=$3
-READS1=$4
-READS2=$5
+# $1 Prefix e.g. NCYC93
+# $2 First part of the paired end reads, relative to read directory
+# $3 Second part of the paired end reads, relative to read directory
+PREFIX=$1
+READS1=$2
+READS2=$3
 
-DOCKERDIR=/home/shepperp/datashare/Piers/github/ncycseqpipe
+source /home/shepperp/datashare/Piers/github/ncycseqpipeHidden/ncycseq.cfg
+echo Docker directory $DOCKERDIR
+echo SSH result path $SSH_RESULT_PATH
+echo Local result path $LOCAL_RESULT_PATH
+echo Read directory $READDIR
 
-if test $ABYSS_LOCAL 
+if [ "$DO_LOCAL_ABYSS_ASSEMBLY" = true ] 
 then 
-	$DOCKERDIR/abyss-pe/runAbyssLocal.sh $WORKDIR/abyssLocal $READDIR $PREFIX $READS1 $READS2 $ABYSS_KMER $ABYSS_PROCS
+	export ABYSS_LOCAL_DONE=false
+	$DOCKERDIR/abyss-1.9.0/runAbyssLocal.sh $PREFIX $READS1 $READS2
 fi
-if test $ABYSS_SSH 
+
+if [ "$DO_SSH_ABYSS_ASSEMBLY" = true ] 
 then 
-	$DOCKERDIR/abyss-pe/runAbyssSSH.sh $WORKDIR/abyssSHH $READDIR $PREFIX $READS1 $READS2 $ABYSS_KMER $ABYSS_PROCS
+	export ABYSS_SSH_DONE=false
+	$DOCKERDIR/abyss-1.9.0/runAbyssSSH.sh $PREFIX $READS1 $READS2
 fi
-if test $WGS 
+
+if [ "$DO_WGS" = true ] 
 then 
-	$DOCKERDIR/abyss-pe/runwgs.sh $WORKDIR/wgs $READDIR $PREFIX $READS1 $READS2 $ABYSS_KMER $ABYSS_PROCS
+	export WGS_SSH_DONE=false
+	$DOCKERDIR/wgs-8.3rc2/runwgs.sh $PREFIX $READS1 $READS2
 fi
+
+#scaffolding
+# while still waiting for files to be uploaded sleep
+while (  [[ "$ABYSS_LOCAL_DONE" = "false"  &&  "$DO_LOCAL_ABYSS_ASSEMBLY" = "ture" ]] \
+		||  [[ "$ABYSS_SSH_DONE" = "false"  &&  "$DO_SSH_ABYSS_ASSEMBLY" = "true" ]]  \
+		||  [[ "$WGS_SSH_DONE" = "false"  &&  "$DO_WGS" = "true" ]]  \
+)
+do
+	#echo abyss local done = $ABYSS_LOCAL_DONE
+	sleep 1m
+done
+
+# scaffolding
+# progressive cactus on results
+# create sequece file
+
+
+# Ragout on results
+# Metrics?
+# Yippee!!
+#
+# /home/shepperp/datashare/Piers/github/ncycseqpipe/assembleStrain.sh NCYC93 NCYC93/NCYC93.FP.fastq NCYC93/NCYC93.RP.fastq 
