@@ -1,13 +1,25 @@
 #!/bin/bash
-source /home/shepperp/datashare/Piers/github/ncycseqpipe/ncycseqpipe.cfg
 # runAbyssLocal.sh
 # $1 Prefix e.g. NCYC93
 # $2 First part of the paired end reads, relative to read directory
 # $3 Second part of the paired end reads, relative to read directory
-PREFIX=$1
-READS1=$2
-READS2=$3
-WORKDIR=$LOCAL_WORKDIR/$PREFIX/abyss-local
+declare -r PREFIX=$1
+declare -r READS1=$2
+declare -r READS2=$3
+
+#To Do - tempory these should be inhereited
+declare -xr SOURCEDIR=/home/shepperp/datashare/Piers/github/ncycseqpipe
+declare -r INPUTDIR=/home/shepperp/datashare/Piers/github/ncycseqpipeHidden/input
+declare -xr CONFIGFILE=$INPUTDIR/ncycseqpipe.cfg
+
+# varables used from config file
+source $CONFIGFILE
+readonly LOCAL_RESULTDIR
+readonly READDIR
+readonly ABYSS_KMER
+readonly ABYSS_PROCS
+
+declare -r WORKDIR=$LOCAL_WORKDIR/$PREFIX/abyss-local
 mkdir -p $WORKDIR
 
 echo ABYSS: about to run abyss
@@ -42,18 +54,7 @@ echo ABYSS: FINISHED!! abysspe$PREFIX FINISHED!!
 
 docker rm -f abysspe$PREFIX 
 echo ABYSS: abysspe$PREFIX  stopped
-#/home/shepperp/datashare/Piers/github/ncycseqpipe/abyss-1.9.0/runAbyssLocal.sh \
-#	NCYC93 \
-#	NCYC93/NCYC93.FP.fastq \
-#		NCYC93/NCYC93.RP.fastq 
-#
-#WORKDIR=/home/shepperp/datashare/Piers/assemblies/test/70NCYC93
-#PREFIX=NCYC93
-#READDIR=/home/shepperp/datashare/Piers/Trim
-#READS1=NCYC93/NCYC93.FP.fastq
-#READS2=/NCYC93/NCYC93.RP.fastq
-#KMER=70
-#PROCS=12
+# /home/shepperp/datashare/Piers/github/ncycseqpipe/abyss/run_abyss_local.sh NCYC22 NCYC22/NCYC22.FP.fastq NCYC22/NCYC22.RP.fastq 
 #
 #Parameters of the driver script, abyss-pe
 #    a: maximum number of branches of a bubble [2]

@@ -1,19 +1,12 @@
 #!/bin/bash
 #
-#DOCKERDIR=/home/shepperp/datashare/Piers/github/ncycseqpipe
-#DOCKERDIR=/home/shepperp/github/ncycseqpipe
-#cd $DOCKERDIR
-
-#Start docker just in case
 sudo service docker start
 
-cd $DOCKERDIR/wgs-8.3rc2/fastqToCA
-sudo docker build -t fastqtoca .
-cd $DOCKERDIR/wgs-8.3rc2/runCA
-sudo docker build -t runCA .
-cd $DOCKERDIR/abyss/abyss-pe
-sudo docker build -t abyss-pe .
-cd $DOCKERDIR/progressiveCactus/runProgressiveCactus
-sudo docker build -t progressivecactus .
-cd $DOCKERDIR/ragout/ragoutpy
-sudo docker build -t ragout .
+#cd $DOCKERDIR/wgs-8.3rc2/fastqToCA
+#sudo docker build -t fastqtoca .
+#cd $DOCKERDIR/wgs-8.3rc2/runCA
+#sudo docker build -t runCA .
+sudo docker build -t abyss-pe /ncycseqpipe/abyss/abyss-pe
+sudo docker build -t progressivecactus /ncycseqpipe/progressiveCactus/runProgressiveCactus
+sudo docker build -t ragout /ncycseqpipe/ragout/ragoutpy
+sudo docker build -t soapdenovo2 /ncycseqpipe/SOAPdenovo2/SOAPdenovo2

@@ -1,16 +1,28 @@
 #!/bin/bash
-source /home/shepperp/datashare/Piers/github/ncycseqpipe/ncycseqpipe.cfg
 # runSOAPdenova2.sh
 # $1 Prefix e.g. NCYC93
 # $2 First part of the paired end reads, relative to read directory
 # $3 Second part of the paired end reads, relative to read directory
-PREFIX=$1
-READS1=$2
-READS2=$3
-WORKDIR=$LOCAL_WORKDIR/$PREFIX/soapenovo2-local
+declare -r PREFIX=$1
+declare -r READS1=$2
+declare -r READS2=$3
+
+#To Do - tempory these should be inhereited
+declare -xr SOURCEDIR=/home/shepperp/datashare/Piers/github/ncycseqpipe
+declare -r INPUTDIR=/home/shepperp/datashare/Piers/github/ncycseqpipeHidden/input
+declare -xr CONFIGFILE=$INPUTDIR/ncycseqpipe.cfg
+
+# varables used from config file
+source $CONFIGFILE
+readonly LOCAL_RESULTDIR
+readonly READDIR
+readonly SOAP_KMER
+readonly SOAP_PROCS
+
+declare -r WORKDIR=$LOCAL_WORKDIR/$PREFIX/soapenovo2-local
 mkdir -p $WORKDIR
 
-echo $PREFIX SOAP2: about to run soap
+echo $PREFIX SOAP2: about to run soap >&2
 echo $PREFIX SOAP2: Work directory=$WORKDIR
 echo $PREFIX SOAP2: Read directory=$READDIR
 echo $PREFIX SOAP2: Result directory=$LOCAL_RESULTDIR
@@ -20,9 +32,10 @@ echo $PREFIX SOAP2: READS2=$READS2
 echo $PREFIX SOAP2: Kmer=$ABYSS_KMER
 echo $PREFIX SOAP2: Processors=$ABYSS_PROCS
 
-cat > $WORKDIR/config_file
-cat $DOCKERDIR/SOAPdenovo2/soapConfigHead.txt >> $WORKDIR/config_file
-cat $DOCKERDIR/SOAPdenovo2/soapConfigLibHead.txt >> $WORKDIR/config_file
+rm $WORKDIR/config_file
+touch $WORKDIR/config_file
+cat $SOURCEDIR/SOAPdenovo2/soap_config_head.txt >> $WORKDIR/config_file
+cat $SOURCEDIR/SOAPdenovo2/soap_config_lib_head.txt >> $WORKDIR/config_file
 echo q1=/reads/$READS1 >> $WORKDIR/config_file
 echo q2=/reads/$READS2 >> $WORKDIR/config_file
 
@@ -54,3 +67,5 @@ echo $PREFIX SOAP2: FINISHED!! soapdenovo2$PREFIX FINISHED!!
 
 docker rm -f soapdenovo2$PREFIX 
 echo $PREFIX SOAP2: soapdenovo2$PREFIX  stopped
+
+# /home/shepperp/datashare/Piers/github/ncycseqpipe/SOAPdenovo2/run_soapdenovo2.sh NCYC22 NCYC22/NCYC22.FP.fastq NCYC22/NCYC22.RP.fastq 
