@@ -1,4 +1,5 @@
 #!/bin/bash
+source /home/shepperp/datashare/Piers/github/ncycseqpipe/ncycseqpipe.cfg
 # runAbyssLocal.sh
 # $1 Prefix e.g. NCYC93
 # $2 First part of the paired end reads, relative to read directory
@@ -6,41 +7,41 @@
 PREFIX=$1
 READS1=$2
 READS2=$3
-
-source /home/shepperp/datashare/Piers/github/ncycseqpipeHidden/ncycseq.cfg
-WORKDIR=$LOCAL_RESULT_PATH/$PREFIX/abyss-local
+WORKDIR=$LOCAL_WORKDIR/$PREFIX/abyss-local
 mkdir -p $WORKDIR
 
-echo about to run abyss
-echo Work directory=$WORKDIR
-echo Read directory=$READDIR
-echo Prefix=$PREFIX
-echo READS1=$READS1
-echo READS2=$READS2
-echo Kmer=$ABYSS_KMER
-echo Processors=$ABYSS_PROCS
+echo ABYSS: about to run abyss
+echo ABYSS: Work directory=$WORKDIR
+echo ABYSS: Read directory=$READDIR
+echo ABYSS: Result directory=$LOCAL_RESULTDIR
+echo ABYSS: Prefix=$PREFIX
+echo ABYSS: READS1=$READS1
+echo ABYSS: READS2=$READS2
+echo ABYSS: Kmer=$ABYSS_KMER
+echo ABYSS: Processors=$ABYSS_PROCS
 
-echo RUN RUN RUN
+echo ABYSS: RUN RUN RUN
 #DEBUG docker run --name abysspe$PREFIX --entrypoint ls abyss-pe
-docker run --name abysspe$PREFIX  \
+docker run \
+	--name abysspe$PREFIX  \
 	-v $READDIR:/reads:ro \
 	-v $WORKDIR:/results \
-	abyss-pe \
+	sriep/abyss-pe \
 		k=$ABYSS_KMER \
 		j=$ABYSS_PROCS \
 		name=/results/$PREFIX \
 		in="/reads/$READS1 /reads/$READS2" 
-ABYSS_LOCAL_DONE=$?
+echo ABYSS: abyss return code is $?
 
 #Copy results to result directrory
-cp $WORKDIR/$PREFIX-6.fa $LOCAL_RESULT_PATH/$PREFIX/ac${PREFIX}i.fasta
-cp $WORKDIR/$PREFIX-8.fa $LOCAL_RESULT_PATH/$PREFIX/as${PREFIX}i.fasta
+mkdir -p $LOCAL_RESULTDIR/$PREFIX
+cp $WORKDIR/$PREFIX-6.fa $LOCAL_RESULTDIR/$PREFIX/ac${PREFIX}i.fasta
+cp $WORKDIR/$PREFIX-8.fa $LOCAL_RESULTDIR/$PREFIX/as${PREFIX}i.fasta
 
-echo FINISHED!! abysspe$PREFIX FINISHED!!
-echo with return value $ABYSS_LOCAL_DONE
+echo ABYSS: FINISHED!! abysspe$PREFIX FINISHED!!
 
 docker rm -f abysspe$PREFIX 
-echo abysspe$PREFIX  stopped
+echo ABYSS: abysspe$PREFIX  stopped
 #/home/shepperp/datashare/Piers/github/ncycseqpipe/abyss-1.9.0/runAbyssLocal.sh \
 #	NCYC93 \
 #	NCYC93/NCYC93.FP.fastq \

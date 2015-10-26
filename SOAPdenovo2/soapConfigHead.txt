@@ -1,0 +1,2 @@
+#maximal read length
+max_rd_len=105

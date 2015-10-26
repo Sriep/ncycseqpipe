@@ -11,7 +11,9 @@ cd $DOCKERDIR/wgs-8.3rc2/fastqToCA
 sudo docker build -t fastqtoca .
 cd $DOCKERDIR/wgs-8.3rc2/runCA
 sudo docker build -t runCA .
-cd $DOCKERDIR/abyss-1.9.0/abyss-pe
+cd $DOCKERDIR/abyss/abyss-pe
 sudo docker build -t abyss-pe .
 cd $DOCKERDIR/progressiveCactus/runProgressiveCactus
-sudo docker build -t runprogressivecactus .
+sudo docker build -t progressivecactus .
+cd $DOCKERDIR/ragout/ragoutpy
+sudo docker build -t ragout .

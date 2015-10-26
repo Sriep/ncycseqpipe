@@ -1,9 +1,9 @@
 #abyss-pe
-FROM ubuntu:14.04
+FROM ubuntu:latest
 MAINTAINER Piers Shepperson
 RUN sudo apt-get update && sudo apt-get install -y \
     automake \
-	build-essential \
+    build-essential \
     git \
     libboost-all-dev \
     libhdf5-openmpi-dev \

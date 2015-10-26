@@ -1,38 +1,22 @@
 #!/bin/bash
-# $1 Path to working directory. Results will be put in abyss subdirectory
-# $2 Path to Read directory
-# $3 Prefix e.g. NCYC93
-# $4 First part of the paired end reads, relative to read directory
-# $5 Second part of the paired end reads, relative to read directory
-# $6 k k-mer size
-# $7 j number of processes
-WORKDIR=$1
-READDIR=$2
-PREFIX=$3
-READS1=$4
-READS2=$5
-KMER=$6
-PROCS=$7
+source /home/shepperp/datashare/Piers/github/ncycseqpipe/ncycseqpipe.cfg
+source abyss-1.9.0
+# $1 Prefix e.g. NCYC93
+# $2 First part of the paired end reads, relative to read directory
+# $3 Second part of the paired end reads, relative to read directory
+PREFIX=$1
+READS1=$2
+READS2=$3
+WORKDIR=$SSH_WORKDIR/$PREFIX/abyss-ssh
+RESULTDIR=$SSH_RESULTDIR_PATH/$PREFIX
+mkdir -p $WORKDIR
+mkdir -p $RESULTDIR 
+abyss-pe k=$ABYSS_KMER j=$ABYSS_PROCS name=$WORKDIR in='$READDIR/$READS1 $READDIR/$READS2' 
 
-sshpass -e ssh -t $USERID@hpc.nbi.ac.uk \
-					"source abyss-1.9.0; \
-					mkdir -p $WORKDIR; \
-					bsub abyss-pe k=$KMER j=$PROCS name=$WORKDIR/$PREFIX in='$READDIR/$READS1 $READDIR/$READS2' " 
-# /home/shepperp/datashare/Piers/github/ncycseqpipe/abyss-1.9.0/runAbyss.sh \
+#/home/shepperp/datashare/Piers/github/ncycseqpipe/abyss-1.9.0/runAbyss.sh \
 #		NCYC93 \
-#		80 \
-#		12 \
-#		/nbi/group-data/ifs/NBI/Research-Groups/Jo-Dicks/Piers/assemblies/test/NCYC93 \
-#		/nbi/group-data/ifs/NBI/Research-Groups/Jo-Dicks/Piers/Trim/NCYC_93/NCYC93.FP.fastq \
-#		/nbi/group-data/ifs/NBI/Research-Groups/Jo-Dicks/Piers/Trim/NCYC_93/NCYC93.RP.fastq
-#
-#WORKDIR=/nbi/group-data/ifs/NBI/Research-Groups/Jo-Dicks/Piers/assemblies/test/70sshNCYC93
-#PREFIX=NCYC93
-#READDIR=/nbi/group-data/ifs/NBI/Research-Groups/Jo-Dicks/Piers/Trim
-#READS1=NCYC93/NCYC93.FP.fastq
-#READS2=/NCYC93/NCYC93.RP.fastq
-#KMER=70
-#PROCS=12
+#		NCYC93/NCYC93.FP.fastq \
+#		NCYC93/NCYC93.RP.fastq 
 #
 #Parameters of the driver script, abyss-pe
 #    a: maximum number of branches of a bubble [2]

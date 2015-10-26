@@ -1,9 +1,10 @@
 FROM centos:latest
 MAINTAINER Piers Shepperson
-RUN  yum update yum install -y \
+#RUN yum check-update && yum install -y \
+RUN yum install -y \
     automake \
     build-essential \
-	gcc-c++
+	gcc-c++ \
     git \
 	make \
     python2.7 \
