@@ -7,12 +7,6 @@ declare -r PREFIX=$1
 declare -r READS1=$2
 declare -r READS2=$3
 
-#To Do - tempory these should be inhereited
-declare -xr SOURCEDIR=/home/shepperp/datashare/Piers/github/ncycseqpipe
-declare -r INPUTDIR=/home/shepperp/datashare/Piers/github/ncycseqpipeHidden/input
-declare -xr CONFIGFILE=$INPUTDIR/ncycseqpipe.cfg
-
-# varables used from config file
 source $CONFIGFILE
 readonly LOCAL_RESULTDIR
 readonly READDIR
@@ -22,18 +16,7 @@ readonly ABYSS_PROCS
 declare -r WORKDIR=$LOCAL_WORKDIR/$PREFIX/abyss-local
 mkdir -p $WORKDIR
 
-echo ABYSS: about to run abyss
-echo ABYSS: Work directory=$WORKDIR
-echo ABYSS: Read directory=$READDIR
-echo ABYSS: Result directory=$LOCAL_RESULTDIR
-echo ABYSS: Prefix=$PREFIX
-echo ABYSS: READS1=$READS1
-echo ABYSS: READS2=$READS2
-echo ABYSS: Kmer=$ABYSS_KMER
-echo ABYSS: Processors=$ABYSS_PROCS
-
-echo ABYSS: RUN RUN RUN
-#DEBUG docker run --name abysspe$PREFIX --entrypoint ls abyss-pe
+echo ABYSS: about to run abyss on $PREFIX
 docker run \
 	--name abysspe$PREFIX  \
 	-v $READDIR:/reads:ro \
@@ -44,16 +27,14 @@ docker run \
 		name=/results/$PREFIX \
 		in="/reads/$READS1 /reads/$READS2" 
 echo ABYSS: abyss return code is $?
+docker rm -f abysspe$PREFIX 
+echo ABYSS: abysspe$PREFIX  stopped
 
-#Copy results to result directrory
 mkdir -p $LOCAL_RESULTDIR/$PREFIX
 cp $WORKDIR/$PREFIX-6.fa $LOCAL_RESULTDIR/$PREFIX/ac${PREFIX}i.fasta
 cp $WORKDIR/$PREFIX-8.fa $LOCAL_RESULTDIR/$PREFIX/as${PREFIX}i.fasta
 
 echo ABYSS: FINISHED!! abysspe$PREFIX FINISHED!!
-
-docker rm -f abysspe$PREFIX 
-echo ABYSS: abysspe$PREFIX  stopped
 # /home/shepperp/datashare/Piers/github/ncycseqpipe/abyss/run_abyss_local.sh NCYC22 NCYC22/NCYC22.FP.fastq NCYC22/NCYC22.RP.fastq 
 #
 #Parameters of the driver script, abyss-pe

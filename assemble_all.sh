@@ -1,37 +1,37 @@
 #!/bin/bash
 #
-echo all: read in config file from $CONFIGFILE
-declare -xr SOURCEDIR=/home/shepperp/datashare/Piers/github/ncycseqpipe
-declare -r INPUTDIR=/home/shepperp/datashare/Piers/github/ncycseqpipeHidden/input
-declare -xr CONFIGFILE=$INPUTDIR/ncycseqpipe.cfg
+declare -xr CONFIGFILE=$1
+# Set sorce directory to be the directory where this file is stored, the
+# assumption is that the companion scripts are stored in the same directory  
+# structure as found at https://github.com/Sriep/ncycseqpipe.git
+declare -xr SOURCEDIR=`dirname "$BASH_SOURCE"`
+
+echo all: "working directory is $PWD"
+echo all: "source directory is $SOURCEDIR"
+echo all: "read in config file from $CONFIGFILE"
 
 source $CONFIGFILE
 readonly ILLUMINA_READS
+echo all: "Illumina reads from $ILLUMINA_READS"
 
-declare -a prefix
-declare -a illumina_read1
-declare -a illumina_read2
-declare -i num_strains=0
-
-if [[ $INPUTDIR/$ILLUMINA_READS ]]; then
+if [[ $ILLUMINA_READS ]]; then
   while read col1 col2 col3; do
-    num_strains=$((num_strains+1))
-    prefix[$num_strains]="$col1"
-    illumina_read1[$num_strains]="$col2"
-    illumina_read2[$num_strains]="$col3"
-    echo all: read in $num_strains th line
+    echo -ne "all: About to assemble  name $col1 \tread1 $col2 \tread2 $col3"
+    $SOURCEDIR/assemble_strain.sh $col1 $col2 $col3 &
   done < $ILLUMINA_READS
 fi
-
-for ((i=1; i<=$num_strains; i++)); do
-  echo -n "all: About to assemble "
-  echo -ne "name ${prefix[$i]}"
-  echo -ne "\tread1 ${illumina_read1[$i]}"
-  echo  -e "\tread2 ${illumina_read2[$i]}"
-  $SOURCEDIR/assemble_strain.sh \
-    ${prefix[$i]} \
-    ${illumina_read1[$i]} \
-    ${illumina_read2[$i]} &
-done
-echo all : Sent of all strains to be assembled.  
-# /home/shepperp/datashare/Piers/github/ncycseqpipe/assemble_all.sh
+echo all : "Sent of all strains to be assembled."
+# /home/shepperp/datashare/Piers/github/ncycseqpipe/assemble_all.sh ncycseqpipe.cfg
+#
+# /home/shepperp/datashare/Piers/github/ncycseqpipe/assemble_all.sh \
+#    /home/shepperp/datashare/Piers/github/ncycseqpipeHidden/input/ncycseqpipe.cfg
+#
+# docker run \
+#    --name ncycpipe_run \
+#    -v /home/shepperp/datashare/Piers/github/ncycseqpipeHidden/input:input \
+#    -v /home/shepperp/datashare/Piers/Trim:/reads:ro \
+#    -v /home/shepperp/datashare/Piers/assemblies/test:/results \ 
+#    -v /home/shepperp/documents/test/workdir:/workdir \
+#    -v /nbi/group-data/ifs/NBI/Research-Groups/Jo-Dicks/Piers/assemblies/test:/sshworkdir \
+#    -v /var/run/docker.sock:/var/run/docker.sock \
+#    ncycpipe

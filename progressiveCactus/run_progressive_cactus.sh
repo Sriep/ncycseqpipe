@@ -1,34 +1,42 @@
 #!/bin/bash
-source /home/shepperp/datashare/Piers/github/ncycseqpipe/ncycseqpipe.cfg
-# runProgressiveCactus.sh
+#source /home/shepperp/datashare/Piers/github/ncycseqpipe/ncycseqpipe.cfg
+echo runProgressiveCactus.sh
 # $1 Prefix e.g. NCYC93
-# $2 First part of the paired end reads, relative to read directory
-# $3 Second part of the paired end reads, relative to read directory
-PREFIX=$1
+declare -r PREFIX=$1
 
-RESULTDIR=$LOCAL_RESULTDIR/$PREFIX
-WORKDIR=$LOCAL_RESULTDIR/$PREFIX/progressiveCactus
+source $CONFIGFILE
+readonly LOCAL_RESULTDIR
+readonly LOCAL_WORKDIR
+
+declare -r WORKDIR=$LOCAL_WORKDIR/$PREFIX/progressiveCactus
 mkdir -p $WORKDIR
 
 # Create the pressive cactus configurartion file
-rm $WORKDIR/$PREFIX.cactus.squ
-touch $WORKDIR/$PREFIX.cactus.squ
-for f in $LOCAL_RESULTDIR/$PREFIX/*.fasta
-do
-	echo $(basename "$f" .fasta) $f >> $WORKDIR/$PREFIX.cactus.squ
-done
-echo Here is progressive cactus sequence file for $PREFIX
-cat $WORKDIR/$PREFIX.cactus.squ
+echo $PREFIX "PCacuts: Here is the workdirectory $WORKDIR"
+echo $PREFIX "PCacuts: Here is the local result directory $LOCAL_RESULTDIR"
 
+rm $WORKDIR/$PREFIX.cactus.seq
+touch $WORKDIR/$PREFIX.cactus.seq
+
+for f in $LOCAL_RESULTDIR/$PREFIX/*.fasta; do
+  echo $(basename "$f" .fasta) "/results/"`basename $f` >> $WORKDIR/$PREFIX.cactus.seq
+done
+
+echo $PREFIX PCacuts:  Here is progressive cactus sequence file for $PREFIX
+cat $WORKDIR/$PREFIX.cactus.seq
+echo $PREFIX PCacuts: Finished sequence file about to run progressiveCactus 
 docker run --name progressivecactus$PREFIX  \
-	-v $RESULTDIR:/workdir \
-	-v $WORKDIR:/results \
+	-v $WORKDIR:/workdir \
+	-v $LOCAL_RESULTDIR/$PREFIX:/results \
 	sriep/progressivecactus \
 		--maxThreads $PCACTUS_THREADS \
-		 /results/$PREFIX.cactus.squ \
+		 /workdir/$PREFIX.cactus.seq \
 		 /workdir \
 		 /results/$PREFIX.hal 
 PCACTUS_DONE=$?
+echo $PREFIX PCacuts: progressivecactus return code is $?
+docker rm -f progressivecactus$PREFIX 
+echo $PREFIX PCacuts: progressivecactus$PREFIX  stopped
 
 #https://github.com/glennhickey/progressiveCactus
 #runProgressiveCactus.sh [options] <seqFile> <workDir> <outputHalFile>

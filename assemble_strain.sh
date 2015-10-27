@@ -7,9 +7,9 @@ declare -r READS1=$2
 declare -r READS2=$3
 
 #To Do - tempory these should be inhereited
-declare -xr SOURCEDIR=/home/shepperp/datashare/Piers/github/ncycseqpipe
-declare -r INPUTDIR=/home/shepperp/datashare/Piers/github/ncycseqpipeHidden/input
-declare -xr CONFIGFILE=$INPUTDIR/ncycseqpipe.cfg
+#declare -xr SOURCEDIR=/home/shepperp/datashare/Piers/github/ncycseqpipe
+#declare -r INPUTDIR=/home/shepperp/datashare/Piers/github/ncycseqpipeHidden/input
+#declare -xr CONFIGFILE=$INPUTDIR/ncycseqpipe.cfg
 
 source $CONFIGFILE
 readonly SSH_RESULTDIR
@@ -25,7 +25,7 @@ echo $PREFIX: source directory $SOURCEDIR
 echo $PREFIX: SSH result path $SSH_RESULTDIR
 echo $PREFIX: Read directory $READDIR
 
-echo $PREFIX: ************************************ Abyss ************************************
+echo $PREFIX: ------------------------ Abyss --------------------------------
 if [ "$DO_LOCAL_ABYSS_ASSEMBLY" = true ]; then 
 	echo $PREFIX: start abyss local assembly
 	$SOURCEDIR/abyss/run_abyss_local.sh $PREFIX $READS1 $READS2 &
@@ -39,7 +39,7 @@ if [ "$DO_SSH_ABYSS_ASSEMBLY" = true ]; then
 	ssh -i $SSH_KEYFILE $SSH_USERID@$SSH_ADDR bsub -o $ABYSS_SSH_REPORTFILE $SOURCEDIR/abyss/run_abyss_ssh.sh $PREFIX $READS1 $READS2 
 fi
 
-echo $PREFIX: ************************************ SOAPdenovo2 ************************************
+echo $PREFIX: --------------------------- SOAPdenovo2 --------------------------
 if [ "$DO_LOCAL_SOAPDENOVO2_ASSEMBLY" = true ]; then 
 	echo $PREFIX: start SOAPdenovo2 local assembly
 	$SOURCEDIR/SOAPdenovo2/run_soapdenovo2_local.sh $PREFIX $READS1 $READS2 &
@@ -53,19 +53,19 @@ if [ "$DO_SSH_SOAPDENOVO2_ASSEMBLY" = true ]; then
 	ssh -i $SSH_KEYFILE $SSH_USERID@$SSH_ADDR bsub -o $SOAP2_SSH_REPORTFILE $SOURCEDIR/SOAPdenovo2/run_soapdenovo2_ssh.sh $PREFIX $READS1 $READS2 
 fi
 
-echo $PREFIX: ************************************ wgs ************************************
+echo $PREFIX: ------------------------------- wgs ------------------------
 if [ "$DO_WGS" = true ]; then 
 	echo $PREFIX: start wgs assembly
 	$SOURCEDIR/wgs-8.3rc2/run_wgs.sh $PREFIX $READS1 $READS2 &
 	PID_WGS=$!
 	echo $PREFIX: wgs had pid $PID_WGS
 fi
+echo $PREFIX: Assemblies sent off !!!!!!!!!!!!!!
 
-echo $PREFIX: ************************************ Waiting ************************************
-# while still waiting for files to be uploaded sleep
-wait $PID_ABYSS_LOCAL $PID_WGS $PID_SOAP_LOCAL
+echo $PREFIX: ------------------------- Waiting --------------------------------
 
 echo $PREFIX: About to wait for assemblies for finish
+wait $PID_ABYSS_LOCAL $PID_WGS $PID_SOAP_LOCAL
 while ( ( [[ "$DO_SSH_ABYSS_ASSEMBLY" = true ]] && [[ ! -e $ABYSS_SSH_REPORTFILE ]] ) ); do
 #		|| ( [[ "$DO_SSH_SOAPDENOVO2_ASSEMBLY" = true ]] && [[ ! -e $SOAP2_SSH_REPORTFILE ]] ) )
 	echo $PREFIX: waiting for SSH assemblies
@@ -73,23 +73,21 @@ while ( ( [[ "$DO_SSH_ABYSS_ASSEMBLY" = true ]] && [[ ! -e $ABYSS_SSH_REPORTFILE
 	sleep 30s
 done
 
-echo $PREFIX: Assemblies sent off !!!!!!!!!!!!!!
+echo $PREFIX: ------------------------- scaffolding ----------------------------
 
-echo $PREFIX: ************************************ scaffolding ************************************
-
-echo $PREFIX: ************************************ progressive cactus ************************************
+echo $PREFIX: -------------------- progressive cactus -------------------------
 # progressive cactus on results
 echo $PREFIX: Check to see if progessive cactus is required
-if [ "DO_PCACTUS" = true ]; then
+if [ "$DO_PCACTUS" = true ]; then
 	echo $PREFIX: run progressive cactus
 	$SOURCEDIR/progressiveCactus/run_progressive_cactus.sh $PREFIX 
 	echo $PREFIX: finished running progressive cactus
 fi
 
-echo $PREFIX: ************************************ ragout ************************************
+echo $PREFIX: --------------------------- ragout -------------------------
 # Ragout on results
 echo $PREFIX: check to see if regout is required
-if [ "DO_RAGOUT" = true ]; then
+if [ "$DO_RAGOUT" = true ]; then
 	echo $PREFIX: run ragout
 	$SOURCEDIR/ragout/run_ragout.sh $PREFIX 
 	echo $PREFIX: finished running ragout
