@@ -1,41 +1,50 @@
 #!/bin/bash
-source /home/shepperp/datashare/Piers/github/ncycseqpipe/ncycseqpipe.cfg
-# runPRagpit.sh
+echo runPRagpit.sh
 # $1 Prefix e.g. NCYC93
-# $2 First part of the paired end reads, relative to read directory
-# $3 Second part of the paired end reads, relative to read directory
-PREFIX=$1
+declare -r PREFIX=$1
 
-RESULTDIR=$LOCAL_RESULTDIR/$PREFIX
-WORKDIR=$LOCAL_RESULTDIR/$PREFIX/progressiveCactus
+source $CONFIGFILE
+readonly LOCAL_RESULTDIR
+readonly LOCAL_WORKDIR
+declare -r WORKDIR=$LOCAL_WORKDIR/$PREFIX/ragout
 mkdir -p $WORKDIR
 
 # Create the ragout configurartion file
 rm $WORKDIR/$PREFIX.ragout.recipe
 touch $WORKDIR/$PREFIX.ragout.recipe
-echo *.draft = true >> $WORKDIR/$PREFIX.ragout.recipe
-echo -n .references >> $WORKDIR/$PREFIX.ragout.recipe
-for f in $LOCAL_RESULTDIR/$PREFIX/*.fasta
-do
-	echo -n $(basename "$f" .fasta), $f >> $WORKDIR/$PREFIX.ragout.recipe
+echo "*.draft" = true >> $WORKDIR/$PREFIX.ragout.recipe
+echo -n ".references =" >> $WORKDIR/$PREFIX.ragout.recipe
+declare seperator=
+for f in $LOCAL_RESULTDIR/$PREFIX/*.fasta; do
+	echo -n "$seperator"$(basename "$f" .fasta) >> $WORKDIR/$PREFIX.ragout.recipe
+  seperator=","
 done
+echo >> $WORKDIR/$PREFIX.ragout.recipe
 #remove trailing commma
-sed -i '$s/,$//' $WORKDIR/$PREFIX.ragout.recipe
+#sed -i '$s/,$//' $WORKDIR/$PREFIX.ragout.recipe
 echo .target = ac${PREFIX}i  >> $WORKDIR/$PREFIX.ragout.recipe
-echo .hal = $PREFIX.hal >> $WORKDIR/$PREFIX.ragout.recipe
+echo .hal = /data/$PREFIX.hal >> $WORKDIR/$PREFIX.ragout.recipe
 
-echo Here is progressive ragout sequence file for $PREFIX
+echo  $PREFIX Ragout: Here is  ragout sequence file for $PREFIX
 cat $WORKDIR/$PREFIX.ragout.recipe
+echo  $PREFIX Ragout: Finished ragout sequence file for $PREFIX
 
 docker run --name ragoutpy$PREFIX  \
-	-v $RESULTDIR:/workdir \
-	-v $WORKDIR:/results \
-	sriep/ragoutpy \
-		--maxThreads $PCACTUS_THREADS \
-		 /results/$PREFIX.ragout.recipe \
-		 /workdir \
-		 /results/$PREFIX.hal 
-RAGOUT_DONE=$?
+	--volume=$WORKDIR:/workdir \
+  --volume=$LOCAL_RESULTDIR/$PREFIX:/data \
+	sriep/ragout \
+    --threads $RAGOUT_THREADS \
+    --outdir /workdir \
+    --synteny hal \
+    /workdir/$PREFIX.ragout.recipe 
+echo $PREFIX Ragout: Ragout return code is $?
+docker rm -f ragoutpy$PREFIX 
+echo $PREFIX Ragout: ragoutpy$PREFIX  stopped
 
-#https://github.com/glennhickey/progressiveCactus
-#runProgressiveCactus.sh [options] <seqFile> <workDir> <outputHalFile>
+mkdir -p $LOCAL_RESULTDIR/$PREFIX
+cp  $WORKDIR/target_scaffolds.fasta \
+    $WORKDIR/target_unplaced.fasta \
+    > $LOCAL_RESULTDIR/$PREFIX/r${PREFIX}i.fasta
+
+#export PYTHONPATH=$PYTHONPATH:/home/shepperp/software/progressiveCactus/submodules
+#ragout.py --threads 8 --outdir /home/shepperp/documents/test/workdir/NCYC22/ragout3 --synteny hal  /home/shepperp/documents/test/workdir/NCYC22/ragout3/NCYC22.ragout.recipe 

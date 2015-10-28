@@ -1,6 +1,5 @@
 FROM centos:latest
 MAINTAINER Piers Shepperson
-#RUN yum check-update && yum install -y \
 RUN yum install -y \
     automake \
     build-essential \
@@ -15,5 +14,7 @@ WORKDIR progressiveCactus/
 RUN git pull
 RUN git submodule update --init
 RUN make
+ENV PATH $PATH:/progressiveCactus/submodules/hal/bin:/progressiveCactus/bin
+ENV PYTHONPATH $PYTHONPATH:/progressiveCactus/submodules 
 ENTRYPOINT ["/progressiveCactus/bin/runProgressiveCactus.sh"]
 

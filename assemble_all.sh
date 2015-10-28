@@ -23,8 +23,7 @@ fi
 echo all : "Sent of all strains to be assembled."
 # /home/shepperp/datashare/Piers/github/ncycseqpipe/assemble_all.sh ncycseqpipe.cfg
 #
-# /home/shepperp/datashare/Piers/github/ncycseqpipe/assemble_all.sh \
-#    /home/shepperp/datashare/Piers/github/ncycseqpipeHidden/input/ncycseqpipe.cfg
+# /home/shepperp/datashare/Piers/github/ncycseqpipe/assemble_all.sh     /home/shepperp/datashare/Piers/github/ncycseqpipeHidden/input/ncycseqpipe.cfg
 #
 # docker run \
 #    --name ncycpipe_run \

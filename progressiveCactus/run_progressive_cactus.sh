@@ -1,5 +1,4 @@
 #!/bin/bash
-#source /home/shepperp/datashare/Piers/github/ncycseqpipe/ncycseqpipe.cfg
 echo runProgressiveCactus.sh
 # $1 Prefix e.g. NCYC93
 declare -r PREFIX=$1
@@ -7,7 +6,6 @@ declare -r PREFIX=$1
 source $CONFIGFILE
 readonly LOCAL_RESULTDIR
 readonly LOCAL_WORKDIR
-
 declare -r WORKDIR=$LOCAL_WORKDIR/$PREFIX/progressiveCactus
 mkdir -p $WORKDIR
 
@@ -33,7 +31,6 @@ docker run --name progressivecactus$PREFIX  \
 		 /workdir/$PREFIX.cactus.seq \
 		 /workdir \
 		 /results/$PREFIX.hal 
-PCACTUS_DONE=$?
 echo $PREFIX PCacuts: progressivecactus return code is $?
 docker rm -f progressivecactus$PREFIX 
 echo $PREFIX PCacuts: progressivecactus$PREFIX  stopped
