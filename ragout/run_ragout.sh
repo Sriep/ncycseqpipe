@@ -6,6 +6,7 @@ declare -r PREFIX=$1
 source $CONFIGFILE
 readonly LOCAL_RESULTDIR
 readonly LOCAL_WORKDIR
+readonly RAGOUT_TARGET
 declare -r WORKDIR=$LOCAL_WORKDIR/$PREFIX/ragout
 mkdir -p $WORKDIR
 
@@ -13,7 +14,7 @@ mkdir -p $WORKDIR
 rm $WORKDIR/$PREFIX.ragout.recipe
 touch $WORKDIR/$PREFIX.ragout.recipe
 echo "*.draft" = true >> $WORKDIR/$PREFIX.ragout.recipe
-echo -n ".references =" >> $WORKDIR/$PREFIX.ragout.recipe
+echo -n ".references =  " >> $WORKDIR/$PREFIX.ragout.recipe
 declare seperator=
 for f in $LOCAL_RESULTDIR/$PREFIX/*.fasta; do
 	echo -n "$seperator"$(basename "$f" .fasta) >> $WORKDIR/$PREFIX.ragout.recipe
@@ -22,8 +23,8 @@ done
 echo >> $WORKDIR/$PREFIX.ragout.recipe
 #remove trailing commma
 #sed -i '$s/,$//' $WORKDIR/$PREFIX.ragout.recipe
-echo .target = ac${PREFIX}i  >> $WORKDIR/$PREFIX.ragout.recipe
-echo .hal = /data/$PREFIX.hal >> $WORKDIR/$PREFIX.ragout.recipe
+echo ".target = $RAGOUT_TARGET"  >> $WORKDIR/$PREFIX.ragout.recipe
+echo ".hal = /data/$PREFIX.hal" >> $WORKDIR/$PREFIX.ragout.recipe
 
 echo  $PREFIX Ragout: Here is  ragout sequence file for $PREFIX
 cat $WORKDIR/$PREFIX.ragout.recipe
@@ -42,9 +43,9 @@ docker rm -f ragoutpy$PREFIX
 echo $PREFIX Ragout: ragoutpy$PREFIX  stopped
 
 mkdir -p $LOCAL_RESULTDIR/$PREFIX
-cp  $WORKDIR/target_scaffolds.fasta \
-    $WORKDIR/target_unplaced.fasta \
-    > $LOCAL_RESULTDIR/$PREFIX/r${PREFIX}i.fasta
+cp  $WORKDIR/${RAGOUT_TARGET}_scaffolds.fasta  $WORKDIR/r${PREFIX}i.fasta
+cat $WORKDIR/${RAGOUT_TARGET}_unplaced.fasta >> $WORKDIR/r${PREFIX}i.fasta
+mv  $WORKDIR/r${PREFIX}i.fasta $LOCAL_RESULTDIR/$PREFIX/r${PREFIX}i.fasta
 
 #export PYTHONPATH=$PYTHONPATH:/home/shepperp/software/progressiveCactus/submodules
 #ragout.py --threads 8 --outdir /home/shepperp/documents/test/workdir/NCYC22/ragout3 --synteny hal  /home/shepperp/documents/test/workdir/NCYC22/ragout3/NCYC22.ragout.recipe 
