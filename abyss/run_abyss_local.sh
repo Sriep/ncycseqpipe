@@ -8,18 +8,23 @@ declare -r READS1=$2
 declare -r READS2=$3
 
 source $CONFIGFILE
-readonly LOCAL_RESULTDIR
+readonly LOCAL_DATA
+readonly RESULTDIR
+readonly LOCAL_WORKDIR
 readonly READDIR
 readonly ABYSS_KMER
 readonly ABYSS_PROCS
 
 declare -r WORKDIR=$LOCAL_WORKDIR/$PREFIX/abyss-local
+declare -r LOCAL_RESULTDIR=$LOCAL_DATA/$RESULTDIR/$PREFIX
+declare -r LOCAL_READSDIR=$LOCAL_DATA/$READDIR
 mkdir -p $WORKDIR
+mkdir -p $LOCAL_RESULTDIR
 
 echo ABYSS: about to run abyss on $PREFIX
 docker run \
 	--name abysspe$PREFIX  \
-	-v $READDIR:/reads:ro \
+	-v $LOCAL_READSDIR:/reads:ro \
 	-v $WORKDIR:/results \
 	sriep/abyss-pe \
 		k=$ABYSS_KMER \
@@ -30,10 +35,8 @@ echo ABYSS: abyss return code is $?
 docker rm -f abysspe$PREFIX 
 echo ABYSS: abysspe$PREFIX  stopped
 
-mkdir -p $LOCAL_RESULTDIR/$PREFIX
-cp $WORKDIR/$PREFIX-6.fa $LOCAL_RESULTDIR/$PREFIX/ac${PREFIX}i.fasta
-cp $WORKDIR/$PREFIX-8.fa $LOCAL_RESULTDIR/$PREFIX/as${PREFIX}i.fasta
-
+cp $WORKDIR/$PREFIX-6.fa $LOCAL_RESULTDIR/ac${PREFIX}i.fasta
+cp $WORKDIR/$PREFIX-8.fa $LOCAL_RESULTDIR/as${PREFIX}i.fasta
 echo ABYSS: FINISHED!! abysspe$PREFIX FINISHED!!
 # /home/shepperp/datashare/Piers/github/ncycseqpipe/abyss/run_abyss_local.sh NCYC22 NCYC22/NCYC22.FP.fastq NCYC22/NCYC22.RP.fastq 
 #

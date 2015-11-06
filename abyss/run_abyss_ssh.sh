@@ -1,18 +1,41 @@
 #!/bin/bash
-source /home/shepperp/datashare/Piers/github/ncycseqpipe/ncycseqpipe.cfg
-source abyss-1.9.0
-# $1 Prefix e.g. NCYC93
-# $2 First part of the paired end reads, relative to read directory
-# $3 Second part of the paired end reads, relative to read directory
-PREFIX=$1
-READS1=$2
-READS2=$3
-WORKDIR=$SSH_WORKDIR/$PREFIX/abyss-ssh
-RESULTDIR=$SSH_RESULTDIR_PATH/$PREFIX
-mkdir -p $WORKDIR
-mkdir -p $RESULTDIR 
-abyss-pe k=$ABYSS_KMER j=$ABYSS_PROCS name=$WORKDIR in='$READDIR/$READS1 $READDIR/$READS2' 
+# runAbyssLocal.sh
+# $1 Config file
+# $2 Prefix e.g. NCYC93
+# $3 First part of the paired end reads, relative to read directory
+# $4 Second part of the paired end reads, relative to read directory
+declare -r SSH_CONFIGFILE=$1
+declare -r PREFIX=$2
+declare -r READS1=$3
+declare -r READS2=$4
+#Hard conded until I workout how to soft code
+declare HPC_DATA=/nbi/group-data/ifs/NBI/Research-Groups/Jo-Dicks
 
+source hpccore-5
+source abyss-1.9.0
+source $HPC_DATA/$SSH_CONFIGFILE
+readonly SSH_WORKDIR
+readonly READDIR
+readonly ABYSS_KMER
+readonly ABYSS_PROCS
+
+echo $PREFIX SSHABYSS: config file $SSH_CONFIGFILE
+
+declare -r WORKDIR=$HPC_DATA/$RESULTDIR/$PREFIX/abyss-ssh
+declare -r SSH_RESULTDIR=$HPC_DATA/$RESULTDIR/$PREFIX
+declare -r SSH_READSDIR=$HPC_DATA/$READDIR
+mkdir -p $WORKDIR
+mkdir -p $SSH_RESULTDIR
+echo $PREFIX SSHABYSS: resultdirectory 
+
+abyss-pe \
+  k=$ABYSS_KMER \
+  j=$ABYSS_PROCS \
+  name=$WORKDIR/$PREFIX \
+  in="$SSH_READSDIR/$READS1 $SSH_READSDIR/$READS2" 
+
+cp $WORKDIR/$PREFIX-6.fa $SSH_RESULTDIR/ac${PREFIX}i_hpc.fasta
+cp $WORKDIR/$PREFIX-8.fa $SSH_RESULTDIR/as${PREFIX}i_hpc.fasta
 #/home/shepperp/datashare/Piers/github/ncycseqpipe/abyss-1.9.0/runAbyss.sh \
 #		NCYC93 \
 #		NCYC93/NCYC93.FP.fastq \

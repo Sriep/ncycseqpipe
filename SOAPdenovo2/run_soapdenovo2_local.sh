@@ -7,15 +7,20 @@ declare -r PREFIX=$1
 declare -r READS1=$2
 declare -r READS2=$3
 
-# varables used from config file
 source $CONFIGFILE
-readonly LOCAL_RESULTDIR
+readonly LOCAL_DATA
+readonly RESULTDIR
+readonly LOCAL_WORKDIR
 readonly READDIR
 readonly SOAP_KMER
 readonly SOAP_PROCS
 
-declare -r WORKDIR=$LOCAL_WORKDIR/$PREFIX/soapenovo2-local
+declare -r WORKDIR=$LOCAL_WORKDIR/$PREFIX/soapdenova2-local
+declare -r LOCAL_RESULTDIR=$LOCAL_DATA/$RESULTDIR/$PREFIX
+declare -r LOCAL_READSDIR=$LOCAL_DATA/$READDIR
 mkdir -p $WORKDIR
+mkdir -p $LOCAL_RESULTDIR
+
 
 echo $PREFIX SOAP2: about to run soap on strain $PREFIX
 
@@ -34,7 +39,7 @@ echo $PREFIX SOAP2: RUN RUN RUN
 
 docker run \
 	--name soapdenovo2$PREFIX  \
-	-v $READDIR:/reads:ro \
+	-v $LOCAL_READSDIR:/reads:ro \
 	-v $WORKDIR:/results \
 	sriep/soapdenovo2 \
 		  all \
@@ -48,9 +53,8 @@ echo $PREFIX SOAP2: SOAPdenovo2 return code is $?
 docker rm -f soapdenovo2$PREFIX 
 echo $PREFIX SOAP2: soapdenovo2$PREFIX  stopped
 
-mkdir -p $LOCAL_RESULTDIR/$PREFIX
-cp $WORKDIR/$PREFIX.contig $LOCAL_RESULTDIR/$PREFIX/sc${PREFIX}i.fasta
-cp $WORKDIR/$PREFIX.scafSeq $LOCAL_RESULTDIR/$PREFIX/ss${PREFIX}i.fasta
+cp $WORKDIR/$PREFIX.contig $LOCAL_RESULTDIR/sc${PREFIX}i.fasta
+cp $WORKDIR/$PREFIX.scafSeq $LOCAL_RESULTDIR/ss${PREFIX}i.fasta
 
 echo $PREFIX SOAP2: FINISHED!! soapdenovo2$PREFIX FINISHED!!
 # /home/shepperp/datashare/Piers/github/ncycseqpipe/SOAPdenovo2/run_soapdenovo2.sh NCYC22 NCYC22/NCYC22.FP.fastq NCYC22/NCYC22.RP.fastq 

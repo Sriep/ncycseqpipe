@@ -4,9 +4,12 @@ echo runProgressiveCactus.sh
 declare -r PREFIX=$1
 
 source $CONFIGFILE
-readonly LOCAL_RESULTDIR
+readonly LOCAL_DATA
+readonly RESULTDIR
 readonly LOCAL_WORKDIR
+
 declare -r WORKDIR=$LOCAL_WORKDIR/$PREFIX/progressiveCactus
+declare -r LOCAL_RESULTDIR=$LOCAL_DATA/$RESULTDIR/$PREFIX
 mkdir -p $WORKDIR
 
 # Create the pressive cactus configurartion file
@@ -16,7 +19,7 @@ echo $PREFIX "PCacuts: Here is the local result directory $LOCAL_RESULTDIR"
 rm $WORKDIR/$PREFIX.cactus.seq
 touch $WORKDIR/$PREFIX.cactus.seq
 
-for f in $LOCAL_RESULTDIR/$PREFIX/*.fasta; do
+for f in $LOCAL_RESULTDIR/*.fasta; do
   echo $(basename "$f" .fasta) "/results/"`basename $f` >> $WORKDIR/$PREFIX.cactus.seq
 done
 
@@ -25,7 +28,7 @@ cat $WORKDIR/$PREFIX.cactus.seq
 echo $PREFIX PCacuts: Finished sequence file about to run progressiveCactus 
 docker run --name progressivecactus$PREFIX  \
 	-v $WORKDIR:/workdir \
-	-v $LOCAL_RESULTDIR/$PREFIX:/results \
+	-v $LOCAL_RESULTDIR:/results \
 	sriep/progressivecactus \
 		--maxThreads $PCACTUS_THREADS \
 		 /workdir/$PREFIX.cactus.seq \
