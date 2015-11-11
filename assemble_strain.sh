@@ -1,4 +1,4 @@
- #!/bin/bash
+#!/bin/bash
 # $1 Prefix e.g. NCYC93
 # $2 First part of the paired end reads, relative to read directory
 # $3 Second part of the paired end reads, relative to read directory
@@ -6,109 +6,112 @@ declare -r PREFIX=$1
 declare -r READS1=$2
 declare -r READS2=$3
 
-#To Do - tempory these should be inhereited
-#declare -xr SOURCEDIR=/home/shepperp/datashare/Piers/github/ncycseqpipe
-#declare -r INPUTDIR=/home/shepperp/datashare/Piers/github/ncycseqpipeHidden/input
-#declare -xr CONFIGFILE=$INPUTDIR/ncycseqpipe.cfg
+#global varables
 
 source $CONFIGFILE
 readonly HPC_DATA
 readonly LOCAL_DATA
-readonly RESULTDIR
-readonly DO_LOCAL_ABYSS_ASSEMBLY
-readonly DO_SSH_ABYSS_ASSEMBLY
-readonly DO_LOCAL_SOAPDENOVO2_ASSEMBLY
-readonly DO_SSH_SOAPDENOVO2_ASSEMBLY
-readonly DO_WGS
 readonly DO_PCACTUS
 readonly DO_RAGOUT
 
-declare -i ABYSS_BSUBID
+declare -axi BSUBIDS
+declare -axi PIDS
+declare -xr SSH_SOURCEDIR=${HPC_DATA}${SOURCEDIR#$LOCAL_DATA}
+declare -xr SSH_CONFIGFILE=${HPC_DATA}${CONFIGFILE#*$LOCAL_DATA}
+declare -xr SSH_REPORTDIR=$HPC_DATA/$RESULTDIR/$PREFIX/ssh_out
+declare -xr LOCAL_REPORTDIR=$LOCAL_DATA/$RESULTDIR/$PREFIX/ssh_out
 
-echo $PREFIX: source directory $SOURCEDIR
-echo $PREFIX: SSH result path $SSH_RESULTDIR
-echo $PREFIX: Read directory $READDIR
-
-function send_local_assemblies ()
+function send_assemblies ()
 {
-  echo $PREFIX: ------------------------ Local assemblies --------------------
-  echo $PREFIX: ------------------------ Abyss --------------------------------
-  if [[ "$DO_LOCAL_ABYSS_ASSEMBLY" = "true" ]]; then 
-    echo $PREFIX: start abyss local assembly
-    $SOURCEDIR/abyss/run_abyss_local.sh $PREFIX $READS1 $READS2 &
-    PID_ABYSS_LOCAL=$!
-    echo $PREFIX: Abyss local had pid $PID_ABYSS_LOCAL
-  fi
-  echo $PREFIX: ------------------------- SOAPdenovo2 --------------------------
-  if [[ "$DO_LOCAL_SOAPDENOVO2_ASSEMBLY" = true ]]; then 
-    echo $PREFIX: start SOAPdenovo2 local assembly
-    $SOURCEDIR/SOAPdenovo2/run_soapdenovo2_local.sh $PREFIX $READS1 $READS2 &
-    PID_SOAP_LOCAL=$! 
-    echo $PREFIX: SOAPdenovo2 local had pid $PID_SOAP_LOCAL
-  fi
-  echo $PREFIX: ------------------------------- wgs ------------------------
-  if [[ "$DO_WGS" = true ]]; then 
-    echo $PREFIX: start wgs assembly
-    $SOURCEDIR/wgs-8.3rc2/run_wgs.sh $PREFIX $READS1 $READS2 &
-    PID_WGS=$!
-    echo $PREFIX: wgs had pid $PID_WGS
-  fi
-}
 
-function send_ssh_assemblies ()
-{
-  declare -r SSH_SOURCEDIR=${HPC_DATA}${SOURCEDIR#$LOCAL_DATA}
-  declare -xr SSH_CONFIGFILE=${CONFIGFILE#*$LOCAL_DATA}
-  declare -r SSH_REPORTDIR=$HPC_DATA/$RESULTDIR/$PREFIX/ssh_out
+  
   mkdir -p $LOCAL_DATA/$RESULTDIR/$PREFIX/ssh_out
   echo $PREFIX: ssh source directory at $SSH_SOURCEDIR
   echo $PREFIX: ssh configure directory at $SSH_CONFIGFILE
   echo $PREFIX: Made ssh reportdir at $SSH_REPORTDIR
   
-  declare rtv
-  function extract_bsubid_from_rtv ()
+  function send_local_assembly
   {
-    #extract id from Job <131068> is submitted to default queue <NBI-Test128>.
-    #DANGER requires name NBI-Test128 stay at 11 characters!!!
-    rtv=${rtv:5:-47}
+      echo "In send_local_assembly function"
+      declare -ri index=$1
+      $SOURCEDIR/${ASSEMBLER_NAME[$index]}/run_${ASSEMBLER_NAME[$index]}_local.sh \
+        $CONFIGFILE \
+        $PREFIX \
+        $READS1 \
+        $READS2 \
+        ${ASSEMBLER_TAG[$index]} \
+        ${ASSEMBLER_PARAMTERS[$index]}
+      ${PIDS[$index]}=$!
   }
   
-  echo $PREFIX: ----------------------- Remote assemblies --------------------
-  echo $PREFIX: ----------------------- Abyss --------------------------------
-  if [[ "$DO_SSH_ABYSS_ASSEMBLY" = "true" ]]; then 
-    echo $PREFIX: start abyss assembly over ssh link to $SSH_USERID@$SSH_ADDR
+  function send_ssh_asembly
+  {
+    echo "$PREFIX: about to send ssh assembly"
+    declare rtv
+    function extract_bsubid_from_rtv ()
+    {
+      #extract id from Job <131068> is submitted to default queue <NBI-Test128>.
+      #DANGER requires name NBI-Test128 stay at 11 characters!!!
+      rtv=${rtv:5:-47}
+    }
+    
+    declare -ri index=$1
+    echo "$PREFIX: start abyss assembly over ssh link to $SSH_USERID@$SSH_ADDR"
+    echo "output directory $SSH_REPORTDIR"
+    echo "assembly parameters ${ASSEMBLER_PARAMTERS[$index]}"
     rtv=$(  ssh -tt -i $SSH_KEYFILE $SSH_USERID@$SSH_ADDR \
             "bsub \
-              -outdir $SSH_REPORTDIR \
-              $SSH_SOURCEDIR/abyss/run_abyss_ssh.sh \
-                  $SSH_CONFIGFILE $PREFIX $READS1 $READS2" \
+            -o $SSH_REPORTDIR \
+              $SSH_SOURCEDIR/${ASSEMBLER_NAME[$index]}/run_${ASSEMBLER_NAME[$index]}_ssh.sh \
+                $SSH_CONFIGFILE \
+                $PREFIX \
+                $READS1 \
+                $READS2" \
+                ${ASSEMBLER_TAG[$index]} \
+                ${ASSEMBLER_PARAMTERS[$index]} \
          )
-    echo $PREFIX:  Abyss ssh assembly return value $rtv
+    echo "$PREFIX:  Abyss ssh assembly return value $rtv"
     extract_bsubid_from_rtv
-    ABYSS_BSUBID=$rtv
-    echo $PREFIX: Abyss ssh bsub id is $ABYSS_BSUBID
-  fi
-  if [ "$DO_SSH_SOAPDENOVO2_ASSEMBLY" = true ]; then 
-    echo start SOAPdenovo2 assembly over ssh link to $SSH_USERID@$SSH_ADDR
-    rtv=$(  ssh -i $SSH_KEYFILE $SSH_USERID@$SSH_ADDR \
-            "bsub \
-              -o $SSH_REPORTDIR \
-              $SOURCEDIR/SOAPdenovo2/run_soapdenovo2_ssh.sh \
-                $SSH_CONFIGFILE $PREFIX $READS1 $READS2" \
-       )
-       extract_bsubid_from_rtv
-  fi
+    BSUBIDS[$index]=$rtv
+    echo "$PREFIX in send_ssh_asembly : Abyss ssh bsub id is ${BSUBIDS[$index]} with index $index"
+  }
+  
+  for (( i=1; i<=$NUM_ASSMEBLERS; ++i )); do
+    echo "$PREFIX: In assembly loop i=$i"
+    if [[ "${ASSEMBLER_LOCATION[$i]}" = "local" ]]; then
+      send_local_assembly $i
+    else 
+      if [[ "${ASSEMBLER_LOCATION[$i]}" = "ssh" ]]; then 
+        send_ssh_asembly $i
+        echo "$PREFIX in send_assemblies : Abyss ssh bsub id is ${BSUBIDS[$i]} with index $i"
+      fi
+    fi
+  done
 }
 
 function wait_for_assemblies_to_finish ()
 {
+  echo "$PREFIX: in wait_for_assemblies_to_finish  Abyss ssh bsub id is ${BSUBIDS[1]} with index 1"
   echo $PREFIX: ------------------------- Waiting ------------------------------
-  wait $PID_ABYSS_LOCAL $PID_WGS $PID_SOAP_LOCAL
-  while ( ( [[ "$DO_SSH_ABYSS_ASSEMBLY" = true ]] && [[ ! -e $ABYSS_SSH_REPORTFILE ]] ) ); do
-  #		|| ( [[ "$DO_SSH_SOAPDENOVO2_ASSEMBLY" = true ]] && [[ ! -e $SOAP2_SSH_REPORTFILE ]] ) )
-    echo $PREFIX: waiting for SSH assemblies
-    ls $SSH_RESULTDIR_PATH/$PREFIX
-    sleep 30s
+  echo "num assemblers $NUM_ASSMEBLERS"
+  for (( i=1; i<=$NUM_ASSMEBLERS; i++ )); do
+    echo "$PREFIX: In assembly loop i=$i"
+    if [[ "${ASSEMBLER_LOCATION[$i]}" = "local" ]]; then
+      echo "wait for pid ${PIDS[$i]}"
+      wait ${PIDS[$i]}
+    else 
+      if [[ "${ASSEMBLER_LOCATION[$i]}" = "ssh" ]]; then         
+        ABYSS_SSH_REPORTFILE=$LOCAL_REPORTDIR/${BSUBIDS[$i]}.out
+        echo "wait for bsub id ${BSUBIDS[$i]}"
+        echo "look for file $ABYSS_SSH_REPORTFILE"
+        while  [[ ! -e $ABYSS_SSH_REPORTFILE ]]; do 
+          echo "cant find $ABYSS_SSH_REPORTFILE about to sleep for a while"
+          sleep 10s; 
+        done
+        echo "cant found $ABYSS_SSH_REPORTFILE contnuing"
+      fi
+    fi
+    echo "finished waiting for assembly number $i"
   done
   echo $PREFIX: Finished waiting!!!!!!!!!!!!!!!!!!!!
 }
@@ -138,8 +141,9 @@ function do_ragout_assembly ()
 
 function main ()
 {
-  send_local_assemblies
-  send_ssh_assemblies
+  source $SOURCEDIR/get_assemblers.sh
+  send_assemblies
+  echo "$PREFIX: in  main Abyss ssh bsub id is ${BSUBIDS[1]} with index 1"
   echo $PREFIX: Assemblies sent off !!!!!!!!!!!!!!
   wait_for_assemblies_to_finish
   create_hal_database
@@ -155,4 +159,4 @@ main "$@"
 # /home/shepperp/datashare/Piers/github/ncycseqpipe/assemble_strain.sh NCYC22 NCYC22/NCYC22.FP.fastq NCYC22/NCYC22.RP.fastq
 #PREFIX=NCYC22
 #READS1=NCYC22/NCYC22.FP.fastq
-#READS2=NCYC22/NCYC22.RP.fastq
+#READS2=N

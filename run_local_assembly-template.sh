@@ -11,14 +11,7 @@ declare -r PREFIX="$2"
 declare -r READS1="$3"
 declare -r READS2="$4"
 declare -r ASSEMBLY_TAG="$5"
-declare -r PARAMTERS="$6"
-
-echo configfile $CONFIGFILE
-echo prefix $PREFIX
-echo reads1 $READS1
-echo reads2 $READS2
-echo assembly tag $ASSEMBLY_TAG
-echo arguments $PARAMTERS
+declare -r ARGUMENTS="$6"
 
 source $CONFIGFILE
 readonly LOCAL_DATA
@@ -30,30 +23,14 @@ declare -r WORKDIR=$LOCAL_WORKDIR/$PREFIX/$ASSEMBLY_TAG-local
 declare -r LOCAL_READSDIR=$LOCAL_DATA/$READDIR
 mkdir -p $WORKDIR
 
-
 #-------------------------- Assembly specific code here --------------------
-
-echo ABYSS: about to run local abyss on $PREFIX
-
-declare -a args
-IFS=' ' read -ra args <<< "$PARAMTERS"
-echo "arguments ${args[@]/#/}"
-#${args[@]/#/}
-docker run \
-	--name abysspe$PREFIX  \
-	-v $LOCAL_READSDIR:/reads:ro \
-	-v $WORKDIR:/results \
-	sriep/abyss-pe \
-		k=${args[0]} j=${args[1]} \
-		name=/results/$PREFIX \
-		in="/reads/$READS1 /reads/$READS2"
-echo ABYSS: abyss return code is $?
-docker rm -f abysspe$PREFIX 
-echo ABYSS: abysspe$PREFIX  stopped
+#Example below
+docker --name myassemblername run my_assembler $ARGUMENTS $WORKDIR $READS1 $READS2
+docker rm -f myassemblername
 
 #Give location of result files
-CONTIGS=$WORKDIR/$PREFIX-6.fa
-SCAFFOLDS=$WORKDIR/$PREFIX-8.fa
+CONTIGS=$WORKDIR/contigs.fasta
+SCAFFOLDS=$WORKDIR/scaffolds.fasta
 #-------------------------- Assembly specific code here --------------------
 
 declare -r LOCAL_RESULTDIR=$LOCAL_DATA/$RESULTDIR/$PREFIX
@@ -61,11 +38,3 @@ mkdir -p $LOCAL_RESULTDIR
 cp $CONTIGS $LOCAL_RESULTDIR/${ASSEMBLY_TAG}c${PREFIX}i.fasta
 cp $SCAFFOLDS $LOCAL_RESULTDIR/${ASSEMBLY_TAG}s${PREFIX}i.fasta
 echo `basename "$0"`: FINISHED!! FINISHED!!
-
-declare  CONFIGFILE=/home/shepperp/datashare/Piers/github/ncycseqpipeHidden/input/ncycseqpipe.cfg
-declare SSH_CONFIGFILE
-declare  PREFIX=NCYC22
-declare  READS1=/NCYC22/NCYC22.FP.fastq
-declare  READS2=/NCYC22/NCYC22.RP.fastq
-declare  ASSEMBLY_TAG=a
-declare  PARAMTERS=k=80 j=10

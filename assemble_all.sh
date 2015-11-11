@@ -13,15 +13,20 @@ echo all: "read in config file from $CONFIGFILE"
 
 source $CONFIGFILE
 readonly ILLUMINA_READS
+readonly ASSEMBLERS_FILE
 echo all: "Illumina reads from $ILLUMINA_READS"
+
+
 
 if [[ $ILLUMINA_READS ]]; then
   while read col1 col2 col3; do
-    echo -ne "all: About to assemble  name $col1 \tread1 $col2 \tread2 $col3"
+    echo -e "all: About to assemble  name $col1 \tread1 $col2 \tread2 $col3"
+    echo "all: about to run $SOURCEDIR/assemble_strain.sh $col1 $col2 $col3 &"
     $SOURCEDIR/assemble_strain.sh $col1 $col2 $col3 &
   done < $ILLUMINA_READS
 fi
 echo all : "Sent of all strains to be assembled."
+
 # /home/shepperp/datashare/Piers/github/ncycseqpipe/assemble_all.sh ncycseqpipe.cfg
 #
 # /home/shepperp/datashare/Piers/github/ncycseqpipe/assemble_all.sh     /home/shepperp/datashare/Piers/github/ncycseqpipeHidden/input/ncycseqpipe.cfg
