@@ -11,14 +11,17 @@ declare -r PREFIX="$2"
 declare -r READS1="$3"
 declare -r READS2="$4"
 declare -r ASSEMBLY_TAG="$5"
-declare -r PARAMTERS="$6"
+#declare -r PARAMTERS="$6"
+#strip quotes
+declare -r PARAMTERS=$(echo "$6" | sed -s "s/^\(\(\"\(.*\)\"\)\|\('\(.*\)'\)\)\$/\\3\\5/g")
+echo "just striped quotes $PARAMTERS"
 
-echo configfile $CONFIGFILE
-echo prefix $PREFIX
-echo reads1 $READS1
-echo reads2 $READS2
-echo assembly tag $ASSEMBLY_TAG
-echo arguments $PARAMTERS
+echo run_local_abyss configfile $CONFIGFILE
+echo run_local_abyss prefix $PREFIX
+echo run_local_abyss reads1 $READS1
+echo run_local_abyss reads2 $READS2
+echo run_local_abyss assembly tag $ASSEMBLY_TAG
+echo run_local_abyss arguments $PARAMTERS
 
 source $CONFIGFILE
 readonly LOCAL_DATA
@@ -39,12 +42,13 @@ declare -a args
 IFS=' ' read -ra args <<< "$PARAMTERS"
 echo "arguments ${args[@]/#/}"
 #${args[@]/#/}
+#k=${args[0]} j=${args[1]} 
 docker run \
 	--name abysspe$PREFIX  \
 	-v $LOCAL_READSDIR:/reads:ro \
 	-v $WORKDIR:/results \
 	sriep/abyss-pe \
-		k=${args[0]} j=${args[1]} \
+		$PARAMTERS \
 		name=/results/$PREFIX \
 		in="/reads/$READS1 /reads/$READS2"
 echo ABYSS: abyss return code is $?

@@ -3,13 +3,13 @@ declare -ax METRIC_NAME
 declare -ax METRIC_LOCATION
 declare -ax METRIC_TAG
 declare -ax METRIC_PARAMTERS
-declare -xi NUM_ASSMEBLERS=0
+declare -xi NUM_METRICS=0
 
 if [[ -n "METRICS_FILE" ]]; then
   while read col1 col2 col3 col4; do 
     echo -e "METRIC $col1 \tlocation $col2 \ttag $col3 \tparamter $col4"
-    NUM_ASSMEBLERS=$(($NUM_ASSMEBLERS + 1 ))
-    echo "num of METRICs $NUM_ASSMEBLERS"
+    NUM_METRICS=$(($NUM_METRICS + 1 ))
+    echo "num of METRICs $NUM_METRICS"
     METRIC_NAME[NUM_METRICS]=$col1
     METRIC_LOCATION[NUM_METRICS]=$col2
     METRIC_TAG[NUM_METRICS]=$col3
