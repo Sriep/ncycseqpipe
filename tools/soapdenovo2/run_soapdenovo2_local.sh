@@ -1,33 +1,16 @@
 #!/bin/bash
-# runSOAPdenova2.sh
-# $1 Prefix e.g. NCYC93
-# $2 First part of the paired end reads, relative to read directory
-# $3 Second part of the paired end reads, relative to read directory
-declare -r PREFIX=$1
-declare -r READS1=$2
-declare -r READS2=$3
+declare -xr SOURCEDIR="$(dirname $BASH_SOURCE)/.."
+source $SOURCEDIR/local_header.sh
 
-source $CONFIGFILE
-readonly LOCAL_DATA
-readonly RESULTDIR
-readonly LOCAL_WORKDIR
-readonly READDIR
-readonly SOAP_KMER
-readonly SOAP_PROCS
-
-declare -r WORKDIR=$LOCAL_WORKDIR/$PREFIX/soapdenova2-local
-declare -r LOCAL_RESULTDIR=$LOCAL_DATA/$RESULTDIR/$PREFIX
-declare -r LOCAL_READSDIR=$LOCAL_DATA/$READDIR
-mkdir -p $WORKDIR
-mkdir -p $LOCAL_RESULTDIR
+#-------------------------- Assembly specific code here --------------------
 
 
 echo $PREFIX SOAP2: about to run soap on strain $PREFIX
 
 rm $WORKDIR/config_file
 touch $WORKDIR/config_file
-cat $SOURCEDIR/SOAPdenovo2/soap_config_head.txt >> $WORKDIR/config_file
-cat $SOURCEDIR/SOAPdenovo2/soap_config_lib_head.txt >> $WORKDIR/config_file
+cat $SOURCEDIR/soapdenovo2/soap_config_head.txt >> $WORKDIR/config_file
+cat $SOURCEDIR/soapdenovo2/soap_config_lib_head.txt >> $WORKDIR/config_file
 echo q1=/reads/$READS1 >> $WORKDIR/config_file
 echo q2=/reads/$READS2 >> $WORKDIR/config_file
 
@@ -53,8 +36,9 @@ echo $PREFIX SOAP2: SOAPdenovo2 return code is $?
 docker rm -f soapdenovo2$PREFIX 
 echo $PREFIX SOAP2: soapdenovo2$PREFIX  stopped
 
-cp $WORKDIR/$PREFIX.contig $LOCAL_RESULTDIR/sc${PREFIX}i.fasta
-cp $WORKDIR/$PREFIX.scafSeq $LOCAL_RESULTDIR/ss${PREFIX}i.fasta
+#Give location of result files
+CONTIGS=$WORKDIR/$PREFIX.contig
+SCAFFOLDS=$WORKDIR/$PREFIX.scafSeq
+#-------------------------- Assembly specific code here --------------------
 
-echo $PREFIX SOAP2: FINISHED!! soapdenovo2$PREFIX FINISHED!!
-# /home/shepperp/datashare/Piers/github/ncycseqpipe/SOAPdenovo2/run_soapdenovo2.sh NCYC22 NCYC22/NCYC22.FP.fastq NCYC22/NCYC22.RP.fastq 
+source $SOURCEDIR/ssh_footer.sh

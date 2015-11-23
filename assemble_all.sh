@@ -5,7 +5,7 @@ declare -xr HPC_CONFIGFILE=$2
 # Set sorce directory to be the directory where this file is stored, the
 # assumption is that the companion scripts are stored in the same directory  
 # structure as found at https://github.com/Sriep/ncycseqpipe.git
-declare -xr SOURCEDIR=`dirname "$BASH_SOURCE"`
+declare -xr SOURCEDIR=$(dirname "$BASH_SOURCE")
 
 echo all: "working directory is $PWD"
 echo all: "source directory is $SOURCEDIR"
@@ -19,11 +19,11 @@ echo all: "Illumina reads from $ILLUMINA_READS"
 
 
 if [[ $ILLUMINA_READS ]]; then
-  while read col1 col2 col3; do
+  while read -r col1 col2 col3; do
     echo -e "all: About to assemble  name $col1 \tread1 $col2 \tread2 $col3"
     echo "all: about to run $SOURCEDIR/assemble_strain.sh $col1 $col2 $col3 &"
-    $SOURCEDIR/assemble_strain.sh $col1 $col2 $col3 &
-  done < $ILLUMINA_READS
+    "$SOURCEDIR/assemble_strain.sh" $col1 $col2 $col3 &
+  done < "$ILLUMINA_READS"
 fi
 echo all : "Sent of all strains to be assembled."
 

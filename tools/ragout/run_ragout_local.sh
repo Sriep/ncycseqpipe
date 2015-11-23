@@ -1,7 +1,6 @@
 #!/bin/bash
-echo runPRagpit.sh
-# $1 Prefix e.g. NCYC93
-declare -r PREFIX=$1
+declare -r CONFIGFILE=$1
+declare -r PREFIX=$2
 
 source $CONFIGFILE
 readonly LOCAL_DATA
