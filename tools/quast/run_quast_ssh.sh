@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/bash 
 # 
 # $1 Config file
 # $2 Prefix e.g. NCYC93

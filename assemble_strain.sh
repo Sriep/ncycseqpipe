@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/bash -e
 # $1 Prefix e.g. NCYC93
 # $2 First part of the paired end reads, relative to read directory
 # $3 Second part of the paired end reads, relative to read directory
@@ -24,7 +24,6 @@ declare -ax TOOL_LOCATION
 declare -ax TOOL_TAG
 declare -ax TOOL_PARAMTERS
 declare -xi num_tools=0
-declare -xi num_tools_this_pass=0
 
 function display_tool_array ()
 {
@@ -32,6 +31,7 @@ function display_tool_array ()
   for (( i=0 ; i <= "$num_tools" ; ++i )); do       
     echo -e "index $i \ttype  ${TOOL_TYPE[$i]} \tname ${TOOL_NAME[$i]} \tlocation ${TOOL_LOCATION[$i]} \ttag ${TOOL_TAG[$i]} \tparameters ${TOOL_PARAMTERS[$i]}"
   done
+  echo finish display_tool_array
 }
 
 function send_tools ()
@@ -60,7 +60,7 @@ function send_tools ()
         "$PARALLEL"
       PIDS[$index]="${PIDS[$index]} $!"
       echo "send_local_assembly pids ${PIDS[$index]}"
-      echo num of tools is currently $num_tools
+      echo num of tools is currently $end_tool
       echo end of send_local_tool endo fo send_local_tool
   }
   
@@ -81,7 +81,7 @@ function send_tools ()
     
     echo "$TOOLPREFIX: start assembly over ssh link to $SSH_USERID@$SSH_ADDR"
     echo "output directory $SSH_REPORTDIR"
-    echo "assembly parameters ${ASSEMBLER_PARAMTERS[$index]}"
+    echo "assembly parameters ${TOOL_PARAMTERS[$index]}"
     rtv=$(  ssh -tt -i "$SSH_KEYFILE" "$SSH_USERID@$SSH_ADDR" \
             bsub \
             -o "$SSH_REPORTDIR" \
@@ -94,8 +94,9 @@ function send_tools ()
                 ${TOOL_PARAMTERS[$index]}" \
          )
     echo "$TOOLPREFIX:  ssh assembly return value $rtv"
-    echo num of tools is currently $num_tools
+    echo num of tools is currently $end_tool
     extract_bsubid_from_rtv
+    echo in send_ssh_tool just got bsubnumber from rtv it is "$rtv"
     BSUBIDS[$index]="${BSUBIDS[$index]} $rtv"
     echo "$TOOLPREFIX in send_ssh_asembly : ssh bsub id is ${BSUBIDS[$index]} with index $index"
     echo end of send_ssh_tool end of send_ssh_tool
@@ -105,28 +106,34 @@ function send_tools ()
   {
     prfix=$1
     index=$2
+    echo send tools to finsih para1 $1 and para2 $2
     echo "$prfix send_tools: In assembly loop i=$index tool is ${TOOL_NAME[$index]}"
     if [[ "${TOOL_LOCATION[$index]}" = local ]]; then
       send_local_tool "$prfix" $index
     else 
       if [[ "${TOOL_LOCATION[$index]}" = ssh ]]; then 
         send_ssh_tool "$prfix" $index
-        echo "$prfix" in send_tools : ssh bsub id is "${BSUBIDS[$index]}" with index $index
+        echo "$prfix in send_tools : ssh bsub id is ${BSUBIDS[$index]} with index $index"
       fi
     fi
-    echo END of send_tool END of send_tool END of send_tool END of send_tool
+    echo "END of send_tool END of send_tool END of send_tool END of send_tool"
   }
   
-  echo before send local tools
+  echo start of send tools
   display_tool_array
   
   # $1 The number of tools to run in this pass
-  declare start_tool=$(($num_tools - $1 ))
-  echo "for (( i=$start_tool ; i <= $num_tools ; ++i )); do"
-  for (( i="$start_tool" ; i <= "$num_tools" ; ++i )); do
-    if [[ "$TOOL_TYPE[$i]" == $METRIC ]]; then
-      for f in $LOCAL_RESULTDIR/*.fasta; do 
-        assembly=$(basename $f .fasta)
+  # $2 The position of the send and wait tool
+  echo send tools para1 $1 and para2 $2
+  declare -i end_tool="$2"
+  declare -i start_tool=$(($end_tool - $1 ))
+  echo send tools para1 $1 and para2 $2 "end tool $end_tool start tool $start_tool"
+
+  echo "for (( i=$start_tool ; i <= $end_tool ; ++i )); do"
+  for (( i="$start_tool" ; i <= "$end_tool" ; ++i )); do
+    if [[ "$TOOL_TYPE[$i]" == "$METRIC" ]]; then
+      for f in "$LOCAL_RESULTDIR"/*.fasta; do 
+        assembly=$(basename "$f" .fasta)
         echo "$PREFIX: TOOL_NAME[$i] metric for $f"
         send_tool "$PREFIX/$assembly" $i
       done
@@ -143,12 +150,18 @@ function send_tools ()
 function wait_for_tools_to_finish ()
 {
   # $1 The number of tools to run in this pass
-  declare start_tool=$(($num_tools - $1 ))
+  # $2 The position of the send and wait tool
+  echo wait for tools to finsih para1 $1 and para2 $2
+  declare end_tool=$2
+  declare start_tool=$(( $end_tool - $1 ))
+  echo wait for tools to finsih para1 $1 and para2 $2
+
   
   echo "$PREFIX: in wait_for_assemblies_to_finish  ssh bsub id is ${BSUBIDS[1]} with index 1"
   echo "$PREFIX: ------------------------- Waiting ------------------------------"
-  echo "num assemblers $NUM_ASSEMBLERS"
-  for (( i=$start_tool; i<$num_tools; ++i )); do
+  echo "num assemblers $num_tools"
+  echo for loop is "for (( i=$start_tool ; i < $end_tool ; ++i )); do"
+  for (( i="$start_tool" ; i < "$end_tool" ; ++i )); do
     echo "$PREFIX: In assembly loop i=$i"
     if [[ "${TOOL_LOCATION[$i]}" = local ]]; then
       echo "wait for pid ${PIDS[$i]}"
@@ -172,43 +185,67 @@ function wait_for_tools_to_finish ()
 
 function parse_recipe_file ()
 {
-  while read -r col1 col2 col3 col4 col5; do 
-    echo -e "parse_recipe_file data: type $col1 $col2 \tlocation $col3 \ttag $col4 \tparamter $col5 "
-    echo "parse_recipe_file num of assemblers $num_tools"
-    case "$col1" in
-      "$SEND_AND_WAIT" )
-        echo "parse_recipe_file: case send_and_wait"
-        num_tools=$(($num_tools + 1 ))
-        TOOL_NAME[num_tools]="send and wait"
-        echo "about to call send_tools $num_tools_this_pass"
-        send_tools $num_tools_this_pass
-        echo "about to call wait_for_tools_to_finish $num_tools_this_pass"
-        wait_for_tools_to_finish $num_tools_this_pass
-        num_tools_this_pass=0
-        echo "finsihed send and wait"
-        echo
-        ;;
-      \#* | "" )
-        echo "parse_recipe_file case commeted out line"
-        ;;
-      $ASDEMBLER | $METRIC )
-        echo "parse_recipe_file case assembler tool $col1 added to list"
-        num_tools=$(($num_tools + 1 ))
-        num_tools_this_pass=$(($num_tools_this_pass + 1 ))
-        TOOL_TYPE[num_tools]=$col1
-        TOOL_NAME[num_tools]=$col2
-        TOOL_LOCATION[num_tools]=$col3
-        TOOL_TAG[num_tools]=$col4
-        TOOL_PARAMTERS[num_tools]=$col5        
-        ;;
-      *)
-        echo "parse_recipe_file unrecognised entry ignore line" 
-        ;;
-    esac
-    echo "parse_recipe_file done onto next line"
-    echo
-  done < "$RECIPEFILE"
-  echo "parse_recipe_file finshed file"
+  function read_recipe_file ()
+  {
+    declare -i num_tools_this_pass=0
+    while read -r col1 col2 col3 col4 col5; do 
+      echo -e "parse_recipe_file data: type $col1 $col2 \tlocation $col3 \ttag $col4 \tparamter $col5 "
+      echo "parse_recipe_file num of assemblers $num_tools"
+      case "$col1" in
+        "$SEND_AND_WAIT" )
+          echo "parse_recipe_file: case send_and_wait"
+          num_tools=$(($num_tools + 1 ))
+          TOOL_TYPE[num_tools]="$SEND_AND_WAIT"
+          TOOL_PARAMTERS[num_tools]=$num_tools_this_pass
+          num_tools_this_pass=0
+          ;;
+        \#* | "" )
+          echo "parse_recipe_file case commeted out line"
+          ;;
+        $ASDEMBLER | $METRIC )
+          echo "parse_recipe_file case assembler tool $col1 added to list"
+          num_tools=$(($num_tools + 1 ))
+          num_tools_this_pass=$(($num_tools_this_pass + 1 ))
+          TOOL_TYPE[num_tools]=$col1
+          TOOL_NAME[num_tools]=$col2
+          TOOL_LOCATION[num_tools]=$col3
+          TOOL_TAG[num_tools]=$col4
+          TOOL_PARAMTERS[num_tools]=$col5        
+          ;;
+        *)
+          echo "parse_recipe_file unrecognised entry ignore line" 
+          ;;
+      esac
+      echo "parse_recipe_file done onto next line"
+      echo
+    done < "$RECIPEFILE"
+    echo "parse_recipe_file finshed file"
+  }
+  
+  function run_recipie_file ()
+  {
+    local recipie_line
+    echo start of run_recipie_file
+    echo for loop in run recipie file is " for (( recipie_line=1; recipie_line<="$num_tools"; ++recipie_line )); do"
+    for (( recipie_line=1; recipie_line<="$num_tools"; ++recipie_line )); do
+      if [[  "${TOOL_TYPE[$recipie_line]}" = $SEND_AND_WAIT ]]; then
+        echo about to call send_tools, paramters ${TOOL_PARAMTERS[$recipie_line]} index $recipie_line
+        send_tools ${TOOL_PARAMTERS[$recipie_line]} $recipie_line
+        echo about to call wait_for_tools_to_finish, paramters ${TOOL_PARAMTERS[$recipie_line]} index $recipie_line
+        wait_for_tools_to_finish ${TOOL_PARAMTERS[$recipie_line]} $recipie_line
+      fi
+      echo run_recipie_file for loop index $recipie_line num tools $num_tools
+      sleep 10s
+    done
+    echo finshied run_recipie_file
+  }
+  
+  read_recipe_file
+  echo just left read_recipe_file abotu to call display_tool_array
+  display_tool_array
+  echo just left display_tool_array about to call run_recipie_file
+  run_recipie_file
+  echo just left run_recipie_file
 }
 
 function main ()
