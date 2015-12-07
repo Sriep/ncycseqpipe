@@ -5,12 +5,21 @@ source hpccore-5
 source SOAPdenovo2-r240
 declare -xr SOURCEDIR="$(dirname $BASH_SOURCE)/.."
 source $SOURCEDIR/ssh_header.sh
-
+# PREFIX - Name of strain to assemble
+# READS1 - First set of paired end reads, relative to $LOCAL_READSDIR
+# READS2 - Second set of paired end reads, relative to $LOCAL_READSDIR
+# TOOL_TAG - Tag to indicate the output from this tool
+# PARAMETERS - Data used to paramatirse this tool
+#
+# WORKDIR - Directory in which to put tempory work files
+# READSDIR - Directory where paired end reads are located
 #-------------------------- Assembly specific code here --------------------
 echo SOAPdenvo2 ssh: about to run ssh soapdenovo2 on $PREFIX
 
-rm $WORKDIR/config_file
-touch $WORKDIR/config_file
+#rm $WORKDIR/config_file
+#touch $WORKDIR/config_file
+
+> $WORKDIR/config_file
 cat $SOURCEDIR/soapdenovo2/soap_config_head.txt >> $WORKDIR/config_file
 cat $SOURCEDIR/soapdenovo2/soap_config_lib_head.txt >> $WORKDIR/config_file
 echo q1=$SSH_READSDIR/$READS1 >> $WORKDIR/config_file
@@ -19,7 +28,7 @@ echo q2=$SSH_READSDIR/$READS2 >> $WORKDIR/config_file
 echo $PREFIX SOAP2: soapdenovo2 config file follows
 cat $WORKDIR/config_file
 echo $PREFIX SOAP2: Finished soapdenovo2 config file 
-
+echo workdir $WORKDIR
 echo $PREFIX SOAP2: RUN RUN RUN
 
 SOAPdenovo-127mer \
@@ -34,5 +43,4 @@ SOAPdenovo-127mer \
 CONTIGS=$WORKDIR/$PREFIX.contig
 SCAFFOLDS=$WORKDIR/$PREFIX.scafSeq
 #-------------------------- Assembly specific code here --------------------
-
 source $SOURCEDIR/ssh_footer.sh

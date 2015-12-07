@@ -15,7 +15,7 @@ function send_tools ()
       echo "In send_local_assembly function tool name ${TOOL_NAME[$index]}"
       echo send the tag "${TOOL_TAG[$index]}"
       echo "send the parmeters ${TOOL_PARAMTERS[$index]}"
-      "$SOURCEDIR/tools/${TOOL_NAME[$index]}/run_${TOOL_NAME[$index]}_local.sh" \
+      $SOURCEDIR/tools/${TOOL_NAME[$index]}/run_${TOOL_NAME[$index]}_local.sh \
         "$CONFIGFILE" \
         "$TOOLPREFIX" \
         "$READS1" \
@@ -23,8 +23,13 @@ function send_tools ()
         "${TOOL_TAG[$index]}" \
         "${TOOL_PARAMTERS[$index]}" \
         "$PARALLEL"
-      PIDS[$index]="${PIDS[$index]} $!"
-      echo "send_local_assembly pids ${PIDS[$index]}"
+      set +u; process_num=$!; set -u
+      if [[ -n "$process_num" ]]; then
+        process_num=$!
+        echo process number is $process_num
+        PIDS[$index]="${PIDS[$index]} $process_num"
+        echo "send_local_assembly pids ${PIDS[$index]}"
+      fi
       echo num of tools is currently $end_tool
       echo end of send_local_tool endo fo send_local_tool
   }
@@ -62,7 +67,10 @@ function send_tools ()
     echo num of tools is currently $end_tool
     extract_bsubid_from_rtv
     echo in send_ssh_tool just got bsubnumber from rtv it is "$rtv"
+    apple="${BSUBIDS[$index]} $rtv"
+    echo apple is $apple bsub is ${BSUBIDS[$index]}
     BSUBIDS[$index]="${BSUBIDS[$index]} $rtv"
+    echo after being set bsubids is ${BSUBIDS[$index]}
     echo "$TOOLPREFIX in send_ssh_asembly : ssh bsub id is ${BSUBIDS[$index]} with index $index"
     echo end of send_ssh_tool end of send_ssh_tool
   }
@@ -94,18 +102,24 @@ function send_tools ()
   declare -i start_tool=$(($end_tool - $1 ))
   echo send tools para1 $1 and para2 $2 "end tool $end_tool start tool $start_tool"
 
-  echo "for (( i=$start_tool ; i <= $end_tool ; ++i )); do"
-  for (( i="$start_tool" ; i <= "$end_tool" ; ++i )); do
-    if [[ "$TOOL_TYPE[$i]" == "$METRIC" ]]; then
+  echo "for (( stool=$start_tool ; stool <= $end_tool ; ++stool )); do"
+  for (( stool="$start_tool" ; stool <= "$end_tool" ; ++stool )); do
+    PIDS[$stool]=
+    BSUBIDS[$stool]=
+    if [[ "${TOOL_TYPE[$stool]}" == "$METRIC" ]]; then
       for f in "$LOCAL_RESULTDIR"/*.fasta; do 
-        assembly=$(basename "$f" .fasta)
-        echo "$PREFIX: TOOL_NAME[$i] metric for $f"
-        send_tool "$PREFIX/$assembly" $i
+        assembly=$(basename "$f" .fasta)        
+        echo "$PREFIX: TOOL_NAME[$stool] metric for $f"
+        echo before before send tool metric for assembley "$f" bsub is now "${BSUBIDS[$stool]}"
+        send_tool "$PREFIX/$assembly" $stool
+        echo after after send tool metric for assembley "$f" bsub is now "${BSUBIDS[$stool]}"
       done
     else
-      send_tool "$PREFIX" $i
+      if [[ "${TOOL_TYPE[$stool]}" == "$ASDEMBLER" ]]; then 
+        send_tool "$PREFIX" $stool
+      fi
     fi
-    echo in send local tools for loop with index = $i
+    echo in send local tools for loop with index = $stool
   done
   echo after send local tools
   display_tool_array

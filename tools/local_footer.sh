@@ -1,5 +1,13 @@
-declare -r LOCAL_RESULTDIR=$LOCAL_DATA/$RESULTDIR/$PREFIX
-mkdir -p $LOCAL_RESULTDIR
-cp $CONTIGS $LOCAL_RESULTDIR/${ASSEMBLY_TAG}c${PREFIX}i.fasta
-cp $SCAFFOLDS $LOCAL_RESULTDIR/${ASSEMBLY_TAG}s${PREFIX}i.fasta
+if [[ -n "$CONTIGS " ]]; then 
+  cp $CONTIGS $LOCAL_RESULTDIR/${TOOL_TAG}c${PRFIX_STUB}i.fasta; 
+fi
+if [[ -n "$SCAFFOLDS " ]]; then
+  cp $SCAFFOLDS $LOCAL_RESULTDIR/${TOOL_TAG}s${PRFIX_STUB}i.fasta
+fi
+if [[ -n "$METRICS " ]]; then
+  cp $METRICS $LOCAL_RESULTDIR/m_${PRFIX_STUB}_${TOOL_TAG}
+fi
 echo `basename "$0"`: FINISHED!! FINISHED!!
+
+#METRICS_CSV=$WORKDIR/out.txt
+

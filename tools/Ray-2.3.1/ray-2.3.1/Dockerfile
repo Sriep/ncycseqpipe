@@ -4,7 +4,10 @@ MAINTAINER Piers Shepperson
 RUN sudo apt-get update && sudo apt-get install -y \
 								libopenmpi-dev \
 								openmpi-bin \
-								wget 
+								wget \
+								libcr-dev \
+								mpich2 \
+								mpich2-doc \
 RUN wget http://sourceforge.net/projects/denovoassembler/files/Ray-2.3.1.tar.bz2/download -O Ray-2.3.1.tar.bz2
 RUN bzip2 Ray-2.3.1.tar.bz2 | tar -xf -
 make PREFIX=ray-build

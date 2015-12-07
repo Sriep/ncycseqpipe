@@ -1,0 +1,5 @@
+    [
+      {
+        orientation: "fr",
+        type: "paired-end",
+        right reads: [

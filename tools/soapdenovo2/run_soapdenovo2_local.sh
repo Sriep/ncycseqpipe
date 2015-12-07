@@ -7,8 +7,7 @@ source $SOURCEDIR/local_header.sh
 
 echo $PREFIX SOAP2: about to run soap on strain $PREFIX
 
-rm $WORKDIR/config_file
-touch $WORKDIR/config_file
+> $WORKDIR/config_file
 cat $SOURCEDIR/soapdenovo2/soap_config_head.txt >> $WORKDIR/config_file
 cat $SOURCEDIR/soapdenovo2/soap_config_lib_head.txt >> $WORKDIR/config_file
 echo q1=/reads/$READS1 >> $WORKDIR/config_file
@@ -22,7 +21,7 @@ echo $PREFIX SOAP2: RUN RUN RUN
 
 docker run \
 	--name soapdenovo2$PREFIX  \
-	-v $LOCAL_READSDIR:/reads:ro \
+	-v $READSDIR:/reads:ro \
 	-v $WORKDIR:/results \
 	sriep/soapdenovo2 \
 		  all \

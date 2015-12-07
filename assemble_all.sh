@@ -1,8 +1,7 @@
-#!/bin/bash -e
+#!/bin/bash -eu
 #
 
 declare -xr CONFIGFILE=$1
-declare -xr HPC_CONFIGFILE=$2
 # Set sorce directory to be the directory where this file is stored, the
 # assumption is that the companion scripts are stored in the same directory  
 # structure as found at https://github.com/Sriep/ncycseqpipe.git

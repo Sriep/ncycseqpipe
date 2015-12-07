@@ -7,8 +7,6 @@ function wait_for_tools_to_finish ()
   declare start_tool=$(( $end_tool - $1 ))
   echo wait for tools to finsih para1 $1 and para2 $2
 
-  
-  echo "$PREFIX: in wait_for_assemblies_to_finish  ssh bsub id is ${BSUBIDS[1]} with index 1"
   echo "$PREFIX: ------------------------- Waiting ------------------------------"
   echo "num assemblers $num_tools"
   echo for loop is "for (( i=$start_tool ; i < $end_tool ; ++i )); do"
@@ -16,17 +14,22 @@ function wait_for_tools_to_finish ()
     echo "$PREFIX: In assembly loop i=$i"
     if [[ "${TOOL_LOCATION[$i]}" = local ]]; then
       echo "wait for pid ${PIDS[$i]}"
-      wait "${PIDS[$i]}"
+      if [[ -n "${PIDS[$i]}" ]]; then wait "${PIDS[$i]}"; fi
     else 
-      if [[ "${TOOL_LOCATION[$i]}" = ssh ]]; then         
-        MY_SSH_REPORTFILE=$LOCAL_REPORTDIR/${BSUBIDS[$i]}.out
-        echo "wait for bsub id ${BSUBIDS[$i]}"
-        echo "look for file $MY_SSH_REPORTFILE"
-        while  [[ ! -e $MY_SSH_REPORTFILE ]]; do 
-          echo "cant find $MY_SSH_REPORTFILE about to sleep for a while"
-          sleep "$SLEEP_TIME" 
+      if [[ "${TOOL_LOCATION[$i]}" = ssh ]]; then 
+        IFS=' ' read -ra bids <<< "${BSUBIDS[$i]}"
+        echo "for loop ssh for (( id=0 ; id < ${#bids[@]} ; ++id )); do"
+        for (( id=0 ; id < ${#bids[@]} ; ++id )); do
+          reportfile=$LOCAL_REPORTDIR/${bids[$id]}.out
+          echo "wait for bsub id ${bids[$id]}"
+          echo "look for file $reportfile"
+          while  [[ ! -e $reportfile ]]; do 
+            echo "cant find $reportfile about to sleep for a while"
+            sleep "$SLEEP_TIME" 
+          done
+          cp $reportfile $LOCAL_REPORTDIR/${PREFIX}_${TOOL_NAME[$i]}.out
+          echo "found $reportfile contnuing"
         done
-        echo "cant found $MY_SSH_REPORTFILE contnuing"
       fi
     fi
     echo "finished waiting for tool number $i"
