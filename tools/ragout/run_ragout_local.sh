@@ -1,4 +1,4 @@
-#!/bin/bash -u
+#!/bin/bash
 # 
 declare -xr SOURCEDIR="$(dirname $BASH_SOURCE)/.."
 source $SOURCEDIR/local_header.sh

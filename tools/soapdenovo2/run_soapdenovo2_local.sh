@@ -40,4 +40,4 @@ CONTIGS=$WORKDIR/$PREFIX.contig
 SCAFFOLDS=$WORKDIR/$PREFIX.scafSeq
 #-------------------------- Assembly specific code here --------------------
 
-source $SOURCEDIR/ssh_footer.sh
+source $SOURCEDIR/local_footer.sh

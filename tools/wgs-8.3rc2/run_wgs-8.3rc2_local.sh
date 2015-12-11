@@ -1,7 +1,8 @@
-#!/bin/bash -u
+#!/bin/bash 
 # 
 declare -xr SOURCEDIR="$(dirname $BASH_SOURCE)/.."
 source $SOURCEDIR/local_header.sh
+PROGNAME=$(basename $0)
 # PREFIX - Name of strain to assemble
 # READS1 - First set of paired end reads, relative to $LOCAL_READSDIR
 # READS2 - Second set of paired end reads, relative to $LOCAL_READSDIR
@@ -11,7 +12,7 @@ source $SOURCEDIR/local_header.sh
 # WORKDIR - Directory in which to put tempory work files
 # READSDIR - Directory where paired end reads are located
 #-------------------------- Assembly specific code here --------------------
-echo about to run fastqToCA
+debug_msg  ${LINENO}  "about to run fastqToCA"
 docker run --name fastqToCA$PREFIX \
                 -v $READSDIR:/reads:ro \
                 --entrypoint="fastqToCA" \
@@ -22,18 +23,19 @@ docker run --name fastqToCA$PREFIX \
                   -type sanger  \
                   -mates /reads/$READS1,/reads/$READS2 \
                   > $WORKDIR/$PREFIX.frg
-echo about to remove fastqToCA$PREFIX
+debug_msg  ${LINENO}  "about to remove fastqToCA$PREFIX"
 docker rm -f fastqToCA$PREFIX 
-echo here is $WORKDIR/$PREFIX.frg
+debug_msg  ${LINENO}  "here is $WORKDIR/$PREFIX.frg"
 cat $WORKDIR/$PREFIX.frg
-echo just finished echoing   $WORKDIR/$PREFIX.frg
+debug_msg  ${LINENO}  "just finished echoing   $WORKDIR/$PREFIX.frg"
 echo "#  Spec file for celera assembly." > $WORKDIR/$PREFIX.spc
 echo $WORKDIR/$PREFIX.frg >> $WORKDIR/$PREFIX.spc
+debug_msg  ${LINENO}  "about to cat $WORKDIR/$PREFIX.spc"
 cat "$WORKDIR/$PREFIX.spc"
-cat $WORKDIR/$PREFIX.spc
-echo end of "$WORKDIR/$PREFIX.spc"
+debug_msg  ${LINENO}  "end of $WORKDIR/$PREFIX.spc"
 
-echo about to run runCA
+debug_msg ${LINENO} "about to run runCA"
+debug_msg ${LINENO} "WGC:about to run runCA" 
 docker run  \
             --name runCA$PREFIX \
             -v $READSDIR:/reads:ro \
@@ -43,7 +45,8 @@ docker run  \
               -d /results \
               -p $PREFIX \
               /results/$PREFIX.frg
-echo about to remove runCA$PREFIX
+echo WGC: about to remove runCA$PREFIX
+debug_msg ${LINENO} "about to remove runCA$PREFIX" 
 docker rm -f runCA$PREFIX 
 # Give location of result files
 # CONTIGS - contig assembly fasta file

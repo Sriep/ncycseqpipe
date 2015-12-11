@@ -11,18 +11,22 @@ declare -r READS2="$4"
 declare -r TOOL_TAG="$5"
 #declare -r PARAMETERS="$6"
 declare -r PARAMETERS=$(echo "$6" | sed -s "s/^\(\(\"\(.*\)\"\)\|\('\(.*\)'\)\)\$/\\3\\5/g")
-echo  $SSH_CONFIGFILE
-echo  $PREFIX
-echo  $READS1
-echo  $READS2
-echo  $TOOL_TAG
-echo  $PARAMTERS
-
 
 source $SSH_CONFIGFILE
+source $SOURCEDIR/../error.sh
+OLD_PROGNAME=$PROGNAME || true
+PROGNAME=$(basename $0)
+
+debug_msg ${LINENO}  "$SSH_CONFIGFILE"
+debug_msg ${LINENO}  "$PREFIX"
+debug_msg ${LINENO}  "$READS1"
+debug_msg ${LINENO}  "$READS2"
+debug_msg ${LINENO}  "$TOOL_TAG"
+debug_msg ${LINENO}  "$PARAMTERS"
+
 readonly SSH_WORKDIR
 readonly READDIR
-echo source directory $SOURCEDIR
+debug_msg ${LINENO} "source directory $SOURCEDIR"
 
 readonly PRFIX_STUB=$(basename $PREFIX)
 declare -r SSH_RESULTDIR=$HPC_DATA/$RESULTDIR/$PREFIX
@@ -30,3 +34,5 @@ declare -r WORKDIR=$SSH_RESULTDIR/$TOOL_TAG-ssh
 declare -r SSH_READSDIR=$HPC_DATA/$READDIR
 declare -r TEMPLATE=$SSH_RESULTDIR.fasta
 mkdir -p $WORKDIR
+
+PROGNAME=$OLD_PROGNAME

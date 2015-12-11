@@ -5,28 +5,29 @@ declare -xr CONFIGFILE=$1
 # Set sorce directory to be the directory where this file is stored, the
 # assumption is that the companion scripts are stored in the same directory  
 # structure as found at https://github.com/Sriep/ncycseqpipe.git
+source $CONFIGFILE
 declare -xr SOURCEDIR=$(dirname "$BASH_SOURCE")
 source $SOURCEDIR/error.sh
-
-echo all: "working directory is $PWD"
-echo all: "source directory is $SOURCEDIR"
-echo all: "read in config file from $CONFIGFILE"
-
-source $CONFIGFILE
+debug_msg  ${LINENO} "working directory is $PWD"
+debug_msg  ${LINENO} "source directory is $SOURCEDIR"
+debug_msg  ${LINENO} "read in config file from $CONFIGFILE"
 readonly ILLUMINA_READS
 readonly ASSEMBLERS_FILE
-echo all: "Illumina reads from $ILLUMINA_READS"
+debug_msg  ${LINENO} "Illumina reads from $ILLUMINA_READS"
 
+function main ()
+{
+  if [[ $ILLUMINA_READS ]]; then
+    while read -r col1 col2 col3; do
+      echo -e "all: About to assemble  name $col1 \tread1 $col2 \tread2 $col3"
+      echo "all: about to run $SOURCEDIR/assemble_strain.sh $col1 $col2 $col3 &"
+      "$SOURCEDIR/assemble_strain.sh" $col1 $col2 $col3 &
+    done < "$ILLUMINA_READS"
+  fi
+  debug_msg  ${LINENO} "Sent of all strains to be assembled."
+}
 
-
-if [[ $ILLUMINA_READS ]]; then
-  while read -r col1 col2 col3; do
-    echo -e "all: About to assemble  name $col1 \tread1 $col2 \tread2 $col3"
-    echo "all: about to run $SOURCEDIR/assemble_strain.sh $col1 $col2 $col3 &"
-    "$SOURCEDIR/assemble_strain.sh" $col1 $col2 $col3 &
-  done < "$ILLUMINA_READS"
-fi
-echo all : "Sent of all strains to be assembled."
+main "$@"
 
 # /home/shepperp/datashare/Piers/github/ncycseqpipe/assemble_all.sh ncycseqpipe.cfg
 #
