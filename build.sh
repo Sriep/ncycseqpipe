@@ -1,19 +1,28 @@
-#!/bin/bash
+#!/bin/bash -eu
 #
 service docker start
 
-#cd $DOCKERDIR/wgs-8.3rc2/fastqToCA
-#sudo docker build -t fastqtoca .
-#cd $DOCKERDIR/wgs-8.3rc2/runCA
-#sudo docker build -t runCA .
-docker build -t sriep/abyss-pe:latest ./assemblers/abyss/abyss-pe
-docker build -t sriep/soapdenovo2:latest ./assemblers/SOAPdenovo2/SOAPdenovo2
-docker build -t sriep/progressivecactus:latest ./progressiveCactus/runProgressiveCactus
-docker build -t sriep/ragout:latest ./ragout/ragoutpy
+docker build -t sriep/sspace-longread-1.1 ./sspace-longread-1.1/sspace-longread-1.1
+docker build -t sriep/progressivecactus ./progressivecactus/progressivecactus
+docker build -t sriep/mauve-2.4.0 ./mauve-2.4.0/mauve-2.4.0
+docker build -t sriep/scaffmatch-3.6.2 ./scaffmatch-3.6.2/scaffmatch-3.6.2
+docker build -t sriep/bowtie2-2.2.6 ./bowtie2-2.2.6/bowtie2-2.2.6
+docker build -t sriep/ray-2.3.1 ./ray-2.3.1/ray-2.3.1
+docker build -t sriep/spades-3.6.2 ./spades-3.6.2
+docker build -t sriep/wgs-8.3rc2/spades-3.6.2
+docker build -t sriep/ragout ./ragout/ragout
+docker build -t sriep/soapdenovo2 ./soapdenovo2/soapdenovo2
+docker build -t sriep/abyss ./abyss/abyss
 
-docker push sriep/abyss-pe:latest
-docker push sriep/soapdenovo2:latest
-docker push sriep/progressivecactus:latest
-docker push sriep/ragout:latest
-
+docker push sriep/sspace-longread-1.1 
+docker push sriep/progressivecactus
+docker push sriep/mauve-2.4.0
+docker push sriep/scaffmatch-3.6.2
+docker push sriep/bowtie2-2.2.6
+docker push sriep/ray-2.3.1
+docker push sriep/spades-3.6.2
+docker push sriep/wgs-8.3rc2
+docker push sriep/ragout
+docker push sriep/soapdenovo2
+docker push sriep/abyss
 

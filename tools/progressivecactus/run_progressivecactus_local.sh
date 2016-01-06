@@ -13,6 +13,11 @@ source $SOURCEDIR/local_header.sh
 # LOCAL_RESULTDIR - Directory where results are to be copied
 #-------------------------- Assembly specific code here --------------------
 
+#function clean_fasta  ()
+#{
+#      sed -i 's/[^a-zA-Z0-9_:.>]/_/g' $1
+#}
+
 #rm $WORKDIR/$PREFIX.cactus.seq || true
 #touch $WORKDIR/$PREFIX.cactus.seq
 > $WORKDIR/$PREFIX.cactus.seq
@@ -28,13 +33,11 @@ docker run --name progressivecactus$PREFIX  \
 	-v $WORKDIR:/workdir \
 	-v $LOCAL_RESULTDIR:/results \
 	sriep/progressivecactus \
-		--maxThreads 20 \
+		--maxThreads 40 \
 		 /workdir/$PREFIX.cactus.seq \
 		 /workdir \
 		 /results/$PREFIX.hal 
-echo $PREFIX PCacuts: progressivecactus return code is $?
-docker rm -f progressivecactus$PREFIX 
-echo $PREFIX PCacuts: progressivecactus$PREFIX  stopped
+remove_docker_container progressivecactus$PREFIX
 
 #$METRICS=$LOCAL_RESULTDIR/$PREFIX.hal
 

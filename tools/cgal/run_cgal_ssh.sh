@@ -16,24 +16,22 @@ source $SOURCEDIR/ssh_header.sh
 # WORKDIR - Directory in which to put tempory work files
 # READSDIR - Directory where paired end reads are located
 #-------------------------- Assembly specific code here --------------------
-echo BOWTIE2 ssh: about to run ssh bowtie2 on $TEMPLATE
-
 declare -r SAMFILE=$SSH_RESULTDIR/${PRFIX_STUB}_BOW2.sam
 
 cd  $WORKDIR
-echo about to run bowtie2convert
-echo "bowtie2convert $SAMFILE 600"
+debug_msg  ${LINENO} "about to run bowtie2convert"
+debug_msg  ${LINENO} "bowtie2convert $SAMFILE 600"
 bowtie2convert $SAMFILE 600
 echo
 #IFS=' ' read -ra bids <<< "${BSUBIDS[$i]}"
-echo "align $TEMPLATE.fasta 1000 12"
-echo "align $TEMPLATE $PARAMETERS"
+debug_msg  ${LINENO} "align $TEMPLATE.fasta 1000 12"
+debug_msg  ${LINENO} "align $TEMPLATE $PARAMETERS"
 #align $TEMPLATE 1000 12
-align "$TEMPLATE" $PARAMETERS
-echo "cgal $TEMPLATE.fasta"
+align "$TEMPLATE" "$PARAMETERS"
+debug_msg  ${LINENO} "cgal $TEMPLATE.fasta"
 echo
 cgal $TEMPLATE
-echo "finished cgal"
+debug_msg  ${LINENO} "finished cgal"
 #Give location of result files
 METRICS_CSV=$WORKDIR/out.txt
 

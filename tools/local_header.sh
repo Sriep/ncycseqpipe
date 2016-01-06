@@ -9,22 +9,24 @@ declare  PREFIX="$2"
 declare  PRFIX_STUB=$(basename $PREFIX)
 declare -r READS1="$3"
 declare -r READS2="$4"
-declare -r TOOL_TAG="$5"
+declare -r READSPB="$5"
+declare -r TOOL_TAG="$6"
 #declare -r PARAMETERS="$6"
 #strip quotes PARAMETERS
-declare -r PARAMETERS=$(echo "$6" | sed -s "s/^\(\(\"\(.*\)\"\)\|\('\(.*\)'\)\)\$/\\3\\5/g")
+declare -r PARAMETERS=$(echo "$7" | sed -s "s/^\(\(\"\(.*\)\"\)\|\('\(.*\)'\)\)\$/\\3\\5/g")
 
 source $CONFIGFILE
 source $SOURCEDIR/../error.sh
 OLD_PROGNAME=$PROGNAME || true
 PROGNAME=$(basename $0)
 
-echo local header configfile $CONFIGFILE
-echo local header prefix $PREFIX
-echo local header reads1 $READS1
-echo local header reads2 $READS2
-echo local header tool tag $TOOL_TAG
-echo local header arguments $PARAMETERS
+debug_msg ${LINENO}  "local header configfile $CONFIGFILE"
+debug_msg ${LINENO} "local header prefix $PREFIX"
+debug_msg ${LINENO}  "local header reads1 $READS1"
+debug_msg ${LINENO}  "local header reads2 $READS2"
+debug_msg ${LINENO}  "local header READSPB $READSPB"
+debug_msg ${LINENO}  "local header tool tag $TOOL_TAG"
+debug_msg ${LINENO}  "local header arguments $PARAMETERS"
 
 readonly LOCAL_DATA
 readonly RESULTDIR
@@ -39,8 +41,19 @@ declare -r TEMPLATE=$LOCAL_RESULTDIR.fasta
 declare CONTIGS=
 declare SCAFFOLDS=
 declare METRICS=
+declare LOGFILE=$LOCAL_RESULTDIR/$PROGNAME.log
+> $LOGFILE
+start=$(date +%s)
 
 mkdir -p $LOCAL_RESULTDIR
 mkdir -p $WORKDIR
 
 PROGNAME=$OLD_PROGNAME
+
+function remove_docker_container ()
+{
+  echo WGC: about to remove $1
+  debug_msg ${LINENO} "about to remove $1" 
+  docker stats --no-stream=true $1 1>> $LOGFILE
+  docker rm -f $1 
+}

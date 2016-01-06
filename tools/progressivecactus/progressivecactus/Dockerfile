@@ -8,6 +8,7 @@ RUN yum install -y \
 	make \
     python2.7 \
 	python-devel \
+	bzip2 \
     wget
 RUN git clone git://github.com/glennhickey/progressiveCactus.git
 WORKDIR progressiveCactus/

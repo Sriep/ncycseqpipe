@@ -13,16 +13,18 @@ source $SOURCEDIR/local_header.sh
 # LOCAL_RESULTDIR - Directory where results are to be copied
 #-------------------------- Assembly specific code here --------------------
 readonly RAGOUT_TARGET=$PARAMETERS
-
+debug_msg  ${LINENO}  "Ragout target is $RAGOUT_TARGET"
 # Create the ragout configurartion file
-rm $WORKDIR/$PREFIX.ragout.recipe
-touch $WORKDIR/$PREFIX.ragout.recipe
+> $WORKDIR/$PREFIX.ragout.recipe
 echo "*.draft" = true >> $WORKDIR/$PREFIX.ragout.recipe
 echo -n ".references =  " >> $WORKDIR/$PREFIX.ragout.recipe
 declare seperator=
 for f in $LOCAL_RESULTDIR/*.fasta; do
-	echo -n "$seperator"$(basename "$f" .fasta) >> $WORKDIR/$PREFIX.ragout.recipe
-  seperator=","
+  assembly=$(basename "$f" .fasta)
+  if [[ "$assembly" != "$RAGOUT_TARGET" ]]; then 
+    echo -n "$seperator"$assembly >> $WORKDIR/$PREFIX.ragout.recipe
+    seperator=","
+  fi
 done
 echo >> $WORKDIR/$PREFIX.ragout.recipe
 #remove trailing commma
@@ -30,9 +32,9 @@ echo >> $WORKDIR/$PREFIX.ragout.recipe
 echo ".target = $RAGOUT_TARGET"  >> $WORKDIR/$PREFIX.ragout.recipe
 echo ".hal = /data/$PREFIX.hal" >> $WORKDIR/$PREFIX.ragout.recipe
 
-echo  $PREFIX Ragout: Here is  ragout sequence file for $PREFIX
+debug_msg  ${LINENO}  "$PREFIX Ragout: Here is  ragout sequence file for $PREFIX"
 cat $WORKDIR/$PREFIX.ragout.recipe
-echo  $PREFIX Ragout: Finished ragout sequence file for $PREFIX
+debug_msg  ${LINENO}  "$PREFIX Ragout: Finished ragout sequence file for $PREFIX"
 
 docker run --name ragoutpy$PREFIX  \
 	--volume=$WORKDIR:/workdir \
@@ -42,9 +44,10 @@ docker run --name ragoutpy$PREFIX  \
     --outdir /workdir \
     --synteny hal \
     /workdir/$PREFIX.ragout.recipe 
-echo $PREFIX Ragout: Ragout return code is $?
-docker rm -f ragoutpy$PREFIX 
-echo $PREFIX Ragout: ragoutpy$PREFIX  stopped
+#echo $PREFIX Ragout: Ragout return code is $?
+#docker rm -f ragoutpy$PREFIX 
+#echo $PREFIX Ragout: ragoutpy$PREFIX  stopped
+remove_docker_container ragoutpy$PREFIX
 
 cp  $WORKDIR/${RAGOUT_TARGET}_scaffolds.fasta  $WORKDIR/r${PREFIX}i.fasta
 cat $WORKDIR/${RAGOUT_TARGET}_unplaced.fasta >> $WORKDIR/r${PREFIX}i.fasta

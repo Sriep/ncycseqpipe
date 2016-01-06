@@ -29,23 +29,26 @@ bowtie2   --mm \
           -x $WORKDIR/$PRFIX_STUB \
           -1 $SSH_READSDIR/$READS1 \
           -2 $SSH_READSDIR/$READS2 \
-          > $WORKDIR/${PRFIX_STUB}_BOW2.sam 
-samtools view -bS $WORKDIR/${PRFIX_STUB}_BOW2.sam  \
- | samtools sort /dev/stdin $WORKDIR/${PRFIX_STUB}_BOW2_sorted     
+          > $WORKDIR/${PRFIX_STUB}_${TOOL_TAG}.sam 
+samtools view -bS $WORKDIR/${PRFIX_STUB}_${TOOL_TAG}.sam  \
+ | samtools sort /dev/stdin $WORKDIR/${PRFIX_STUB}_${TOOL_TAG}     
           
 #          > $WORKDIR/${PRFIX_STUB}_BOW2.sam \
 #  | samtools view -bS - \
 #  | samtools sort /dev/stdin $WORKDIR/${PRFIX_STUB}_BOW2_sorted
 echo about to run samtools index
-samtools index $WORKDIR/${PRFIX_STUB}_BOW2_sorted.bam
+samtools index $WORKDIR/${PRFIX_STUB}__${TOOL_TAG}.bam
 
 #Give location of result files
-METRICS_CSV=$WORKDIR/${PRFIX_STUB}_BOW2_sorted.bam
-mv $WORKDIR/${PRFIX_STUB}_BOW2.sam $SSH_RESULTDIR/${PRFIX_STUB}_BOW2.sam
+#METRICS_CSV=$WORKDIR/${PRFIX_STUB}_${TOOL_TAG}.bam
+mv $WORKDIR/${PRFIX_STUB}_${TOOL_TAG}.sam $SSH_RESULTDIR/${PRFIX_STUB}_${TOOL_TAG}.sam
+#
+cp $WORKDIR/${PRFIX_STUB}_${TOOL_TAG}.bam $WORKDIR/${PRFIX_STUB}__${TOOL_TAG}.bam 
+cp $WORKDIR/${PRFIX_STUB}_${TOOL_TAG}.bai $WORKDIR/${PRFIX_STUB}__${TOOL_TAG}.bai
 
 #-------------------------- Assembly specific code here --------------------
 
-cp $METRICS_CSV $SSH_RESULTDIR/m_${PRFIX_STUB}_${TOOL_TAG}
+#cp $METRICS_CSV $SSH_RESULTDIR/m_${PRFIX_STUB}_${TOOL_TAG}
 
 #cp $CONTIGS $SSH_RESULTDIR/${ASSEMBLY_TAG}c${PREFIX}i.fasta
 #cp $SCAFFOLDS $SSH_RESULTDIR/${ASSEMBLY_TAG}s${PREFIX}i.fasta

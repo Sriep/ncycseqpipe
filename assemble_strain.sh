@@ -5,6 +5,7 @@
 declare -xr PREFIX=$1
 declare -xr READS1=$2
 declare -xr READS2=$3
+declare -xr READSPB=$4
 echo "$PREFIX starting assemble_strain_sh"
 #global varables
 source $CONFIGFILE
@@ -45,15 +46,19 @@ function parse_recipe_file ()
   function compile_strians_metrics
   {
     for (( recipie_line=1; recipie_line<="$num_tools"; ++recipie_line )); do
-      if [[  "${TOOL_TYPE[$recipie_line]}" = "$METRIC" ]]; then
+      if [[  "${TOOL_TYPE[$recipie_line]}" == "$METRIC" ]]; then
         if [[ ${TOOL_TAG[$recipie_line]: -4}  == .csv ]]; then
-          filename=$HPC_DATA/$RESULTDIR/${PREFIX}_${TOOL_TAG[$recipie_line]}
+          filename=$LOCAL_DATA/$RESULTDIR/$PREFIX/metric_${PREFIX}_${TOOL_TAG[$recipie_line]}
+          debug_msg  ${LINENO} "filename is $filename"
           > ~/temp.csv
-          for f in $HPC_DATA/$RESULTDIR/*/m_*_${TOOL_TAG[recipie_linei]}; do
-            echo "$f" >> $filename
-            cat "m_${PRFIX}_${ASSEMBLER_TAG[i]}" >> ~/temp.csv
+          for f in $LOCAL_DATA/$RESULTDIR/$PREFIX/*/m_*_"${TOOL_TAG[recipie_line]}"; do
+            #debug_msg  ${LINENO} "loop file: $f"
+            echo "$f" >> ~/temp.csv
+            cat "$f" >> ~/temp.csv
           done
-          mv ~/temp.scv $filename
+          rm $filename || true
+          debug_msg  ${LINENO} "about to copy to $filename"
+          mv ~/temp.csv $filename
         fi
       fi
     done
@@ -63,7 +68,7 @@ function parse_recipe_file ()
   {
     declare -i num_tools_this_pass=0
     while read -r col1 col2 col3 col4 col5; do 
-      debug_msg  ${LINENO} -e "parse_recipe_file data: type $col1 $col2 \tlocation $col3 \ttag $col4 \tparamter $col5 "
+      debug_msg  ${LINENO} "parse_recipe_file data: type $col1 $col2 \tlocation $col3 \ttag $col4 \tparamter $col5 "
       debug_msg  ${LINENO} "parse_recipe_file num of assemblers $num_tools"
       case "$col1" in
         "$SEND_AND_WAIT" )
@@ -128,6 +133,7 @@ function main ()
   if [[ -n "$RECIPEFILE" ]]; then
     parse_recipe_file
   fi
+  debug_msg  ${LINENO} "Finished assemble_strain_sh main for strain $PREFIX"
 }
 
 main "$@"

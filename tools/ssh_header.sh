@@ -8,9 +8,10 @@ declare -r SSH_CONFIGFILE="$1"
 declare -r PREFIX="$2"
 declare -r READS1="$3"
 declare -r READS2="$4"
-declare -r TOOL_TAG="$5"
+declare -r READSPB="$5"
+declare -r TOOL_TAG="$6"
 #declare -r PARAMETERS="$6"
-declare -r PARAMETERS=$(echo "$6" | sed -s "s/^\(\(\"\(.*\)\"\)\|\('\(.*\)'\)\)\$/\\3\\5/g")
+declare -r PARAMETERS=$(echo "$7" | sed -s "s/^\(\(\"\(.*\)\"\)\|\('\(.*\)'\)\)\$/\\3\\5/g")
 
 source $SSH_CONFIGFILE
 source $SOURCEDIR/../error.sh

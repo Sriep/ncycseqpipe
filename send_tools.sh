@@ -12,43 +12,36 @@ function send_tools ()
   {
       declare -r TOOLPREFIX=$1
       declare -ri index=$2
-      debug_msg  ${LINENO}  "send_local_assembly tool prefix $TOOLPREFIX"
       debug_msg  ${LINENO}  "In send_local_assembly function tool name ${TOOL_NAME[$index]}"
-      debug_msg  ${LINENO}  "send the tag ${TOOL_TAG[$index]}"
-      debug_msg  ${LINENO}  "send the parmeters ${TOOL_PARAMTERS[$index]}"
       if [[ "$PARALLEL" == "&" ]]; then
-        debug_msg  ${LINENO}  parallel is ampusand
+        debug_msg  ${LINENO}  "parallel is ampusand"
+        # /usr/bin/time -o output.time.txt -p date 
+        # /usr/bin/time -v 2> stats_$PREFIX_${TOOL_NAME[$index]}.log
+        # ( time ./sleep.sh )  2> timeout1.txt
+        #( time 
         $SOURCEDIR/tools/${TOOL_NAME[$index]}/run_${TOOL_NAME[$index]}_local.sh \
           "$CONFIGFILE" \
           "$TOOLPREFIX" \
           "$READS1" \
           "$READS2" \
+          "$READSPB" \
           "${TOOL_TAG[$index]}" \
-          "${TOOL_PARAMTERS[$index]}" \
-          &
-          process_num=$!
+          "${TOOL_PARAMTERS[$index]}" &
+          #) 2> $LOCAL_WORKDIR/$PREFIX/${TOOL_TAG[$index]}_$PREFIX.log &
+          #process_num=$! 
           #set +u; process_num=$!; set -u
       else
-        parrelle is not not ampusand
+        debug_msg  ${LINENO} "parrelle is not not ampusand"
+        #( time 
         $SOURCEDIR/tools/${TOOL_NAME[$index]}/run_${TOOL_NAME[$index]}_local.sh \
           "$CONFIGFILE" \
           "$TOOLPREFIX" \
           "$READS1" \
           "$READS2" \
+          "$READSPB" \
           "${TOOL_TAG[$index]}" \
-          "${TOOL_PARAMTERS[$index]}"
-          process_num=          
+          "${TOOL_PARAMTERS[$index]}" 
       fi
-      #set +u; process_num=$!; set -u
-      debug_msg ${LINENO} "process number is $process_num"
-      debug_msg  ${LINENO} "process number is $process_num"
-      if [[ -n "$process_num" ]]; then
-        #process_num=$!
-        debug_msg ${LINENO} process number is $process_num
-        PIDS[$index]="${PIDS[$index]} $process_num"
-        debug_msg ${LINENO} "send_local_assembly pids ${PIDS[$index]}"
-      fi
-      debug_msg  ${LINENO} "num of tools is currently $end_tool"
       debug_msg  ${LINENO} "end of send_local_tool endo fo send_local_tool"
   }
   
@@ -70,7 +63,8 @@ function send_tools ()
     debug_msg  ${LINENO} "$TOOLPREFIX: start assembly over ssh link to $SSH_USERID@$SSH_ADDR"
     debug_msg  ${LINENO} "output directory $SSH_REPORTDIR"
     debug_msg  ${LINENO} "assembly parameters ${TOOL_PARAMTERS[$index]}"
-    rtv=$(  ssh -tt -i "$SSH_KEYFILE" "$SSH_USERID@$SSH_ADDR" \
+    rtv=$(  ssh -oStrictHostKeyChecking=no  -tt -i  \
+                "$SSH_KEYFILE" "$SSH_USERID@$SSH_ADDR" \
             bsub \
             -o "$SSH_REPORTDIR" \
                "$SSH_SOURCEDIR/tools/${TOOL_NAME[$index]}/run_${TOOL_NAME[$index]}_ssh.sh \
@@ -78,17 +72,14 @@ function send_tools ()
                 $TOOLPREFIX \
                 $READS1 \
                 $READS2 \
+                $READSPB \
                 ${TOOL_TAG[$index]} \
                 ${TOOL_PARAMTERS[$index]}" \
          )
     debug_msg  ${LINENO}  "$TOOLPREFIX:  ssh assembly return value $rtv"
-    debug_msg  ${LINENO}  "num of tools is currently $end_tool"
     extract_bsubid_from_rtv
-    debug_msg  ${LINENO}  "in send_ssh_tool just got bsubnumber from rtv it is $rtv"
-    apple="${BSUBIDS[$index]} $rtv"
     BSUBIDS[$index]="${BSUBIDS[$index]} $rtv"
     debug_msg  ${LINENO}  "after being set bsubids is ${BSUBIDS[$index]}"
-    debug_msg  ${LINENO} "$TOOLPREFIX in send_ssh_asembly : ssh bsub id is ${BSUBIDS[$index]} with index $index"
     debug_msg  ${LINENO} "end of send_ssh_tool end of send_ssh_tool"
   }
   
@@ -96,14 +87,13 @@ function send_tools ()
   {
     prfix=$1
     index=$2
-    debug_msg  ${LINENO} "send tools to finsih para1 $1 and para2 $2"
-    echo "$prfix send_tools: In assembly loop i=$index tool is ${TOOL_NAME[$index]}"
+    debug_msg  ${LINENO} "tool location is ${TOOL_LOCATION[$index]}"
+    debug_msg  ${LINENO} "$prfix send_tools: In assembly loop i=$index tool is ${TOOL_NAME[$index]}"
     if [[ "${TOOL_LOCATION[$index]}" = local ]]; then
       send_local_tool "$prfix" $index
     else 
       if [[ "${TOOL_LOCATION[$index]}" = ssh ]]; then 
         send_ssh_tool "$prfix" $index
-        debug_msg  ${LINENO} "$prfix in send_tools : ssh bsub id is ${BSUBIDS[$index]} with index $index"
       fi
     fi
     debug_msg  ${LINENO} "END of send_tool END of send_tool END of send_tool END of send_tool"

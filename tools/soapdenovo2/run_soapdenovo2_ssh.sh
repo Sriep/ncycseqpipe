@@ -14,7 +14,7 @@ source $SOURCEDIR/ssh_header.sh
 # WORKDIR - Directory in which to put tempory work files
 # READSDIR - Directory where paired end reads are located
 #-------------------------- Assembly specific code here --------------------
-echo SOAPdenvo2 ssh: about to run ssh soapdenovo2 on $PREFIX
+debug_msg  ${LINENO} "SOAPdenvo2 ssh: about to run ssh soapdenovo2 on $PREFIX"
 
 #rm $WORKDIR/config_file
 #touch $WORKDIR/config_file
@@ -25,11 +25,11 @@ cat $SOURCEDIR/soapdenovo2/soap_config_lib_head.txt >> $WORKDIR/config_file
 echo q1=$SSH_READSDIR/$READS1 >> $WORKDIR/config_file
 echo q2=$SSH_READSDIR/$READS2 >> $WORKDIR/config_file
 
-echo $PREFIX SOAP2: soapdenovo2 config file follows
+debug_msg  ${LINENO} "$PREFIX SOAP2: soapdenovo2 config file follows"
 cat $WORKDIR/config_file
-echo $PREFIX SOAP2: Finished soapdenovo2 config file 
-echo workdir $WORKDIR
-echo $PREFIX SOAP2: RUN RUN RUN
+debug_msg  ${LINENO} "$PREFIX SOAP2: Finished soapdenovo2 config file" 
+debug_msg  ${LINENO} "workdir $WORKDIR"
+debug_msg  ${LINENO} "$PREFIX SOAP2: RUN RUN RUN"
 
 SOAPdenovo-127mer \
 		  all \

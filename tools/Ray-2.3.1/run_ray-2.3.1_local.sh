@@ -1,6 +1,7 @@
 #!/bin/bash
 declare -xr SOURCEDIR="$(dirname $BASH_SOURCE)/.."
 source $SOURCEDIR/local_header.sh
+PROGNAME=$(basename $0)
 # PREFIX - Name of strain to assemble
 # READS1 - First set of paired end reads, relative to $LOCAL_READSDIR
 # READS2 - Second set of paired end reads, relative to $LOCAL_READSDIR
@@ -10,7 +11,7 @@ source $SOURCEDIR/local_header.sh
 # WORKDIR - Directory in which to put tempory work files
 # READSDIR - Directory where paired end reads are located
 #-------------------------- Assembly specific code here --------------------
-echo $PREFIX ray-2.3.1: about to run ray on strain $PREFIX
+debug_msg  ${LINENO} "about to run ray on strain $PREFIX"
 
 docker run \
 	--name ray-2.3.1$PREFIX  \
@@ -23,9 +24,8 @@ docker run \
       -k 31 \
       -p /reads/$READS1 /reads/$READS2 \
       -o /results/out 
-echo $PREFIX ray-2.3.1: SOAPdenovo2 return code is $?
+debug_msg  ${LINENO} "ray return code is $?"
 docker rm -f ray-2.3.1$PREFIX 
-echo $PREFIX ray-2.3.1: soapdenovo2$PREFIX  stopped
 
 #Give location of result files
 chmod -R o+rwx $WORKDIR/out

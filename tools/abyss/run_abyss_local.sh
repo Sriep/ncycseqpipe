@@ -12,24 +12,24 @@ source $SOURCEDIR/local_header.sh
 # READSDIR - Directory where paired end reads are located
 #-------------------------- Assembly specific code here --------------------
 
-echo ABYSS: about to run local abyss on $PREFIX
+debug_msg  ${LINENO} "ABYSS: about to run local abyss on $PREFIX"
 
 declare -a args=( "" "" "" "" "" )
 IFS=' ' read -ra args <<< "$PARAMETERS"
-echo "arguments ${args[@]/#/}"
+debug_msg  ${LINENO} "arguments ${args[@]/#/}"
 
 docker run \
-	--name abysspe$PREFIX  \
+	--name abyss$PREFIX  \
 	-v $READSDIR:/reads:ro \
 	-v $WORKDIR:/results \
 	sriep/abyss-pe \
 		${args[0]}  ${args[1]} ${args[2]} ${args[3]} ${args[4]} \
 		name=/results/$PREFIX \
 		in="/reads/$READS1 /reads/$READS2"
-echo ABYSS: abyss return code is $?
-docker rm -f abysspe$PREFIX 
-echo ABYSS: abysspe$PREFIX  stopped
-
+#echo ABYSS: abyss return code is $?
+#docker rm -f abysspe$PREFIX 
+#echo ABYSS: abysspe$PREFIX  stopped
+remove_docker_container abyss$PREFIX
 # Give location of result files
 # CONTIGS - contig assembly fasta file
 # SCAFFOLDS - scaffold assembly fasta file

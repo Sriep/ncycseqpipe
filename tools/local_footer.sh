@@ -7,7 +7,8 @@ fi
 if [[ -n "$METRICS" ]]; then
   cp $METRICS $LOCAL_RESULTDIR/m_${PRFIX_STUB}_${TOOL_TAG}
 fi
+
+end=$(date +%s)
+runtime=$((end-start))
+echo -e "start: $start \tend: $end \ttaken $runtime" >> $LOGFILE
 echo `basename "$0"`: FINISHED!! FINISHED!!
-
-#METRICS_CSV=$WORKDIR/out.txt
-

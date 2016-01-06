@@ -15,9 +15,9 @@ function error_exit ()
   local message="$2"
   local code="${3:-1}"
   if [[ -n "$message" ]] ; then
-    echo "${PROGNAME}: Error on or near line ${parent_lineno}: ${message}; exiting with status ${code}"
+    echo -e "${PROGNAME}: Error on or near line ${parent_lineno}: ${message}; exiting with status ${code}"
   else
-    echo "${PROGNAME}: Error on or near line ${parent_lineno}; exiting with status ${code}"
+    echo -e "${PROGNAME}: Error on or near line ${parent_lineno}; exiting with status ${code}"
   fi
   exit "${code}"
 }
@@ -31,6 +31,6 @@ function debug_msg ()
   if [[ $DEBUG = true ]]; then
     local parent_lineno="$1"
     local message="$2"
-    echo "Debug msg ${PROGNAME}: line ${parent_lineno}: ${message}"
+    echo -e "Debug msg ${PROGNAME}: line ${parent_lineno}: ${message}"
   fi
 }

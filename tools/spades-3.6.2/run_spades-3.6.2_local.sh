@@ -4,6 +4,7 @@ source $SOURCEDIR/local_header.sh
 # PREFIX - Name of strain to assemble
 # READS1 - First set of paired end reads, relative to $LOCAL_READSDIR
 # READS2 - Second set of paired end reads, relative to $LOCAL_READSDIR
+# READSPB
 # ASSEMBLY_TAG - Tag to indicate the output from this tool
 # PARAMETERS - Data used to paramatirse this tool
 #
@@ -17,11 +18,16 @@ echo $PREFIX SPADES: about to run soap on strain $PREFIX
 YAMLFILE=$WORKDIR/$PREFIX.yaml
 > $YAMLFILE
 cat $BASHDIR/spadesYamlHead.txt >> $YAMLFILE
-echo "/reads/$READS1" >> $YAMLFILE
-cat $BASHDIR/spadesYamlBreak.txt >> $YAMLFILE
-echo "/reads/$READS2" >> $YAMLFILE
+if  [[ "$READS1" != $NONE ]]; then
+  echo "/reads/$READS1" >> $YAMLFILE
+  cat $BASHDIR/spadesYamlBreak.txt >> $YAMLFILE
+  echo "/reads/$READS2" >> $YAMLFILE
+fi
+if [[ "$READSPB" != $NONE ]]; then
+  cat $BASHDIR/spadesPbYamlHead.txt >> $YAMLFILE
+  echo "/reads/$READSPB" >> $YAMLFILE
+fi
 cat $BASHDIR/spadesYamlEnd.txt >> $YAMLFILE
-
 
 echo about to run docker spades
 docker run \
@@ -31,10 +37,7 @@ docker run \
     sriep/spades-3.6.2 \
       --dataset /results/$PREFIX.yaml \
       -o /results 
-
-echo $PREFIX spades: spades return code is $?
-docker rm -f spades$PREFIX 
-echo $PREFIX spades: spades$PREFIX  stopped
+remove_docker_container spades$PREFIX
 
 #Give location of result files
 CONTIGS=$WORKDIR/spades/contigs.fasta
