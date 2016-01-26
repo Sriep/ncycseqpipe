@@ -4,21 +4,21 @@ function send_tools ()
 {
   # $1 The number of tools to run in this pass
   mkdir -p "$LOCAL_DATA/$RESULTDIR/$PREFIX/ssh_out"
-  debug_msg  ${LINENO} "$PREFIX: ssh source directory at $SSH_SOURCEDIR"
-  debug_msg  ${LINENO} "$PREFIX: ssh configure directory at $SSH_CONFIGFILE"
-  debug_msg  ${LINENO} "$PREFIX: Made ssh reportdir at $SSH_REPORTDIR"
+  debug_msg  ${LINENO} "start send tools"
   
   function send_local_tool ()
   {
       declare -r TOOLPREFIX=$1
       declare -ri index=$2
-      debug_msg  ${LINENO}  "In send_local_assembly function tool name ${TOOL_NAME[$index]}"
+      debug_msg  ${LINENO}  "In send_local_assembly function tool name ${TOOL_NAME[$index]} file ${TOOL_NAME[$index]}/run_${TOOL_NAME[$index]}_local.sh"
+      debug_msg  ${LINENO}  "log files ${LOGPREFIX}.run_${TOOL_NAME[$index]}_local.sh.log and ${LOGPREFIX}.run_${TOOL_NAME[$index]}_local.sh.err.log"
       if [[ "$PARALLEL" == "&" ]]; then
         debug_msg  ${LINENO}  "parallel is ampusand"
         # /usr/bin/time -o output.time.txt -p date 
         # /usr/bin/time -v 2> stats_$PREFIX_${TOOL_NAME[$index]}.log
         # ( time ./sleep.sh )  2> timeout1.txt
         #( time 
+        #sudo bash -c "/home/shepperp/datashare/Piers/github/ncycseqpipe/utNCYC22.sh &"
         $SOURCEDIR/tools/${TOOL_NAME[$index]}/run_${TOOL_NAME[$index]}_local.sh \
           "$CONFIGFILE" \
           "$TOOLPREFIX" \
@@ -26,7 +26,11 @@ function send_tools ()
           "$READS2" \
           "$READSPB" \
           "${TOOL_TAG[$index]}" \
-          "${TOOL_PARAMTERS[$index]}" &
+          "${TOOL_NAME[$index]}" \
+          "${LOGPREFIX}" \
+          "${TOOL_PARAMTERS[$index]}" \
+          > "${LOGPREFIX}.run_${TOOL_NAME[$index]}_local.sh.stdout.log" \
+          2> "${LOGPREFIX}.run_${TOOL_NAME[$index]}_local.sh.stderr.log" &
           #) 2> $LOCAL_WORKDIR/$PREFIX/${TOOL_TAG[$index]}_$PREFIX.log &
           #process_num=$! 
           #set +u; process_num=$!; set -u
@@ -40,7 +44,11 @@ function send_tools ()
           "$READS2" \
           "$READSPB" \
           "${TOOL_TAG[$index]}" \
-          "${TOOL_PARAMTERS[$index]}" 
+          "${TOOL_NAME[$index]}" \  
+          "${LOGPREFIX}" \          
+          "${TOOL_PARAMTERS[$index]}" \
+          > "${LOGPREFIX}.run_${TOOL_NAME[$index]}_local.sh.stdout.log" \
+          2> "${LOGPREFIX}.run_${TOOL_NAME[$index]}_local.sh.stderr.log"           
       fi
       debug_msg  ${LINENO} "end of send_local_tool endo fo send_local_tool"
   }
@@ -61,7 +69,7 @@ function send_tools ()
     }
     
     debug_msg  ${LINENO} "$TOOLPREFIX: start assembly over ssh link to $SSH_USERID@$SSH_ADDR"
-    debug_msg  ${LINENO} "output directory $SSH_REPORTDIR"
+    debug_msg  ${LINENO} "output directory $SSH_REPORTDIR filename ${TOOL_NAME[$index]}/run_${TOOL_NAME[$index]}_ssh.sh"
     debug_msg  ${LINENO} "assembly parameters ${TOOL_PARAMTERS[$index]}"
     rtv=$(  ssh -oStrictHostKeyChecking=no  -tt -i  \
                 "$SSH_KEYFILE" "$SSH_USERID@$SSH_ADDR" \
@@ -74,6 +82,8 @@ function send_tools ()
                 $READS2 \
                 $READSPB \
                 ${TOOL_TAG[$index]} \
+                ${TOOL_NAME[$index]} \
+                ${LOGPREFIX} \
                 ${TOOL_PARAMTERS[$index]}" \
          )
     debug_msg  ${LINENO}  "$TOOLPREFIX:  ssh assembly return value $rtv"

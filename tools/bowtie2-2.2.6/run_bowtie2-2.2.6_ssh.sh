@@ -14,16 +14,13 @@ source $SOURCEDIR/ssh_header.sh
 # WORKDIR - Directory in which to put tempory work files
 # READSDIR - Directory where paired end reads are located
 #-------------------------- Assembly specific code here --------------------
-echo BOWTIE2 ssh: about to run ssh bowtie2 on $TEMPLATE
+debug_msg  ${LINENO} "BOWTIE2 ssh: about to run ssh bowtie2 on $TEMPLATE"
 
 
-echo about to run bowtie2-build
-echo "bowtie2-build $TEMPLATE $WORKDIR/$PREFIX"
+debug_msg  ${LINENO} "bowtie2-build $TEMPLATE $WORKDIR/$PREFIX"
 bowtie2-build $TEMPLATE $WORKDIR/$PRFIX_STUB
-echo
-echo
-echo In run_bowtie2_ssh.sh
-echo about to run bowtie
+
+debug_msg  ${LINENO} "about to run bowtie"
 bowtie2   --mm \
           --no-mixed \
           -x $WORKDIR/$PRFIX_STUB \
@@ -31,20 +28,18 @@ bowtie2   --mm \
           -2 $SSH_READSDIR/$READS2 \
           > $WORKDIR/${PRFIX_STUB}_${TOOL_TAG}.sam 
 samtools view -bS $WORKDIR/${PRFIX_STUB}_${TOOL_TAG}.sam  \
- | samtools sort /dev/stdin $WORKDIR/${PRFIX_STUB}_${TOOL_TAG}     
-          
-#          > $WORKDIR/${PRFIX_STUB}_BOW2.sam \
-#  | samtools view -bS - \
-#  | samtools sort /dev/stdin $WORKDIR/${PRFIX_STUB}_BOW2_sorted
-echo about to run samtools index
-samtools index $WORKDIR/${PRFIX_STUB}__${TOOL_TAG}.bam
+ | samtools sort /dev/stdin $WORKDIR/${PRFIX_STUB}_${TOOL_TAG}
+
+debug_msg  ${LINENO} "about to run samtools index"
+samtools index $WORKDIR/${PRFIX_STUB}_${TOOL_TAG}.bam
 
 #Give location of result files
 #METRICS_CSV=$WORKDIR/${PRFIX_STUB}_${TOOL_TAG}.bam
+debug_msg  ${LINENO} "About to copy result files"
 mv $WORKDIR/${PRFIX_STUB}_${TOOL_TAG}.sam $SSH_RESULTDIR/${PRFIX_STUB}_${TOOL_TAG}.sam
 #
-cp $WORKDIR/${PRFIX_STUB}_${TOOL_TAG}.bam $WORKDIR/${PRFIX_STUB}__${TOOL_TAG}.bam 
-cp $WORKDIR/${PRFIX_STUB}_${TOOL_TAG}.bai $WORKDIR/${PRFIX_STUB}__${TOOL_TAG}.bai
+cp $WORKDIR/${PRFIX_STUB}_${TOOL_TAG}.bam $SSH_RESULTDIR/${PRFIX_STUB}_${TOOL_TAG}.bam 
+cp $WORKDIR/${PRFIX_STUB}_${TOOL_TAG}.bam.bai $SSH_RESULTDIR/${PRFIX_STUB}_${TOOL_TAG}.bai
 
 #-------------------------- Assembly specific code here --------------------
 

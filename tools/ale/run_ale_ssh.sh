@@ -1,10 +1,7 @@
 #!/bin/bash
 # 
 source hpccore-5
-source bowtie2-2.2.5
-source samtools-1.0
-source jdk-1.7.0_25
-source CGAL-0.9.6 
+source ale-0.9
 declare -xr SOURCEDIR="$(dirname $BASH_SOURCE)/.."
 source $SOURCEDIR/ssh_header.sh
 # PREFIX - Name of strain to assemble
@@ -16,27 +13,18 @@ source $SOURCEDIR/ssh_header.sh
 # WORKDIR - Directory in which to put tempory work files
 # READSDIR - Directory where paired end reads are located
 #-------------------------- Assembly specific code here --------------------
-declare -r SAMFILE=$SSH_RESULTDIR/${PRFIX_STUB}_bow2.sam
+declare -r SAMFILE=$SSH_RESULTDIR/${PRFIX_STUB}_BOW2.sam
+declare -r BAMFILE=$SSH_RESULTDIR/${PRFIX_STUB}_BOW2.bam
 
 cd  $WORKDIR
-debug_msg  ${LINENO} "about to run bowtie2convert"
-debug_msg  ${LINENO} "bowtie2convert $SAMFILE 600"
-bowtie2convert $SAMFILE 600
-echo
-#IFS=' ' read -ra bids <<< "${BSUBIDS[$i]}"
-debug_msg  ${LINENO} "align $TEMPLATE.fasta 1000 12"
-debug_msg  ${LINENO} "align $TEMPLATE $PARAMETERS"
-#align $TEMPLATE 1000 12
-align "$TEMPLATE" "$PARAMETERS"
-debug_msg  ${LINENO} "cgal $TEMPLATE.fasta"
-echo
-cgal $TEMPLATE
-debug_msg  ${LINENO} "finished cgal"
+debug_msg  ${LINENO} "about to run ale"
+debug_msg  ${LINENO} "bamfile  $BAMFILE"
+
+$ALE $BAMFILE $TEMPLATE $WORKDIR/$TEMPLATE.ale
+
+debug_msg  ${LINENO} "finished ale"
 #Give location of result files
-METRICS=$WORKDIR/out.txt
+METRICS=$WORKDIR/$TEMPLATE.ale
 
 #-------------------------- Assembly specific code here --------------------
-
 source $SOURCEDIR/ssh_footer.sh
-
-echo `basename "$0"`: FINISHED!! FINISHED!!

@@ -6,7 +6,8 @@ declare -xr PREFIX=$1
 declare -xr READS1=$2
 declare -xr READS2=$3
 declare -xr READSPB=$4
-echo "$PREFIX starting assemble_strain_sh"
+declare -xr LOGPREFIX=$5
+
 #global varables
 source $CONFIGFILE
 source $SOURCEDIR/error.sh
@@ -25,6 +26,23 @@ declare -ax TOOL_LOCATION
 declare -ax TOOL_TAG
 declare -ax TOOL_PARAMTERS
 declare -xi num_tools=0
+debug_msg  ${LINENO} "$PREFIX starting assemble_strain_sh"
+debug_msg  ${LINENO} "log prefix is $LOGPREFIX"
+
+#function save_strain_pipe_config_information ()
+#{
+#  logdir="$LOCAL_DATA/$RESULTDIR/$PREFIX/logdir"
+#  debug_msg  ${LINENO} "$PREFIX logdir is $logdir"
+#  mkdir -p $logdir
+#  num_runs=1
+#  if [[ -e "$logdir/runs" ]]; then
+#    num_runs=$(<"$logdir/runs")
+#    num_runs=$(($num_runs+1))
+#  fi
+#  echo "$num_runs" > "$logdir/runs"
+#  cp "$CONFIGFILE" "$logdir/$num_runs.CONFIGFILE"
+#  cp "$RECIPEFILE" "$logdir/$num_runs.RECIPEFILE"
+#}
 
 function display_tool_array ()
 {
@@ -40,6 +58,20 @@ function display_tool_array ()
 source  $SOURCEDIR/send_tools.sh
 source  $SOURCEDIR/wait_for_tools_to_finish.sh
 
+function save_pipe_config_information ()
+{
+  CONFIGDIR="$LOCAL_DATA/$RESULTDIR/$PREFIX/pipline_parameters"
+  debug_msg  ${LINENO} "configdir is $CONFIGDIR"
+  mkdir -p $CONFIGDIR
+  num_runs=1
+  if [[ -e "$CONFIGDIR/runs" ]]; then
+    num_runs=$(<"$CONFIGDIR/runs")
+    num_runs=$(($num_runs+1))
+  fi
+  echo "$num_runs" > "$CONFIGDIR/runs"
+  cp "$CONFIGFILE" "$CONFIGDIR/CONFIGFILE.$num_runs"
+  cp "$RECIPEFILE" "$CONFIGDIR/RECIPEFILE.$num_runs"
+}
 
 function parse_recipe_file ()
 {
@@ -72,7 +104,7 @@ function parse_recipe_file ()
       debug_msg  ${LINENO} "parse_recipe_file num of assemblers $num_tools"
       case "$col1" in
         "$SEND_AND_WAIT" )
-          debug_msg  ${LINENO} "parse_recipe_file: case send_and_wait"
+          #debug_msg  ${LINENO} "parse_recipe_file: case send_and_wait"
           num_tools=$(($num_tools + 1 ))
           TOOL_TYPE[num_tools]="$SEND_AND_WAIT"
           TOOL_PARAMTERS[num_tools]=$num_tools_this_pass
@@ -82,7 +114,7 @@ function parse_recipe_file ()
           debug_msg  ${LINENO} "parse_recipe_file case commeted out line"
           ;;
         $ASDEMBLER | $METRIC )
-          debug_msg  ${LINENO} "parse_recipe_file case assembler tool $col1 added to list"
+          #debug_msg  ${LINENO} "parse_recipe_file case assembler tool $col1 added to list"
           num_tools=$(($num_tools + 1 ))
           num_tools_this_pass=$(($num_tools_this_pass + 1 ))
           TOOL_TYPE[num_tools]=$col1
@@ -92,10 +124,10 @@ function parse_recipe_file ()
           TOOL_PARAMTERS[num_tools]=$col5        
           ;;
         *)
-          debug_msg  ${LINENO} "parse_recipe_file unrecognised entry ignore line" 
+          #debug_msg  ${LINENO} "parse_recipe_file unrecognised entry ignore line" 
           ;;
       esac
-      debug_msg  ${LINENO} "parse_recipe_file done onto next line"
+      #debug_msg  ${LINENO} "parse_recipe_file done onto next line"
     done < "$RECIPEFILE"
     debug_msg  ${LINENO} "parse_recipe_file finshed file"
   }
@@ -129,6 +161,7 @@ function parse_recipe_file ()
 
 function main ()
 {
+  #save_strain_pipe_config_information 
   debug_msg  ${LINENO} "In assemble_strain_sh main"
   if [[ -n "$RECIPEFILE" ]]; then
     parse_recipe_file

@@ -10,8 +10,9 @@ declare -r READS1="$3"
 declare -r READS2="$4"
 declare -r READSPB="$5"
 declare -r TOOL_TAG="$6"
-#declare -r PARAMETERS="$6"
-declare -r PARAMETERS=$(echo "$7" | sed -s "s/^\(\(\"\(.*\)\"\)\|\('\(.*\)'\)\)\$/\\3\\5/g")
+declare -r TOOL_NAME="$7"
+declare -r LOGPREFIX="$8"
+declare -r PARAMETERS=$(echo "$9" | sed -s "s/^\(\(\"\(.*\)\"\)\|\('\(.*\)'\)\)\$/\\3\\5/g")
 
 source $SSH_CONFIGFILE
 source $SOURCEDIR/../error.sh
@@ -23,6 +24,8 @@ debug_msg ${LINENO}  "$PREFIX"
 debug_msg ${LINENO}  "$READS1"
 debug_msg ${LINENO}  "$READS2"
 debug_msg ${LINENO}  "$TOOL_TAG"
+debug_msg ${LINENO}  "$TOOL_NAME"
+debug_msg ${LINENO}  "$LOGPREFIX"
 debug_msg ${LINENO}  "$PARAMTERS"
 
 readonly SSH_WORKDIR

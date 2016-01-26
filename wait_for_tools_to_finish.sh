@@ -33,8 +33,11 @@ function wait_for_tools_to_finish ()
             debug_msg  ${LINENO} "cant find $reportfile about to sleep for a while"
             sleep "$SLEEP_TIME" 
           done
-          cp $reportfile $LOCAL_REPORTDIR/${PREFIX}_${TOOL_NAME[$i]}.out
           debug_msg  ${LINENO} "found $reportfile contnuing"
+          cp "$reportfile" "$LOCAL_REPORTDIR/${PREFIX}_${TOOL_NAME[$i]}.out"
+          debug_msg  ${LINENO} "about to copy $reportfile to ${LOGPREFIX}.ssh.${TOOL_NAME[$i]}.out"
+          cp "$reportfile" "${LOGPREFIX}.ssh.${TOOL_NAME[$i]}.out"  
+          debug_msg  ${LINENO} "temp done copy"
         done
       fi
     fi

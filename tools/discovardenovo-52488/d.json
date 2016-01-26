@@ -1,0 +1,83 @@
+[
+{
+    "Id": "5567d731d3d7a9d9cae7b6b7d3ba01a347008fa3c0f3718b52d64a6fbc39f004",
+    "Parent": "b07947b4ffefddb31ec73852d340063aa395e5f051b2ba6167b34884a29daf89",
+    "Comment": "",
+    "Created": "2016-01-25T13:12:26.142123816Z",
+    "Container": "5b654dce7000e58ea13a5284426622be36ed81e04359bde72e4a6807b724c6cb",
+    "ContainerConfig": {
+        "Hostname": "f813a028846a",
+        "Domainname": "",
+        "User": "",
+        "AttachStdin": false,
+        "AttachStdout": false,
+        "AttachStderr": false,
+        "ExposedPorts": null,
+        "PublishService": "",
+        "Tty": false,
+        "OpenStdin": false,
+        "StdinOnce": false,
+        "Env": [
+            "PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"
+        ],
+        "Cmd": [
+            "/bin/sh",
+            "-c",
+            "#(nop) ENTRYPOINT \u0026{[\"DiscovarDeNovo\"]}"
+        ],
+        "Image": "b07947b4ffefddb31ec73852d340063aa395e5f051b2ba6167b34884a29daf89",
+        "Volumes": null,
+        "VolumeDriver": "",
+        "WorkingDir": "/discovardenovo-52488",
+        "Entrypoint": [
+            "DiscovarDeNovo"
+        ],
+        "NetworkDisabled": false,
+        "MacAddress": "",
+        "OnBuild": [],
+        "Labels": null
+    },
+    "DockerVersion": "1.8.2",
+    "Author": "Piers Shepperson",
+    "Config": {
+        "Hostname": "f813a028846a",
+        "Domainname": "",
+        "User": "",
+        "AttachStdin": false,
+        "AttachStdout": false,
+        "AttachStderr": false,
+        "ExposedPorts": null,
+        "PublishService": "",
+        "Tty": false,
+        "OpenStdin": false,
+        "StdinOnce": false,
+        "Env": [
+            "PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"
+        ],
+        "Cmd": null,
+        "Image": "b07947b4ffefddb31ec73852d340063aa395e5f051b2ba6167b34884a29daf89",
+        "Volumes": null,
+        "VolumeDriver": "",
+        "WorkingDir": "/discovardenovo-52488",
+        "Entrypoint": [
+            "DiscovarDeNovo"
+        ],
+        "NetworkDisabled": false,
+        "MacAddress": "",
+        "OnBuild": [],
+        "Labels": null
+    },
+    "Architecture": "amd64",
+    "Os": "linux",
+    "Size": 0,
+    "VirtualSize": 6354129005,
+    "GraphDriver": {
+        "Name": "devicemapper",
+        "Data": {
+            "DeviceId": "4289",
+            "DeviceName": "docker-8:3-4309231229-5567d731d3d7a9d9cae7b6b7d3ba01a347008fa3c0f3718b52d64a6fbc39f004",
+            "DeviceSize": "107374182400"
+        }
+    }
+}
+]
