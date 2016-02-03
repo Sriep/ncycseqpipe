@@ -10,8 +10,14 @@ function send_tools ()
   {
       declare -r TOOLPREFIX=$1
       declare -ri index=$2
+      outlog="${LOGPREFIX}.run_${TOOL_NAME[$index]}_local.sh.log"
+      errlog="${LOGPREFIX}.run_${TOOL_NAME[$index]}_local.sh.err.log"
       debug_msg  ${LINENO}  "In send_local_assembly function tool name ${TOOL_NAME[$index]} file ${TOOL_NAME[$index]}/run_${TOOL_NAME[$index]}_local.sh"
-      debug_msg  ${LINENO}  "log files ${LOGPREFIX}.run_${TOOL_NAME[$index]}_local.sh.log and ${LOGPREFIX}.run_${TOOL_NAME[$index]}_local.sh.err.log"
+      #debug_msg  ${LINENO}  "log files ${LOGPREFIX}.run_${TOOL_NAME[$index]}_local.sh.log and ${LOGPREFIX}.run_${TOOL_NAME[$index]}_local.sh.err.log"
+      debug_msg  ${LINENO}  "log files ot  $outlog and err $errlog"
+      #> $errlog 
+      #> $outlog
+      
       if [[ "$PARALLEL" == "&" ]]; then
         debug_msg  ${LINENO}  "parallel is ampusand"
         # /usr/bin/time -o output.time.txt -p date 
@@ -19,6 +25,8 @@ function send_tools ()
         # ( time ./sleep.sh )  2> timeout1.txt
         #( time 
         #sudo bash -c "/home/shepperp/datashare/Piers/github/ncycseqpipe/utNCYC22.sh &"
+        debug_msg  ${LINENO}  "std out to $outlog"
+        debug_msg  ${LINENO}  "std err to $errlog" 
         $SOURCEDIR/tools/${TOOL_NAME[$index]}/run_${TOOL_NAME[$index]}_local.sh \
           "$CONFIGFILE" \
           "$TOOLPREFIX" \
@@ -29,13 +37,16 @@ function send_tools ()
           "${TOOL_NAME[$index]}" \
           "${LOGPREFIX}" \
           "${TOOL_PARAMTERS[$index]}" \
-          > "${LOGPREFIX}.run_${TOOL_NAME[$index]}_local.sh.stdout.log" \
-          2> "${LOGPREFIX}.run_${TOOL_NAME[$index]}_local.sh.stderr.log" &
+          > "$outlog" 2> "$errlog" &
+          #> "${LOGPREFIX}.run_${TOOL_NAME[$index]}_local.sh.stdout.log" \
+          #2> "${LOGPREFIX}.run_${TOOL_NAME[$index]}_local.sh.stderr.log" &
           #) 2> $LOCAL_WORKDIR/$PREFIX/${TOOL_TAG[$index]}_$PREFIX.log &
           #process_num=$! 
           #set +u; process_num=$!; set -u
       else
         debug_msg  ${LINENO} "parrelle is not not ampusand"
+        debug_msg  ${LINENO}  "std out to $outlog"
+        debug_msg  ${LINENO}  "std err to $errlog" 
         #( time 
         $SOURCEDIR/tools/${TOOL_NAME[$index]}/run_${TOOL_NAME[$index]}_local.sh \
           "$CONFIGFILE" \
@@ -44,11 +55,12 @@ function send_tools ()
           "$READS2" \
           "$READSPB" \
           "${TOOL_TAG[$index]}" \
-          "${TOOL_NAME[$index]}" \  
-          "${LOGPREFIX}" \          
+          "${TOOL_NAME[$index]}" \
+          "${LOGPREFIX}" \
           "${TOOL_PARAMTERS[$index]}" \
-          > "${LOGPREFIX}.run_${TOOL_NAME[$index]}_local.sh.stdout.log" \
-          2> "${LOGPREFIX}.run_${TOOL_NAME[$index]}_local.sh.stderr.log"           
+          > $outlog 2> $errlog  
+          #> "${LOGPREFIX}.run_${TOOL_NAME[$index]}_local.sh.stdout.log" \
+          #2> "${LOGPREFIX}.run_${TOOL_NAME[$index]}_local.sh.stderr.log"
       fi
       debug_msg  ${LINENO} "end of send_local_tool endo fo send_local_tool"
   }

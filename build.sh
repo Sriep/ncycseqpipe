@@ -42,6 +42,6 @@ docker push sriep/spades-3.6.2
 docker push sriep/sspace-longread-1.1 
 docker push sriep/wgs-8.3rc2
 
-sudo bash -c "/home/shepperp/datashare/Piers/github/ncycseqpipe/utNCYC22.sh &"
+#sudo bash -c "/home/shepperp/datashare/Piers/github/ncycseqpipe/utNCYC22.sh &"
 #sudo bash -c "/home/shepperp/datashare/Piers/github/ncycseqpipe/build.sh &"
 

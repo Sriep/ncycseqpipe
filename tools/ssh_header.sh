@@ -32,9 +32,13 @@ readonly SSH_WORKDIR
 readonly READDIR
 debug_msg ${LINENO} "source directory $SOURCEDIR"
 
+declare -a args=( "" "" "" "" "" "" "" "" "" "" )
+IFS=' ' read -ra args <<< "$PARAMETERS"
+echo "arguments ${args[@]/#/}"
+
 readonly PRFIX_STUB=$(basename $PREFIX)
 declare -r SSH_RESULTDIR=$HPC_DATA/$RESULTDIR/$PREFIX
-declare -r WORKDIR=$SSH_RESULTDIR/$TOOL_TAG-ssh
+declare -r WORKDIR=$SSH_RESULTDIR/$TOOL_NAME-ssh
 declare -r SSH_READSDIR=$HPC_DATA/$READDIR
 declare -r TEMPLATE=$SSH_RESULTDIR.fasta
 mkdir -p $WORKDIR

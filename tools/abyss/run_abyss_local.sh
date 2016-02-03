@@ -14,8 +14,8 @@ source $SOURCEDIR/local_header.sh
 
 debug_msg  ${LINENO} "ABYSS: about to run local abyss on $PREFIX"
 
-declare -a args=( "" "" "" "" "" )
-IFS=' ' read -ra args <<< "$PARAMETERS"
+#declare -a args=( "" "" "" "" "" )
+#IFS=' ' read -ra args <<< "$PARAMETERS"
 debug_msg  ${LINENO} "arguments ${args[@]/#/}"
 
 docker run \

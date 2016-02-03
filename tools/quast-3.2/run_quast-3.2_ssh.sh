@@ -22,7 +22,6 @@ debug_msg  ${LINENO}  "now send the quest command for real"
 
 $QUASTDIR/quast.py \
   --eukaryote \
-  --scaffolds \
   -o $WORKDIR \
   $TEMPLATE
 

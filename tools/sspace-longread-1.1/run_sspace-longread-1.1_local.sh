@@ -13,6 +13,8 @@ PROGNAME=$(basename $0)
 # WORKDIR - Directory in which to put tempory work files
 # READSDIR - Directory where paired end reads are located
 #-------------------------- Assembly specific code here --------------------
+readonly TARGET=${args[0]}${args[1]}${PREFIX}i
+debug_msg  ${LINENO}  "target is $RAGOUT_TARGET"
 
 debug_msg  ${LINENO}   "about to run local sspace longread on $PREFIX"
 declare -a args=( "" "" "" "" "" )
@@ -28,7 +30,7 @@ docker run \
 	sriep/sspace-longread-1.1 \
       SSPACE-LongRead.pl \
       -b /results  \
-      -c /data/${args[0]}.fasta \
+      -c /data/$TARGET.fasta \
       -p /reads/$READSPB \
       -t 10 
 remove_docker_container sspace-longread$PREFIX

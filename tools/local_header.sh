@@ -44,8 +44,11 @@ declare -r TEMPLATE=$LOCAL_RESULTDIR.fasta
 declare CONTIGS=
 declare SCAFFOLDS=
 declare METRICS=
-declare LOGFILE=$LOGPREFIX/$PROGNAME.log
+declare LOGFILE=${LOGPREFIX}$PROGNAME.log
 
+declare -a args=( "" "" "" "" "" "" "" "" "" "" )
+IFS=' ' read -ra args <<< "$PARAMETERS"
+debug_msg ${LINENO} "arguments ${args[@]/#/}"
 
 mkdir -p $LOCAL_RESULTDIR
 mkdir -p $WORKDIR
@@ -58,6 +61,7 @@ function remove_docker_container ()
   echo WGC: about to remove $1
   debug_msg ${LINENO} "about to remove $1" 
   docker stats --no-stream=true $1 1>> $LOGFILE
-  docker inspect > $LOGPREFIX/$PROGNAME.$1.json
+  #docker inspect $1 >> $LOGPREFIX.$PROGNAME.$1.json
+  docker inspect $1 >> $LOGFILE
   docker rm -f $1 
 }

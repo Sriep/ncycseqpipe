@@ -11,8 +11,8 @@ source $SOURCEDIR/local_header.sh
 # WORKDIR - Directory in which to put tempory work files
 # READSDIR - Directory where paired end reads are located
 #-------------------------- Assembly specific code here --------------------
-declare -r SAMFILE=$LOCAL_RESULTDIR/${PRFIX_STUB}_BOW2.sam
-declare -r BAMFILE=$LOCAL_RESULTDIR/${PRFIX_STUB}_BOW2.bam
+declare -r SAMFILE=$LOCAL_RESULTDIR/${PRFIX_STUB}_bow2.sam
+declare -r BAMFILE=$LOCAL_RESULTDIR/${PRFIX_STUB}_bow2.bam
 
 declare -a args=( "" "" "" "" "" )
 IFS=' ' read -ra args <<< "$PARAMETERS"
@@ -27,7 +27,7 @@ docker run \
 	-v $LOCAL_RESULTDIR:/datadir:ro \
 	-v $WORKDIR:/results \
 	sriep/ale \
-		/datadir/${PRFIX_STUB}_BOW2.bam \
+		/datadir/${PRFIX_STUB}_bow2.bam \
 		/datadir/$template_basename \
 		/results/$template_basename.ale
 remove_docker_container ale$PREFIX

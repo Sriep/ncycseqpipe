@@ -1,6 +1,11 @@
 #!/bin/bash
+source hpccore-5
+source Ray-2.3.1
+source mpich2-1.5
+source openmpi-1.6.5
+source openssl-1.0.1j
 declare -xr SOURCEDIR="$(dirname $BASH_SOURCE)/.."
-source $SOURCEDIR/local_header.sh
+source $SOURCEDIR/ssh_header.sh
 PROGNAME=$(basename $0)
 # PREFIX - Name of strain to assemble
 # READS1 - First set of paired end reads, relative to $LOCAL_READSDIR
@@ -12,24 +17,23 @@ PROGNAME=$(basename $0)
 # READSDIR - Directory where paired end reads are located
 #-------------------------- Assembly specific code here --------------------
 debug_msg  ${LINENO} "about to run ray on strain $PREFIX"
-declare -a args=( "" "" "" "" "" )
-IFS=' ' read -ra args <<< "$PARAMETERS"
-debug_msg  ${LINENO} "arguments ${args[@]/#/}"
-#${args[0]}  ${args[1]} ${args[2]} ${args[3]} ${args[4]} 
+RAYEX=/nbi/software/testing/Ray/2.3.1/x86_64/bin
+#docker run \
+#	--name ray-2.3.1$PREFIX  \
+#	-v $READSDIR:/reads:ro \
+#	-v $WORKDIR:/results \
+#  --entrypoint mpiexec \
+#	sriep/ray-2.3.1 \
+#      -n 10 \
+#		  /Ray-2.3.1/ray-build/Ray \
+#      -k 31 \
+#      -p /reads/$READS1 /reads/$READS2 \
+#      -o /results/out 
+#debug_msg  ${LINENO} "ray return code is $?"
+#docker rm -f ray-2.3.1$PREFIX 
 
-docker run \
-	--name ray-2.3.1$PREFIX  \
-	-v $READSDIR:/reads:ro \
-	-v $WORKDIR:/results \
-  --entrypoint mpiexec \
-	sriep/ray-2.3.1 \
-      -n ${args[0]} \
-		  /Ray-2.3.1/ray-build/Ray \
-      -k ${args[1]} \
-      -p /reads/$READS1 /reads/$READS2 \
-      -o /results/out 
-debug_msg  ${LINENO} "ray return code is $?"
-docker rm -f ray-2.3.1$PREFIX 
+mpiexec -n 10 Ray -k 31 -p $READSDIR/$READS1 $/READSDIR/$READS2 \
+      -o $WORKDIR/out 
 
 #Give location of result files
 chmod -R o+rwx $WORKDIR/out
@@ -37,7 +41,7 @@ CONTIGS=$WORKDIR/out/Contigs.fasta
 #SCAFFOLDS=$WORKDIR/$PREFIX.scafSeq
 #-------------------------- Assembly specific code here --------------------
 
-source $SOURCEDIR/local_footer.sh
+source $SOURCEDIR/ssh_footer.sh
 
 #DEBUG
 #source /home/shepperp/datashare/Piers/github/ncycseqpipeHidden/input/ncycseqpipe.cfg

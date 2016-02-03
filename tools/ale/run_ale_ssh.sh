@@ -13,14 +13,14 @@ source $SOURCEDIR/ssh_header.sh
 # WORKDIR - Directory in which to put tempory work files
 # READSDIR - Directory where paired end reads are located
 #-------------------------- Assembly specific code here --------------------
-declare -r SAMFILE=$SSH_RESULTDIR/${PRFIX_STUB}_BOW2.sam
-declare -r BAMFILE=$SSH_RESULTDIR/${PRFIX_STUB}_BOW2.bam
+declare -r SAMFILE=$SSH_RESULTDIR/${PRFIX_STUB}_bow2.sam
+declare -r BAMFILE=$SSH_RESULTDIR/${PRFIX_STUB}_bow2.bam
 
 cd  $WORKDIR
 debug_msg  ${LINENO} "about to run ale"
 debug_msg  ${LINENO} "bamfile  $BAMFILE"
 
-$ALE $BAMFILE $TEMPLATE $WORKDIR/$TEMPLATE.ale
+ALE $BAMFILE $TEMPLATE $WORKDIR/$TEMPLATE.ale
 
 debug_msg  ${LINENO} "finished ale"
 #Give location of result files

@@ -56,7 +56,7 @@ function main ()
       debug_msg  ${LINENO} "log dirctory for strian $col1 is $logdir/$num_runs"
       "$SOURCEDIR/assemble_strain.sh" $col1 $col2 $col3 $col4 "$logdir/$num_runs" \
         > "$logdir/$num_runs.assemble_all.stdout.log" \
-        2> "$logdir/$num_runs.assemble_all.stderr.log"  $MULTISTRAIN_PARALLEL
+        2> "$logdir/$num_runs.assemble_all.stderr.log" & 
     done < "$READSFILE"
   fi
   debug_msg  ${LINENO} "Sent of all strains to be assembled."
