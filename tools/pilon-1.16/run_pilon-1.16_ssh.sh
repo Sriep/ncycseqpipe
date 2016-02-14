@@ -20,6 +20,9 @@ debug_msg  ${LINENO} "Start run_pilon1.16"
 declare -r PILONPATH=/nbi/software/testing/pilon/1.16/x86_64/bin
 cd  $WORKDIR
 
+readonly TARGET=${args[0]}${args[1]}${PREFIX}i
+debug_msg  ${LINENO}  "target is $TARGET"
+
 declare -a args=( "" "" "" "" "" "" "" )
 IFS=' ' read -ra args <<< "$PARAMETERS"
 debug_msg  ${LINENO} "arguments ${args[@]/#/}"
@@ -28,7 +31,7 @@ debug_msg  ${LINENO} "about to run pilon"
 debug_msg  ${LINENO} "about to run pilon"
 java -jar $PILONPATH/pilon-1.16.jar \
   --genome "$SSH_RESULTDIR/${args[0]}.fasta"  \
-  --frags $SSH_RESULTDIR/${args[0]}/m_${args[0]}_bow2.bam \
+  --frags $SSH_RESULTDIR/${TARGET}/${TARGET}_bow2.bam \
   --output "$SSH_RESULTDIR/${args[0]}_p.fasta" \
    ${args[1]} ${args[2]} ${args[3]} ${args[4]} ${args[5]} ${args[6]} 
 #Give location of result files

@@ -13,14 +13,15 @@ source $SOURCEDIR/ssh_header.sh
 # WORKDIR - Directory in which to put tempory work files
 # READSDIR - Directory where paired end reads are located
 #-------------------------- Assembly specific code here --------------------
-echo ABYSS ssh: about to run ssh abyss on $PREFIX
+debug_msg  ${LINENO} " about to run ssh abyss on $PREFIX with parameters $PARAMETERS"
 
-declare -a args=( "" "" "" "" "" )
-IFS=' ' read -ra args <<< "$PARAMETERS"
-echo "arguments ${args[@]/#/}"
+#declare -a args=( "" "" "" "" "" )
+#IFS=' ' read -ra args <<< "$PARAMETERS"
+debug_msg  ${LINENO} "arguments ${args[@]/#/}"
 
 abyss-pe \
 		${args[0]}  ${args[1]} ${args[2]} ${args[3]} ${args[4]} \
+    ${args[5]}  ${args[6]} ${args[7]} ${args[8]} ${args[9]} \
 		name=$WORKDIR/$PREFIX \
 		in="$SSH_READSDIR/$READS1 $SSH_READSDIR/$READS2"
 

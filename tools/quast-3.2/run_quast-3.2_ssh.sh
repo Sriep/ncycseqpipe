@@ -14,15 +14,14 @@ source $SOURCEDIR/ssh_header.sh
 # WORKDIR - Directory in which to put tempory work files
 # READSDIR - Directory where paired end reads are located
 #-------------------------- Assembly specific code here --------------------
-echo QUAST ssh: about to run ssh quast on $PREFIX
+debug_msg  ${LINENO}  "QUAST ssh: about to run ssh quast on $PREFIX"
 
-echo template is $TEMPLATE
-echo "$QUASTDIR/quast.py  --eukaryote  --scaffolds  -o $WORKDIR  $f"
-echo now send the quest command for real
+debug_msg  ${LINENO}  "template is $TEMPLATE"
+debug_msg  ${LINENO}  "$QUASTDIR/quast.py  --eukaryote  --scaffolds  -o $WORKDIR  $f"
+debug_msg  ${LINENO}  "now send the quest command for real"
 
 $QUASTDIR/quast.py \
   --eukaryote \
-  --scaffolds \
   -o $WORKDIR \
   $TEMPLATE
 
@@ -31,3 +30,7 @@ METRICS=$WORKDIR/transposed_report.tsv
 
 #-------------------------- Assembly specific code here --------------------
 source $SOURCEDIR/ssh_footer.sh
+
+#WORKDIR=/nbi/group-data/ifs/NBI/Research-Groups/Jo-Dicks/Piers/assemblies/test/NCYC388/rNCYC388i
+#TEMPLATE=/nbi/group-data/ifs/NBI/Research-Groups/Jo-Dicks/Piers/assemblies/test/NCYC388/rNCYC388i.fasta
+#bsub $QUASTDIR/quast.py   --eukaryote   --scaffolds   -o $WORKDIR   $TEMPLATE

@@ -1,4 +1,4 @@
-#abyss-pe
+#abyss
 FROM ubuntu:latest
 MAINTAINER Piers Shepperson
 RUN sudo apt-get update && sudo apt-get install -y \

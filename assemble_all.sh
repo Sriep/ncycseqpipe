@@ -10,18 +10,54 @@ source $SOURCEDIR/error.sh
 debug_msg  ${LINENO} "working directory is $PWD"
 debug_msg  ${LINENO} "source directory is $SOURCEDIR"
 debug_msg  ${LINENO} "read in config file from $CONFIGFILE"
-readonly ILLUMINA_READS 
-readonly ASSEMBLERS_FILE
-debug_msg  ${LINENO} "Illumina reads from $ILLUMINA_READS"
+readonly READSFILE 
+debug_msg  ${LINENO} "Illumina reads from $READSFILE"
+
+function save_pipe_config_information ()
+{
+  CONFIGDIR="$LOCAL_DATA/$RESULTDIR/pipline_parameters"
+  debug_msg  ${LINENO} "configdir is $CONFIGDIR"
+  mkdir -p $CONFIGDIR
+  num_runs=1
+  if [[ -e "$CONFIGDIR/runs" ]]; then
+    num_runs=$(<"$CONFIGDIR/runs")
+    num_runs=$(($num_runs+1))
+  fi
+  echo "$num_runs" > "$CONFIGDIR/runs"
+  cp "$CONFIGFILE" "$CONFIGDIR/$num_runs.CONFIGFILE"
+  cp "$READSFILE" "$CONFIGDIR/$num_runs.READSFILE"
+  cp "$RECIPEFILE" "$CONFIGDIR/$num_runs.RECIPEFILE"
+}
+
+function save_strain_pipe_config_information ()
+{
+  debug_msg  ${LINENO} "logdir is $logdir"
+  mkdir -p $logdir
+  num_runs=1
+  if [[ -e "$logdir/runs" ]]; then
+    num_runs=$(<"$logdir/runs")
+    num_runs=$(($num_runs+1))
+  fi
+  echo "$num_runs" > "$logdir/runs"
+  cp "$CONFIGFILE" "$logdir/$num_runs.CONFIGFILE"
+  cp "$RECIPEFILE" "$logdir/$num_runs.RECIPEFILE"
+}
 
 function main ()
 {
-  if [[ -n $ILLUMINA_READS ]]; then
+  save_pipe_config_information
+  debug_msg  ${LINENO} "readsfile is $READSFILE"
+  if [[ -n $READSFILE ]]; then
     while read -r col1 col2 col3 col4; do
       debug_msg  ${LINENO} "all: About to assemble  name $col1 \tread1 $col2 \tread2 $col3 \treadpb $col3"
       debug_msg  ${LINENO} "all: about to run $SOURCEDIR/assemble_strain.sh $col1 $col2 $col3 $col4 &"
-      "$SOURCEDIR/assemble_strain.sh" $col1 $col2 $col3 $col4 &
-    done < "$ILLUMINA_READS"
+      logdir="$LOCAL_DATA/$RESULTDIR/$col1/logdir"
+      save_strain_pipe_config_information $col1 
+      debug_msg  ${LINENO} "log dirctory for strian $col1 is $logdir/$num_runs"
+      "$SOURCEDIR/assemble_strain.sh" $col1 $col2 $col3 $col4 "$logdir/$num_runs" \
+        > "$logdir/$num_runs.assemble_all.stdout.log" \
+        2> "$logdir/$num_runs.assemble_all.stderr.log" & 
+    done < "$READSFILE"
   fi
   debug_msg  ${LINENO} "Sent of all strains to be assembled."
   debug_msg  ${LINENO} "FINISHED assemble_all.sh."
@@ -29,19 +65,22 @@ function main ()
 
 main "$@"
 
-# /home/shepperp/datashare/Piers/github/ncycseqpipe/assemble_all.sh ncycseqpipe.cfg
+#sudo bash -c "/home/shepperp/datashare/Piers/github/ncycseqpipe/assemble_all.sh /home/shepperp/datashare/Piers/github/ncycseqpipeHidden/input/ncycseqpipe93.cfg > /home/shepperp/93.log 2> /home/shepperp/93err.log &"
 #
-# sudo /home/shepperp/datashare/Piers/github/ncycseqpipe/assemble_all.sh     /home/shepperp/datashare/Piers/github/ncycseqpipeHidden/input/ncycseqpipe.cfg &
-#
-# sudo /home/shepperp/datashare/Piers/github/ncycseqpipe/assemble_all.sh     /home/shepperp/datashare/Piers/github/ncycseqpipeHidden/input/ncycseqpipe1.cfg 
-#
-# sudo /home/shepperp/datashare/Piers/github/ncycseqpipe/assemble_all.sh     /home/shepperp/datashare/Piers/github/ncycseqpipeHidden/input/ncycseqpipe2.cfg > Wgstry2.out  2> Wgstry2.err & 
-# docker run \
-#    --name ncycpipe_run \
-#    -v /home/shepperp/datashare/Piers/github/ncycseqpipeHidden/input:input \
-#    -v /home/shepperp/datashare/Piers/Trim:/reads:ro \
-#    -v /home/shepperp/datashare/Piers/assemblies/test:/results \ 
-#    -v /home/shepperp/documents/test/workdir:/workdir \
-#    -v /nbi/group-data/ifs/NBI/Research-Groups/Jo-Dicks/Piers/assemblies/test:/sshworkdir \
-#    -v /var/run/docker.sock:/var/run/docker.sock \
-#    ncycpipe
+#sudo bash -c "/home/shepperp/datashare/Piers/github/ncycseqpipe/assemble_all.sh /home/shepperp/datashare/Piers/github/ncycseqpipeHidden/input/ncycseqpipe93group.cfg > /home/shepperp/93g.log 2> /home/shepperp/93gerr.log &"
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

@@ -14,8 +14,8 @@ source $SOURCEDIR/local_header.sh
 
 debug_msg  ${LINENO} "ABYSS: about to run local abyss on $PREFIX"
 
-declare -a args=( "" "" "" "" "" )
-IFS=' ' read -ra args <<< "$PARAMETERS"
+#declare -a args=( "" "" "" "" "" )
+#IFS=' ' read -ra args <<< "$PARAMETERS"
 debug_msg  ${LINENO} "arguments ${args[@]/#/}"
 
 docker run \
@@ -26,23 +26,11 @@ docker run \
 		${args[0]}  ${args[1]} ${args[2]} ${args[3]} ${args[4]} \
 		name=/results/$PREFIX \
 		in="/reads/$READS1 /reads/$READS2"
-#echo ABYSS: abyss return code is $?
-#docker rm -f abysspe$PREFIX 
-#echo ABYSS: abysspe$PREFIX  stopped
 remove_docker_container abyss$PREFIX
-# Give location of result files
-# CONTIGS - contig assembly fasta file
-# SCAFFOLDS - scaffold assembly fasta file
+
 CONTIGS=$WORKDIR/$PREFIX-6.fa
 SCAFFOLDS=$WORKDIR/$PREFIX-8.fa
 #-------------------------- Footer --------------------
 
 source $SOURCEDIR/local_footer.sh
 
-#declare  CONFIGFILE=/home/shepperp/datashare/Piers/github/ncycseqpipeHidden/input/ncycseqpipe.cfg
-#declare SSH_CONFIGFILE
-#declare  PREFIX=NCYC22
-#declare  READS1=/NCYC22/NCYC22.FP.fastq
-#declare  READS2=/NCYC22/NCYC22.RP.fastq
-#declare  ASSEMBLY_TAG=a
-#declare  PARAMTERS=k=80 j=10
