@@ -2,6 +2,8 @@
 #include <QPdfWriter>
 #include <QMargins>
 #include <QTextCursor>
+#include <QPdfWriter>
+#include <QPageSize>
 #include <algorithm>
 #include "qcpdocumentobject.h"
 #include "plotlvn.h"
