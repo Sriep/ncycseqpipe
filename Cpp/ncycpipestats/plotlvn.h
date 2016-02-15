@@ -12,7 +12,7 @@ class PlotLvN : public QMainWindow
 {
      Q_OBJECT
 public:
-    PlotLvN(ScatterData& scatterData, QWidget *parent = 0);
+    PlotLvN(ScatterData& scatterData, QString workDir, QWidget *parent = 0);
     virtual ~PlotLvN();
    // virtual void operator() ();
 private:
@@ -22,6 +22,7 @@ private:
     QCustomPlot lvNPlot;
     QTextEdit* textEdit;
     ScatterData& scatterData;
+    QString workDir;
 };
 
 #endif // PLOTLVN_H
