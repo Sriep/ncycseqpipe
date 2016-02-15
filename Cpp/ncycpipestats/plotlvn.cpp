@@ -92,18 +92,28 @@ void PlotLvN::populatePlot()
 
 void PlotLvN::writeToPdf()
 {
-    QPdfWriter* pdfWriter = new QPdfWriter("fileNameLvN5.pdf");
-    QMargins margin = textEdit->contentsMargins();
-    QMargins marginsF(margin);
+    QPdfWriter* pdfWriter = new QPdfWriter("fileNameLvN6.pdf");
+    //QMargins margin = textEdit->contentsMargins();
+    //QMargins marginsF(margin);
 
-    pdfWriter->setPageMargins(marginsF);
-    pdfWriter->setPageSize(QPageSize(QPageSize::A3));
+    //pdfWriter->setPageMargins(marginsF);
+    //pdfWriter->setPageSize(QPageSize(QPageSize::A3));
     pdfWriter->setTitle("Liklyhood vrs N75");
     textEdit->print(pdfWriter);
 }
-
-
-
+/*
+# plotlvn.cpp: In member function 'void PlotLvN::writeToPdf()':
+# plotlvn.cpp:99:16: error: 'class QPdfWriter' has no member named 'setPageMargins'
+#     pdfWriter->setPageMargins(marginsF);
+#                ^
+# plotlvn.cpp:100:38: error: 'QPageSize' has not been declared
+#     pdfWriter->setPageSize(QPageSize(QPageSize::A3));
+#                                      ^
+# plotlvn.cpp:100:51: error: 'QPageSize' was not declared in this scope
+#     pdfWriter->setPageSize(QPageSize(QPageSize::A3));
+#                                                   ^
+# make: *** [plotlvn.o] Error 1
+*/
 
 
 
