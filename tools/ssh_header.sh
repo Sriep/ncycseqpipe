@@ -4,37 +4,39 @@
 # $4 Second part of the paired end reads, relative to read directory
 # $5 Assembly tag from input file
 # $6 Arguments from input file
-declare -r SSH_CONFIGFILE="$1"
-declare -r PREFIX="$2"
-declare -r READS1="$3"
-declare -r READS2="$4"
-declare -r READSPB="$5"
-declare -r TOOL_TAG="$6"
-declare -r TOOL_NAME="$7"
-declare -r LOGPREFIX="$8"
-declare -r PARAMETERS=$(echo "$9" | sed -s "s/^\(\(\"\(.*\)\"\)\|\('\(.*\)'\)\)\$/\\3\\5/g")
+declare -r SSH_CONFIGFILE="$2"
+declare -r PREFIX="$3"
+declare -r READS1="$4"
+declare -r READS2="$5"
+declare -r READSPB="$6"
+declare -r TOOL_TAG="$7"
+declare -r TOOL_NAME="$8"
+declare -r LOGPREFIX="$9"
+declare -r PARAMETERS=$(echo "${10}" | sed -s "s/^\(\(\"\(.*\)\"\)\|\('\(.*\)'\)\)\$/\\3\\5/g")
 
 source $SSH_CONFIGFILE
-source $SOURCEDIR/../error.sh
+source $SOURCEDIR/error.sh
 OLD_PROGNAME=$PROGNAME || true
 PROGNAME=$(basename $0)
 
-debug_msg ${LINENO}  "$SSH_CONFIGFILE"
-debug_msg ${LINENO}  "$PREFIX"
-debug_msg ${LINENO}  "$READS1"
-debug_msg ${LINENO}  "$READS2"
-debug_msg ${LINENO}  "$TOOL_TAG"
-debug_msg ${LINENO}  "$TOOL_NAME"
-debug_msg ${LINENO}  "$LOGPREFIX"
-debug_msg ${LINENO}  "$PARAMTERS"
-
-readonly SSH_WORKDIR
+debug_msg ${LINENO}  "SOURCEDIR=$SOURCEDIR"
+debug_msg ${LINENO}  "SSH_CONFIGFILE=$SSH_CONFIGFILE"
+debug_msg ${LINENO}  "PREFIX=$PREFIX"
+debug_msg ${LINENO}  "READS1=$READS1"
+debug_msg ${LINENO}  "READS2=$READS2"
+debug_msg ${LINENO}  "READSPB=$READSPB"
+debug_msg ${LINENO}  "TOOL_TAG=$TOOL_TAG"
+debug_msg ${LINENO}  "TOOL_NAME=$TOOL_NAME"
+debug_msg ${LINENO}  "LOGPREFIX=$LOGPREFIX"
+debug_msg ${LINENO}  "PARAMETERS=$PARAMETERS"
+debug_msg ${LINENO}  "argument doller ten=$10"
+#readonly SSH_WORKDIR
 readonly READDIR
-debug_msg ${LINENO} "source directory $SOURCEDIR"
+#debug_msg ${LINENO} "SSH_WORKDIR=$SSH_WORKDIR"
 
 declare -a args=( "" "" "" "" "" "" "" "" "" "" )
 IFS=' ' read -ra args <<< "$PARAMETERS"
-echo "arguments ${args[@]/#/}"
+echo "arguments from PARAMETERS are ${args[@]/#/}"
 
 readonly PRFIX_STUB=$(basename $PREFIX)
 declare -r SSH_RESULTDIR=$HPC_DATA/$RESULTDIR/$PREFIX

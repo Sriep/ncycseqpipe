@@ -6,12 +6,12 @@ declare -xr PREFIX=$1
 declare -xr READS1=$2
 declare -xr READS2=$3
 declare -xr READSPB=$4
-declare -xr LOGPREFIX=$5
+declare -xr LOGPATH=$5
 
 #global varables
 source $CONFIGFILE
 source $SOURCEDIR/error.sh
-
+BATCHOPT=LSF #templine
 declare -ax BSUBIDS
 declare -ax PIDS
 declare -xr SSH_SOURCEDIR=${HPC_DATA}${SOURCEDIR#$LOCAL_DATA}
@@ -20,6 +20,13 @@ declare -xr SSH_REPORTDIR=$HPC_DATA/$RESULTDIR/$PREFIX/ssh_out
 declare -xr LOCAL_REPORTDIR=$LOCAL_DATA/$RESULTDIR/$PREFIX/ssh_out
 declare -r LOCAL_RESULTDIR=$LOCAL_DATA/$RESULTDIR/$PREFIX
 
+declare -xr LOCAL_LOGPREFIX="$LOCAL_DATA/$LOGPATH"
+declare -xr SSH_LOGPREFIX="$HPC_DATA/$LOGPATH"
+debug_msg  ${LINENO} " SSH_SOURCEDIR is $SSH_SOURCEDIR"
+debug_msg  ${LINENO} " SSH_CONFIGFILE is $SSH_CONFIGFILE"
+debug_msg  ${LINENO} " LOCAL_LOGPREFIX is $LOCAL_LOGPREFIX"
+debug_msg  ${LINENO} " SSH_LOGPREFIX is $SSH_LOGPREFIX"
+
 declare -ax TOOL_TYPE
 declare -ax TOOL_NAME
 declare -ax TOOL_LOCATION
@@ -27,7 +34,6 @@ declare -ax TOOL_TAG
 declare -ax TOOL_PARAMTERS
 declare -xi num_tools=0
 debug_msg  ${LINENO} "$PREFIX starting assemble_strain_sh"
-debug_msg  ${LINENO} "log prefix is $LOGPREFIX"
 
 #function save_strain_pipe_config_information ()
 #{
@@ -100,8 +106,8 @@ function parse_recipe_file ()
   {
     declare -i num_tools_this_pass=0
     while read -r col1 col2 col3 col4 col5; do 
-      debug_msg  ${LINENO} "parse_recipe_file data: type $col1 $col2 \tlocation $col3 \ttag $col4 \tparamter $col5 "
-      debug_msg  ${LINENO} "parse_recipe_file num of assemblers $num_tools"
+      #debug_msg  ${LINENO} "parse_recipe_file data: type $col1 $col2 \tlocation $col3 \ttag $col4 \tparamter $col5 "
+      #debug_msg  ${LINENO} "parse_recipe_file num of assemblers $num_tools"
       case "$col1" in
         "$SEND_AND_WAIT" )
           #debug_msg  ${LINENO} "parse_recipe_file: case send_and_wait"
@@ -111,7 +117,7 @@ function parse_recipe_file ()
           num_tools_this_pass=0
           ;;
         \#* | "" )
-          debug_msg  ${LINENO} "parse_recipe_file case commeted out line"
+          #debug_msg  ${LINENO} "parse_recipe_file case commeted out line"
           ;;
         $ASDEMBLER | $METRIC )
           #debug_msg  ${LINENO} "parse_recipe_file case assembler tool $col1 added to list"
@@ -140,6 +146,7 @@ function parse_recipe_file ()
     for (( recipie_line=1; recipie_line<="$num_tools"; ++recipie_line )); do
       if [[  "${TOOL_TYPE[$recipie_line]}" = $SEND_AND_WAIT ]]; then
         debug_msg  ${LINENO} "about to call send_tools, paramters ${TOOL_PARAMTERS[$recipie_line]} index $recipie_line"
+        SSHJOBIDS=""
         send_tools ${TOOL_PARAMTERS[$recipie_line]} $recipie_line
         debug_msg  ${LINENO} "about to call wait_for_tools_to_finish, paramters ${TOOL_PARAMTERS[$recipie_line]} index $recipie_line"
         wait_for_tools_to_finish ${TOOL_PARAMTERS[$recipie_line]} $recipie_line

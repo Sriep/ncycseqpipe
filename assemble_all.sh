@@ -45,6 +45,9 @@ function save_strain_pipe_config_information ()
 
 function main ()
 {
+  echo before
+  ssh -i /home/shepperp/.ssh/id_rsa shepperp@SLURM.nbi.ac.uk echo "This is the first echo"
+  echo after
   save_pipe_config_information
   debug_msg  ${LINENO} "readsfile is $READSFILE"
   if [[ -n $READSFILE ]]; then
@@ -54,7 +57,7 @@ function main ()
       logdir="$LOCAL_DATA/$RESULTDIR/$col1/logdir"
       save_strain_pipe_config_information $col1 
       debug_msg  ${LINENO} "log dirctory for strian $col1 is $logdir/$num_runs"
-      "$SOURCEDIR/assemble_strain.sh" $col1 $col2 $col3 $col4 "$logdir/$num_runs" \
+      "$SOURCEDIR/assemble_strain.sh" $col1 $col2 $col3 $col4 "$RESULTDIR/$col1/logdir/$num_runs" \
         > "$logdir/$num_runs.assemble_all.stdout.log" \
         2> "$logdir/$num_runs.assemble_all.stderr.log" & 
     done < "$READSFILE"
@@ -68,19 +71,4 @@ main "$@"
 #sudo bash -c "/home/shepperp/datashare/Piers/github/ncycseqpipe/assemble_all.sh /home/shepperp/datashare/Piers/github/ncycseqpipeHidden/input/ncycseqpipe93.cfg > /home/shepperp/93.log 2> /home/shepperp/93err.log &"
 #
 #sudo bash -c "/home/shepperp/datashare/Piers/github/ncycseqpipe/assemble_all.sh /home/shepperp/datashare/Piers/github/ncycseqpipeHidden/input/ncycseqpipe93group.cfg > /home/shepperp/93g.log 2> /home/shepperp/93gerr.log &"
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 

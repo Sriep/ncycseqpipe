@@ -1,10 +1,9 @@
 #!/bin/bash
 # 
-
 source hpccore-5
 source SOAPdenovo2-r240
-declare -xr SOURCEDIR="$(dirname $BASH_SOURCE)/.."
-source $SOURCEDIR/ssh_header.sh
+declare -r SOURCEDIR="$1"
+source $SOURCEDIR/tools/ssh_header.sh
 # PREFIX - Name of strain to assemble
 # READS1 - First set of paired end reads, relative to $LOCAL_READSDIR
 # READS2 - Second set of paired end reads, relative to $LOCAL_READSDIR
@@ -20,8 +19,8 @@ debug_msg  ${LINENO} "SOAPdenvo2 ssh: about to run ssh soapdenovo2 on $PREFIX"
 #touch $WORKDIR/config_file
 
 > $WORKDIR/config_file
-cat $SOURCEDIR/soapdenovo2/soap_config_head.txt >> $WORKDIR/config_file
-cat $SOURCEDIR/soapdenovo2/soap_config_lib_head.txt >> $WORKDIR/config_file
+cat $SOURCEDIR/tools/soapdenovo2/soap_config_head.txt >> $WORKDIR/config_file
+cat $SOURCEDIR/tools/soapdenovo2/soap_config_lib_head.txt >> $WORKDIR/config_file
 echo q1=$SSH_READSDIR/$READS1 >> $WORKDIR/config_file
 echo q2=$SSH_READSDIR/$READS2 >> $WORKDIR/config_file
 
@@ -43,4 +42,4 @@ SOAPdenovo-127mer \
 CONTIGS=$WORKDIR/$PREFIX.contig
 SCAFFOLDS=$WORKDIR/$PREFIX.scafSeq
 #-------------------------- Assembly specific code here --------------------
-source $SOURCEDIR/ssh_footer.sh
+source $SOURCEDIR/tools/ssh_footer.sh

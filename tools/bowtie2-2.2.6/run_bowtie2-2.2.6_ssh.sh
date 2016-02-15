@@ -3,8 +3,8 @@ source hpccore-5
 source bowtie2-2.2.5
 source samtools-1.0
 source jdk-1.7.0_25
-declare -xr SOURCEDIR="$(dirname $BASH_SOURCE)/.."
-source $SOURCEDIR/ssh_header.sh
+declare -r SOURCEDIR="$1"
+source $SOURCEDIR/tools/ssh_header.sh
 # PREFIX - Name of strain to assemble
 # READS1 - First set of paired end reads, relative to $LOCAL_READSDIR
 # READS2 - Second set of paired end reads, relative to $LOCAL_READSDIR
