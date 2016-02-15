@@ -6,7 +6,7 @@
 #include <QPdfWriter>
 #include <QFont>
 #include <QPen>
-#include <QPageSize>
+//#include <QPageSize>
 #include <algorithm>
 #include "qcpdocumentobject.h"
 #include "plotlvn.h"
