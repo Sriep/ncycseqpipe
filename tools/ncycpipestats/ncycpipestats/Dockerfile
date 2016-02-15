@@ -1,20 +1,17 @@
-#abyss
 FROM ubuntu:latest
 MAINTAINER Piers Shepperson
-RUN sudo apt-get update && sudo apt-get install -y \
-    automake \
+#RUN sudo apt-key update && apt-get update && sudo apt-get install -y \
+RUN apt-get update && sudo apt-get install -y \
+	git \
     build-essential \
-    git \
-    libboost-all-dev \
-    libhdf5-openmpi-dev \
-    libopenmpi-dev \
-    openmpi-bin \
-    sparsehash \
-    wget
-RUN git clone https://github.com/bcgsc/abyss.git
-WORKDIR abyss/
-RUN ./autogen.sh
-RUN ./configure
+	Xvfb \
+	qt5-default \	
+    wget 
+RUN git clone https://github.com/Sriep/ncycseqpipe.git
+WORKDIR /ncycseqpipe/Cpp/ncycpipestats
+RUN qmake ncycpipestats.pro
 RUN make
-RUN sudo make install
-ENTRYPOINT ["abyss-pe"]
+ENV PATH  $PATH:/ncycseqpipe/Cpp/ncycpipestats
+ENTRYPOINT ["xvfb-run"]
+#ENTRYPOINT ["ncycpipestats"]
+
