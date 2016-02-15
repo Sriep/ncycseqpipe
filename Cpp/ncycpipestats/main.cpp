@@ -71,7 +71,7 @@ void runProgram(QString workDirectory)
     //QuastMetrics::QuastFolderData quastData=quastStuff.folderData();
     //ScatterData(CgalMetrics& cgal, QuastMetrics& quast);
     ScatterData scatterData(cgalStuff, quastStuff);
-    PlotLvN scatterPlot(scatterData);
+    PlotLvN scatterPlot(scatterData, workDirectory);
     scatterPlot.show();
 }
 

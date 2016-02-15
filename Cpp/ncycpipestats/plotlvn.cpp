@@ -11,8 +11,8 @@
 #include "qcpdocumentobject.h"
 #include "plotlvn.h"
 
-PlotLvN::PlotLvN(ScatterData& scatterData, QWidget *parent)
-    : QMainWindow(parent), scatterData(scatterData)
+PlotLvN::PlotLvN(ScatterData& scatterData, QString workDir, QWidget *parent)
+    : QMainWindow(parent), scatterData(scatterData), workDir(workDir)
 {
     init();
 }
@@ -92,7 +92,7 @@ void PlotLvN::populatePlot()
 
 void PlotLvN::writeToPdf()
 {
-    QPdfWriter* pdfWriter = new QPdfWriter("fileNameLvN6.pdf");
+    QPdfWriter* pdfWriter = new QPdfWriter(workDir + "/LvN75.pdf");
     //QMargins margin = textEdit->contentsMargins();
     //QMargins marginsF(margin);
 
