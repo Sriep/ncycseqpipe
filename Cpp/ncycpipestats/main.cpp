@@ -72,7 +72,7 @@ void runProgram(QString workDirectory)
     //ScatterData(CgalMetrics& cgal, QuastMetrics& quast);
     ScatterData scatterData(cgalStuff, quastStuff);
     PlotLvN scatterPlot(scatterData, workDirectory);
-    scatterPlot.show();
+    //scatterPlot.show();
 }
 
 
