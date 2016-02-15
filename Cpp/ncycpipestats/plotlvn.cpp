@@ -2,7 +2,10 @@
 #include <QPdfWriter>
 #include <QMargins>
 #include <QTextCursor>
+#include <QTextEdit>
 #include <QPdfWriter>
+#include <QFont>
+#include <QPen>
 #include <QPageSize>
 #include <algorithm>
 #include "qcpdocumentobject.h"
