@@ -4,8 +4,8 @@
 #include <QFileInfo>
 #include <QStringList>
 
-//#include <QtWidgets/QApplication>
-//#include <QtWidgets/QMainWindow>
+#include <QtWidgets/QApplication>
+#include <QtWidgets/QMainWindow>
 //#include "chartview.h"
 
 #include "main.h"
@@ -19,7 +19,7 @@ int main(int argc, char *argv[])
 {
 
     QApplication a(argc, argv);
-
+    //QCoreApplication a(argc, argv);
     QString workDirectory(argv[1]);
     runProgram(workDirectory);
     return a.exec();
@@ -48,8 +48,8 @@ int main(int argc, char *argv[])
 
 void runProgram(QString workDirectory)
 {
-    QCoreApplication::setOrganizationName("NCYC");
-    QCoreApplication::setApplicationName("NcycPipeStats");
+    //QCoreApplication::setOrganizationName("NCYC");
+    //QCoreApplication::setApplicationName("NcycPipeStats");
 
     QSettings settings("ncyc", "ncycpipe");
     QDir* base_dir = new QDir(workDirectory);
@@ -74,8 +74,6 @@ void runProgram(QString workDirectory)
     PlotLvN scatterPlot(scatterData, workDirectory);
     //scatterPlot.show();
 }
-
-
 
 
 

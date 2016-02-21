@@ -12,6 +12,7 @@ TARGET = ncycpipestats
 
 #CONFIG   += console
 #CONFIG   -= app_bundle
+#/home/shepperp/Qt/5.5/gcc_64/bin/qmake ncycpipestats.pro
 CONFIG  += c++11
 
 TEMPLATE = app

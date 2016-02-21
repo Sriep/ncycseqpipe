@@ -18,11 +18,16 @@ public:
 private:
     void init();
     void populatePlot();
+    void AddTextEditHeader();
+    void AddPlotToTextEdit();
     void writeToPdf();
+
     QCustomPlot lvNPlot;
     QTextEdit* textEdit;
     ScatterData& scatterData;
     QString workDir;
+    int width;
+    int height;
 };
 
 #endif // PLOTLVN_H

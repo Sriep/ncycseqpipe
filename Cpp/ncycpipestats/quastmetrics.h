@@ -25,10 +25,14 @@ public:
      * @brief QuastMetrics
      * @param quastDataFile
      */
+    typedef QMapIterator<QString, QString> QuastAssemblyDataIterator;
+    typedef QMapIterator<QString, QuastAssemblyData> QuastFolderDataIterator;
+
     QuastMetrics(QFileInfo quastDataFile);
     const QuastFolderData folderData();
 private:
     void init();
+    void dump();
     //QuastAssemblyData readQuastDataLine(QStringList header, QStringList data);
 
     QuastFolderData quastData;
