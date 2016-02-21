@@ -12,7 +12,7 @@ function wait_for_tools_to_finish ()
   # $1 The number of tools to run in this pass
   # $2 The position of the send and wait tool
   debug_msg  ${LINENO} "wait for tools to finsih para1 $1 and para2 $2"
-  ps
+  #ps
   declare end_tool=$2
   declare start_tool=$(( $end_tool - $1 ))
   debug_msg  ${LINENO} "wait for tools to finsih para1 $1 and para2 $2"

@@ -14,4 +14,3 @@ RUN make
 ENV PATH  $PATH:/ncycseqpipe/Cpp/ncycpipestats
 ENTRYPOINT ["xvfb-run"]
 #ENTRYPOINT ["ncycpipestats"]
-

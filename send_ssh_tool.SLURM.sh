@@ -34,7 +34,7 @@ function send_ssh_tool ()
               $READSPB \
               ${TOOL_TAG[$index]} \
               ${TOOL_NAME[$index]} \
-              ${SSH_LOGPREFIX} \
+              "${SSH_LOGPREFIX}stats/" \
               ${TOOL_PARAMTERS[$index]}" \
        )
               #per-task= 10
@@ -45,14 +45,4 @@ function send_ssh_tool ()
   debug_msg  ${LINENO}  "after being set job list is $SSHJOBIDS"
   
 }
-
-
-
-
-
-
-
-
-
-
 

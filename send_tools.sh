@@ -25,7 +25,7 @@ function send_tools ()
           "$READSPB" \
           "${TOOL_TAG[$index]}" \
           "${TOOL_NAME[$index]}" \
-          "${LOCAL_LOGPREFIX}" \
+          "${LOCAL_LOGPREFIX}stats/" \
           "${TOOL_PARAMTERS[$index]}" \
           > "$outlog" 2> "$errlog" &
           #> "${LOGPREFIX}.run_${TOOL_NAME[$index]}_local.sh.stdout.log" \
@@ -43,7 +43,7 @@ function send_tools ()
           "$READSPB" \
           "${TOOL_TAG[$index]}" \
           "${TOOL_NAME[$index]}" \
-          "${LOCAL_LOGPREFIX}" \
+          "${LOCAL_LOGPREFIX}stats/" \
           "${TOOL_PARAMTERS[$index]}" \
           > $outlog 2> $errlog  
           #> "${LOGPREFIX}.run_${TOOL_NAME[$index]}_local.sh.stdout.log" \

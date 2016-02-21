@@ -30,11 +30,12 @@ debug_msg  ${LINENO} "target=${TARGET}"
 debug_msg  ${LINENO} "geonme $SSH_RESULTDIR/${args[0]}.fasta"
 debug_msg  ${LINENO} "mapping file $SSH_RESULTDIR/${TARGET}/${TARGET}_bow2.bam"
 debug_msg  ${LINENO} "result dir $WORKDIR"
+debug_msg  ${LINENO} "output ${WORKDIR}${TARGET}_pilon.fasta"
 
 java -jar $PILONPATH/pilon-1.16.jar \
   --genome "$SSH_RESULTDIR/${TARGET}.fasta"  \
   --frags $SSH_RESULTDIR/${TARGET}/${TARGET}_bow2.bam \
-  --output "$WORKDIR" \
+  --output "${WORKDIR}${TARGET}_pilon.fasta" \
   ${args[2]} ${args[3]} ${args[4]} ${args[5]} ${args[6]} 
 
 #java -jar $PILONPATH/pilon-1.16.jar \
@@ -47,7 +48,7 @@ java -jar $PILONPATH/pilon-1.16.jar \
 debug_msg  ${LINENO} "Finished run_pilon1.16"
 #-------------------------- Assembly specific code here --------------------
 
-cp $METRICS_CSV $SSH_RESULTDIR/m_${PRFIX_STUB}_${TOOL_TAG}
+#cp $METRICS_CSV $SSH_RESULTDIR/m_${PRFIX_STUB}_${TOOL_TAG}
 #source $SOURCEDIR/tools/ssh_footer.sh
 #cp $CONTIGS $SSH_RESULTDIR/${ASSEMBLY_TAG}c${PREFIX}i.fasta
 #cp $SCAFFOLDS $SSH_RESULTDIR/${ASSEMBLY_TAG}s${PREFIX}i.fasta

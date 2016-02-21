@@ -45,6 +45,7 @@ declare CONTIGS=
 declare SCAFFOLDS=
 declare METRICS=
 declare LOGFILE=${LOGPREFIX}$PROGNAME.log
+declare DOCKERLOGFILE=${LOGPREFIX}${PROGNAME}_docker.log
 
 declare -a args=( "" "" "" "" "" "" "" "" "" "" )
 IFS=' ' read -ra args <<< "$PARAMETERS"
@@ -52,7 +53,11 @@ debug_msg ${LINENO} "arguments ${args[@]/#/}"
 
 mkdir -p $LOCAL_RESULTDIR
 mkdir -p $WORKDIR
+debug_msg ${LINENO}  "LOGFILE=$LOGFILE"
+debug_msg ${LINENO}  "DOCKERLOGFILE=$DOCKERLOGFILE"
 > $LOGFILE
+> $DOCKERLOGFILE
+
 start=$(date +%s)
 PROGNAME=$OLD_PROGNAME
 
@@ -60,8 +65,8 @@ function remove_docker_container ()
 {
   echo WGC: about to remove $1
   debug_msg ${LINENO} "about to remove $1" 
-  docker stats --no-stream=true $1 1>> $LOGFILE
+  docker stats --no-stream=true $1 1>> $DOCKERLOGFILE
   #docker inspect $1 >> $LOGPREFIX.$PROGNAME.$1.json
-  docker inspect $1 >> $LOGFILE
+  docker inspect $1 >> $DOCKERLOGFILE
   docker rm -f $1 
 }

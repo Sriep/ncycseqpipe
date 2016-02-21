@@ -38,6 +38,11 @@ declare -a args=( "" "" "" "" "" "" "" "" "" "" )
 IFS=' ' read -ra args <<< "$PARAMETERS"
 echo "arguments from PARAMETERS are ${args[@]/#/}"
 
+declare LOGFILE=${LOGPREFIX}$PROGNAME.log
+debug_msg ${LINENO}  "LOGFILE=$LOGFILE"
+> $LOGFILE
+start=$(date +%s)
+
 readonly PRFIX_STUB=$(basename $PREFIX)
 declare -r SSH_RESULTDIR=$HPC_DATA/$RESULTDIR/$PREFIX
 declare -r WORKDIR=$SSH_RESULTDIR/$TOOL_NAME-ssh

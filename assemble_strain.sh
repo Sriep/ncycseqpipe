@@ -1,4 +1,5 @@
 #!/bin/bash -eu
+# assemble_strain_sh
 # $1 Prefix e.g. NCYC93
 # $2 First part of the paired end reads, relative to read directory
 # $3 Second part of the paired end reads, relative to read directory
@@ -26,6 +27,7 @@ debug_msg  ${LINENO} " SSH_SOURCEDIR is $SSH_SOURCEDIR"
 debug_msg  ${LINENO} " SSH_CONFIGFILE is $SSH_CONFIGFILE"
 debug_msg  ${LINENO} " LOCAL_LOGPREFIX is $LOCAL_LOGPREFIX"
 debug_msg  ${LINENO} " SSH_LOGPREFIX is $SSH_LOGPREFIX"
+mkdir -p "${LOCAL_LOGPREFIX}stats/"
 
 declare -ax TOOL_TYPE
 declare -ax TOOL_NAME
@@ -35,20 +37,17 @@ declare -ax TOOL_PARAMTERS
 declare -xi num_tools=0
 debug_msg  ${LINENO} "$PREFIX starting assemble_strain_sh"
 
-#function save_strain_pipe_config_information ()
-#{
-#  logdir="$LOCAL_DATA/$RESULTDIR/$PREFIX/logdir"
-#  debug_msg  ${LINENO} "$PREFIX logdir is $logdir"
-#  mkdir -p $logdir
-#  num_runs=1
-#  if [[ -e "$logdir/runs" ]]; then
-#    num_runs=$(<"$logdir/runs")
-#    num_runs=$(($num_runs+1))
-#  fi
-#  echo "$num_runs" > "$logdir/runs"
-#  cp "$CONFIGFILE" "$logdir/$num_runs.CONFIGFILE"
-#  cp "$RECIPEFILE" "$logdir/$num_runs.RECIPEFILE"
-#}
+function compile_stats ()
+{
+  debug_msg  ${LINENO} "function compile_stats"
+  stats_file=${LOCAL_LOGPREFIX}stats/allstats.csv
+  > $stats_file
+  debug_msg  ${LINENO} "fstats file=$stats_file"
+  for f in ${LOCAL_LOGPREFIX}stats/*.log; do
+    echo -n $(basename $f)"," >> "$stats_file"
+    cat $f >> "$stats_file"
+  done  
+}
 
 function display_tool_array ()
 {
@@ -88,39 +87,40 @@ function parse_recipe_file ()
         if [[ ${TOOL_TAG[$recipie_line]: -4}  == .csv ]]; then
           filename=$LOCAL_DATA/$RESULTDIR/$PREFIX/metric_${PREFIX}_${TOOL_TAG[$recipie_line]}
           debug_msg  ${LINENO} "filename is $filename"
-          > ~/temp.csv
+          tempfile=$(mktemp)
           for f in $LOCAL_DATA/$RESULTDIR/$PREFIX/*/m_*_"${TOOL_TAG[recipie_line]}"; do
             #debug_msg  ${LINENO} "loop file: $f"
-            echo "$f" >> ~/temp.csv
-            cat "$f" >> ~/temp.csv
+            echo "$f" >> $tempfile
+            cat "$f" >> $tempfile
           done
           rm $filename || true
-          debug_msg  ${LINENO} "about to copy to $filename"
-          mv ~/temp.csv $filename
+          debug_msg  ${LINENO} "about to move $tempfile to $filename"
+          mv $tempfile $filename
         fi
       fi
     done
+    debug_msg  ${LINENO} "finished compile_strians_metrics"
   }
   
   function read_recipe_file ()
   {
     declare -i num_tools_this_pass=0
     while read -r col1 col2 col3 col4 col5; do 
-      #debug_msg  ${LINENO} "parse_recipe_file data: type $col1 $col2 \tlocation $col3 \ttag $col4 \tparamter $col5 "
+      debug_msg  ${LINENO} "parse_recipe_file data: type $col1 $col2 \tlocation $col3 \ttag $col4 \tparamter $col5 "
       #debug_msg  ${LINENO} "parse_recipe_file num of assemblers $num_tools"
       case "$col1" in
         "$SEND_AND_WAIT" )
-          #debug_msg  ${LINENO} "parse_recipe_file: case send_and_wait"
+          debug_msg  ${LINENO} "parse_recipe_file: case send_and_wait"
           num_tools=$(($num_tools + 1 ))
           TOOL_TYPE[num_tools]="$SEND_AND_WAIT"
           TOOL_PARAMTERS[num_tools]=$num_tools_this_pass
           num_tools_this_pass=0
           ;;
         \#* | "" )
-          #debug_msg  ${LINENO} "parse_recipe_file case commeted out line"
+          debug_msg  ${LINENO} "parse_recipe_file case commeted out line"
           ;;
         $ASDEMBLER | $METRIC )
-          #debug_msg  ${LINENO} "parse_recipe_file case assembler tool $col1 added to list"
+          debug_msg  ${LINENO} "parse_recipe_file case assembler tool $col1 added to list"
           num_tools=$(($num_tools + 1 ))
           num_tools_this_pass=$(($num_tools_this_pass + 1 ))
           TOOL_TYPE[num_tools]=$col1
@@ -130,7 +130,7 @@ function parse_recipe_file ()
           TOOL_PARAMTERS[num_tools]=$col5        
           ;;
         *)
-          #debug_msg  ${LINENO} "parse_recipe_file unrecognised entry ignore line" 
+          debug_msg  ${LINENO} "parse_recipe_file unrecognised entry ignore line" 
           ;;
       esac
       #debug_msg  ${LINENO} "parse_recipe_file done onto next line"
@@ -163,7 +163,7 @@ function parse_recipe_file ()
   debug_msg  ${LINENO} "just left display_tool_array about to call run_recipie_file"
   run_recipie_file
   compile_strians_metrics
-  debug_msg  ${LINENO} "just left run_recipie_file"
+  debug_msg  ${LINENO} "just left parse_recipe_file"
 }
 
 function main ()
@@ -174,6 +174,10 @@ function main ()
     parse_recipe_file
   fi
   debug_msg  ${LINENO} "Finished assemble_strain_sh main for strain $PREFIX"
+  compile_stats
+  
+  > LOCAL_RESULTDIR/run_ncycpipestats.sh
+  echo /home/shepperp/software/ncycseqpipe/Cpp/ncycpipestats $LOCAL_RESULTDIR
 }
 
 main "$@"

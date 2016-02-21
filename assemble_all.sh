@@ -1,5 +1,10 @@
 #!/bin/bash -eu
 #
+## @file assemble_all.sh
+## @author Piers Shepperson
+## @brief Bash Argsparse Library
+## @version 0.0
+
 declare -xr CONFIGFILE=$1
 # Set sorce directory to be the directory where this file is stored, the
 # assumption is that the companion scripts are stored in the same directory  
@@ -12,9 +17,18 @@ debug_msg  ${LINENO} "source directory is $SOURCEDIR"
 debug_msg  ${LINENO} "read in config file from $CONFIGFILE"
 readonly READSFILE 
 debug_msg  ${LINENO} "Illumina reads from $READSFILE"
-
-function save_pipe_config_information ()
-{
+if [[ -z $TOP_LOOP_SLEEP ]]; then 
+  TOP_LOOP_SLEEP=1s
+fi
+## @fn save_pipe_config_information()
+## @brief Set the minimum number of non-option parameters expected on
+## the command line.
+## @param unsigned_int a positive number.
+## @retval 0 if there is an unsigned integer is provided and is the
+## single parameter of this function.
+## @retval 1 in other cases.
+## @ingroup ArgsparseParameter
+save_pipe_config_information () {
   CONFIGDIR="$LOCAL_DATA/$RESULTDIR/pipline_parameters"
   debug_msg  ${LINENO} "configdir is $CONFIGDIR"
   mkdir -p $CONFIGDIR
@@ -60,6 +74,7 @@ function main ()
       "$SOURCEDIR/assemble_strain.sh" $col1 $col2 $col3 $col4 "$RESULTDIR/$col1/logdir/$num_runs" \
         > "$logdir/$num_runs.assemble_all.stdout.log" \
         2> "$logdir/$num_runs.assemble_all.stderr.log" & 
+        sleep $TOP_LOOP_SLEEP
     done < "$READSFILE"
   fi
   debug_msg  ${LINENO} "Sent of all strains to be assembled."
