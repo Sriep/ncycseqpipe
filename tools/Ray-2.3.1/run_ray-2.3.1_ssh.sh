@@ -4,7 +4,7 @@ source Ray-2.3.1
 source mpich2-1.5
 source openmpi-1.6.5
 source openssl-1.0.1j
-declare -xr SOURCEDIR="$(dirname $BASH_SOURCE)/.."
+declare -r SOURCEDIR="$1"
 source $SOURCEDIR/ssh_header.sh
 PROGNAME=$(basename $0)
 # PREFIX - Name of strain to assemble

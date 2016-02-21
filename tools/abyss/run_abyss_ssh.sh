@@ -2,8 +2,9 @@
 # 
 source hpccore-5
 source abyss-1.9.0
-declare -xr SOURCEDIR="$(dirname $BASH_SOURCE)/.."
-source $SOURCEDIR/ssh_header.sh
+source openmpi-1.6.5
+declare -r SOURCEDIR="$1"
+source $SOURCEDIR/tools/ssh_header.sh
 # PREFIX - Name of strain to assemble
 # READS1 - First set of paired end reads, relative to $LOCAL_READSDIR
 # READS2 - Second set of paired end reads, relative to $LOCAL_READSDIR
@@ -25,9 +26,15 @@ abyss-pe \
 		name=$WORKDIR/$PREFIX \
 		in="$SSH_READSDIR/$READS1 $SSH_READSDIR/$READS2"
 
+#abyss-pe \
+#		${args[0]}  ${args[1]} ${args[2]} ${args[3]} ${args[4]} 
+#    ${args[5]}  ${args[6]} ${args[7]} ${args[8]} ${args[9]} 
+
+
+
 #Give location of result files
 CONTIGS=$WORKDIR/$PREFIX-6.fa
 SCAFFOLDS=$WORKDIR/$PREFIX-8.fa
 #-------------------------- Assembly specific code here --------------------
 
-source $SOURCEDIR/ssh_footer.sh
+source $SOURCEDIR/tools/ssh_footer.sh

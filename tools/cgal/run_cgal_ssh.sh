@@ -5,8 +5,8 @@ source bowtie2-2.2.5
 source samtools-1.0
 source jdk-1.7.0_25
 source CGAL-0.9.6 
-declare -xr SOURCEDIR="$(dirname $BASH_SOURCE)/.."
-source $SOURCEDIR/ssh_header.sh
+declare -r SOURCEDIR="$1"
+source $SOURCEDIR/tools/ssh_header.sh
 # PREFIX - Name of strain to assemble
 # READS1 - First set of paired end reads, relative to $LOCAL_READSDIR
 # READS2 - Second set of paired end reads, relative to $LOCAL_READSDIR
@@ -37,6 +37,6 @@ METRICS=$WORKDIR/out.txt
 
 #-------------------------- Assembly specific code here --------------------
 
-source $SOURCEDIR/ssh_footer.sh
+source $SOURCEDIR/tools/ssh_footer.sh
 
 echo `basename "$0"`: FINISHED!! FINISHED!!

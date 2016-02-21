@@ -2,8 +2,8 @@
 # 
 source hpccore-5
 source progressiveCactus-0.0
-declare -xr SOURCEDIR="$(dirname $BASH_SOURCE)/.."
-source $SOURCEDIR/ssh_header.sh
+declare -r SOURCEDIR="$1"
+source $SOURCEDIR/tools/ssh_header.sh
 # PREFIX - Name of strain to assemble
 # READS1 - First set of paired end reads, relative to $LOCAL_READSDIR
 # READS2 - Second set of paired end reads, relative to $LOCAL_READSDIR
@@ -16,6 +16,13 @@ source $SOURCEDIR/ssh_header.sh
 #-------------------------- Assembly specific code here --------------------
 
 > $WORKDIR/$PREFIX.cactus.seq
+
+#for f in $SSH_RESULTDIR/*.fasta; do
+#  echo $(basename "$f" .fasta) "$WORKDIR/"$(basename $f) >> $WORKDIR/$PREFIX.cactus.seq
+#  debug_msg  ${LINENO} "about to cp $f $WORKDIR/$(basename $f)" 
+#  cp $f $WORKDIR/$(basename $f)
+#  sed -i 's/[^a-zA-Z0-9_:.>]/_/g' $WORKDIR/$(basename $f)
+#done
 
 for f in $SSH_RESULTDIR/*.fasta; do
   echo $(basename "$f" .fasta) "$WORKDIR/"$(basename $f) >> $WORKDIR/$PREFIX.cactus.seq
@@ -57,4 +64,4 @@ runProgressiveCactus.sh \
 #runProgressiveCactus.sh [options] <seqFile> <workDir> <outputHalFile>
 
 #-------------------------- Assembly specific code here --------------------
-source $SOURCEDIR/ssh_footer.sh
+source $SOURCEDIR/tools/ssh_footer.sh
