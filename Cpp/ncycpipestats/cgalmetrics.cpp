@@ -8,7 +8,7 @@ CgalMetrics::CgalMetrics(QFileInfo cgalDataFile)
     init();
 }
 
-const CgalMetrics::CgalFolderData CgalMetrics::cgalData()
+const CgalMetrics::CgalFolderData CgalMetrics::cgalData() const
 {
     return cgalFolderData;
 }

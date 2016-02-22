@@ -2,12 +2,12 @@
 #define CGALMETRICS_H
 #include <QFileInfo>
 #include <QMap>
-#include "pipemetric.h"
+#include "pipedata.h"
 
 /**
  * @brief The CgalMetrics class
  */
-class CgalMetrics : public PipeMetric
+class CgalMetrics : public PipeData
 {
 public:
     /**
@@ -58,7 +58,7 @@ public:
      */
     typedef QMap<QString, CgalData> CgalFolderData;
     typedef QMapIterator<QString, CgalData> CgalDataIterator;
-    const CgalFolderData cgalData();
+    const CgalFolderData cgalData() const;
 private:
     void init();
 

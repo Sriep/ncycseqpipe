@@ -40,7 +40,7 @@ void QuastMetrics::init()
         }
     }
     quastFile.close();
-    dump();
+    //dump();
 }
 
 void QuastMetrics::dump()
@@ -61,7 +61,7 @@ void QuastMetrics::dump()
     qDebug() << "finished dumping quast metircs";
 }
 
-const QuastMetrics::QuastFolderData QuastMetrics::folderData()
+QuastMetrics::QuastFolderData QuastMetrics::folderData() const
 {
     return quastData;
 }

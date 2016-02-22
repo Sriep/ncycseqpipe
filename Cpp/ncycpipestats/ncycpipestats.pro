@@ -19,22 +19,24 @@ TEMPLATE = app
 
 SOURCES += main.cpp \
     options.cpp \
-    pipemetric.cpp \
     quastmetrics.cpp \
     cgalmetrics.cpp \
     qcustomplot.cpp \
     plotlvn.cpp \
     qcpdocumentobject.cpp \
-    scatterdata.cpp
+    scatterdata.cpp \
+    pipedata.cpp \
+    recipielist.cpp
 
 HEADERS += \
     main.h \
     options.h \
-    pipemetric.h \
     quastmetrics.h \
     cgalmetrics.h \
     qcustomplot.h \
     plotlvn.h \
     qcpdocumentobject.h \
-    scatterdata.h
+    scatterdata.h \
+    pipedata.h \
+    recipielist.h
 

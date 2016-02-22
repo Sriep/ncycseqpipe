@@ -1,18 +1,26 @@
-
 #include <QPdfWriter>
 #include <QMargins>
 #include <QTextCursor>
 #include <QTextEdit>
 #include <QFont>
 #include <QPen>
+#include <QChar>
 #include <QPageSize>
 #include <QtDebug>
 #include <algorithm>
 #include "qcpdocumentobject.h"
 #include "plotlvn.h"
 
-PlotLvN::PlotLvN(ScatterData& scatterData, QString workDir, QWidget *parent)
-    : QMainWindow(parent), scatterData(scatterData), workDir(workDir)
+/*PlotLvN::PlotLvN(ScatterData& scatterData, QString workDir, QWidget *parent)
+    : QMainWindow(parent), scatterData(scatterData), workDir(workDir), recipieList(RecipieList())
+{
+    width = 800;
+    height = 600;
+    init();
+}*/
+
+PlotLvN::PlotLvN(ScatterData &scatterData, QString workDir, RecipieList &recipie, QWidget *parent)
+: QMainWindow(parent), scatterData(scatterData), workDir(workDir), recipieList(recipie)
 {
     width = 800;
     height = 600;
@@ -83,7 +91,18 @@ void PlotLvN::populatePlot()
 void PlotLvN::AddTextEditHeader()
 {
     textEdit->setFont(QFont(font().family(), 30));
-    textEdit->insertPlainText("Thies is a lsv plot\n\n");
+    textEdit->insertPlainText(prefix() + " LvsN plot\n\n");
+    textEdit->setFont(QFont(font().family(), 16));
+    for ( int i=0 ; i<scatterData.x.size() ; i++ )
+    {
+        QString text = scatterData.pointLabel.at(i);
+        QString tag = text.left(2);
+        QString name1 = nameFromTag(tag);
+        QString insertString = tag + " = " + name1 + "\n";
+        qDebug() << text << tag << name1 << insertString;
+        textEdit->insertPlainText(insertString);
+    }
+    textEdit->insertPlainText("\n\n");
 }
 
 void PlotLvN::AddPlotToTextEdit()
@@ -115,8 +134,44 @@ void PlotLvN::writeToPdf()
 
     //pdfWriter->setPageMargins(marginsF);
     //pdfWriter->setPageSize(QPageSize(QPageSize::A3));
-    pdfWriter->setTitle("Liklyhood vrs N75");
+    pdfWriter->setTitle(prefix() + "Liklyhood vrs N75");
     textEdit->print(pdfWriter);
+}
+
+QString PlotLvN::nameFromTag(QString tag) const
+{
+    QString name;
+    QString head = tag.left(tag.size()-1);
+    char tail = tag.at(tag.size()-1).cell();
+
+    QVector<RecipieList::Recipie> recipies = recipieList.recipiesData();
+    for ( int i = 0 ; i < recipies.size() ; ++i )
+    {
+        if (recipies.at(i).tag == head)
+        {
+            name = recipies.at(i).name;
+            break;
+        }
+    }
+    switch (tail){
+        case 's'  :
+           name += " scaffolds";
+           break;
+        case 'c'  :
+           name += " contigs";
+           break;
+        default :
+           ;
+    }
+    return name;
+}
+
+QString PlotLvN::prefix() const
+{
+    QString text = scatterData.pointLabel.at(0);
+    text = text.right(text.size()-2);
+    text = text.left(text.size()-1);
+    return text;
 }
 
 

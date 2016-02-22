@@ -4,6 +4,7 @@
 #include <QMainWindow>
 #include <QWidget>
 #include <QTextEdit>
+#include <QString>
 #include "qcustomplot.h"
 #include "scatterdata.h"
 
@@ -12,7 +13,11 @@ class PlotLvN : public QMainWindow
 {
      Q_OBJECT
 public:
-    PlotLvN(ScatterData& scatterData, QString workDir, QWidget *parent = 0);
+    //PlotLvN(ScatterData& scatterData, QString workDir, QWidget *parent = 0);
+    PlotLvN(ScatterData& scatterData
+            , QString workDir
+            , RecipieList& recipie
+            , QWidget *parent = 0);
     virtual ~PlotLvN();
    // virtual void operator() ();
 private:
@@ -21,10 +26,13 @@ private:
     void AddTextEditHeader();
     void AddPlotToTextEdit();
     void writeToPdf();
+    QString nameFromTag(QString tag) const;
+    QString prefix() const;
 
     QCustomPlot lvNPlot;
     QTextEdit* textEdit;
     ScatterData& scatterData;
+    RecipieList& recipieList;
     QString workDir;
     int width;
     int height;

@@ -4,13 +4,13 @@
 #include <QMap>
 #include <QList>
 #include <QString>
-#include "pipemetric.h"
+#include "pipedata.h"
 
 /**
  * @brief Result of running Quast http://quast.bioinf.spbau.ru/manual.html
  * on an assembly.
  */
-class QuastMetrics : public PipeMetric
+class QuastMetrics : public PipeData
 {
 public:
     /**
@@ -28,8 +28,8 @@ public:
     typedef QMapIterator<QString, QString> QuastAssemblyDataIterator;
     typedef QMapIterator<QString, QuastAssemblyData> QuastFolderDataIterator;
 
-    QuastMetrics(QFileInfo quastDataFile);
-    const QuastFolderData folderData();
+    QuastMetrics(QFileInfo quastDataFile) ;
+    QuastFolderData folderData() const;
 private:
     void init();
     void dump();
