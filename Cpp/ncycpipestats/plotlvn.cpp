@@ -128,7 +128,7 @@ void PlotLvN::AddPlotToTextEdit()
 
 void PlotLvN::writeToPdf()
 {
-    QPdfWriter* pdfWriter = new QPdfWriter(workDir + "/LvN75.pdf");
+    QPdfWriter* pdfWriter = new QPdfWriter(workDir + "/" + prefix() + "_LvN75.pdf");
     //QMargins margin = textEdit->contentsMargins();
     //QMargins marginsF(margin);
 

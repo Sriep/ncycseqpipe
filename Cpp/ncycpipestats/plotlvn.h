@@ -32,8 +32,9 @@ private:
     QCustomPlot lvNPlot;
     QTextEdit* textEdit;
     ScatterData& scatterData;
-    RecipieList& recipieList;
     QString workDir;
+    RecipieList& recipieList;
+
     int width;
     int height;
 };
