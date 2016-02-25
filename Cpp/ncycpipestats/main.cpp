@@ -66,17 +66,15 @@ void runProgram(QString workDirectory)
     metrics=base_dir->entryInfoList();
     QuastMetrics quastStuff(metrics.at(0));
 
-    //QStringList recipieFilter;
-    //recipieFilter << "logdir\1.RECIPEFILE";
-    //base_dir->setNameFilters(recipieFilter);
-    //metrics=base_dir->entryInfoList();
     QFileInfo recipiefileinfo(workDirectory + "/logdir/1.RECIPEFILE");
     RecipieList recipieStuff(recipiefileinfo);
 
     ScatterData scatterData(cgalStuff, quastStuff);
     PlotLvN scatterPlot(scatterData, workDirectory, recipieStuff);
+    scatterPlot.writeToPdf();
     //scatterPlot.show();
 }
+
 
 
 

@@ -1,7 +1,6 @@
 #include <QPdfWriter>
 #include <QMargins>
 #include <QTextCursor>
-#include <QTextEdit>
 #include <QFont>
 #include <QPen>
 #include <QChar>
@@ -11,16 +10,13 @@
 #include "qcpdocumentobject.h"
 #include "plotlvn.h"
 
-/*PlotLvN::PlotLvN(ScatterData& scatterData, QString workDir, QWidget *parent)
-    : QMainWindow(parent), scatterData(scatterData), workDir(workDir), recipieList(RecipieList())
-{
-    width = 800;
-    height = 600;
-    init();
-}*/
-
 PlotLvN::PlotLvN(ScatterData &scatterData, QString workDir, RecipieList &recipie, QWidget *parent)
-: QMainWindow(parent), scatterData(scatterData), workDir(workDir), recipieList(recipie)
+    : QMainWindow(parent)
+    , lvNPlot(this)
+    , document(this)
+    , scatterData(scatterData)
+    , workDir(workDir)
+    , recipieList(recipie)
 {
     width = 800;
     height = 600;
@@ -32,25 +28,76 @@ PlotLvN::~PlotLvN()
 
 }
 
-//void PlotLvN::operator()()
-//{
-//}
-
 void PlotLvN::init()
 {
     resize(width, height);
-
-    textEdit = new QTextEdit;
-    setCentralWidget(textEdit);   
-
-    populatePlot();
-    AddTextEditHeader();
-    AddPlotToTextEdit();
-
-
+    populateDocument();
     bool worked = lvNPlot.savePdf(workDir + "fileninameSavePdf.pdf");
     qDebug() << worked;
-    writeToPdf();
+}
+
+void PlotLvN::populateDocument()
+{
+    setHeader(document.firstBlock());
+
+    QTextCursor cursor(&document);
+    cursor.movePosition(QTextCursor::End);
+    cursor.insertBlock();
+    setLegend(document.lastBlock());
+
+    cursor.movePosition(QTextCursor::End);
+    cursor.insertBlock();
+    setGraph(document.lastBlock());
+}
+
+void PlotLvN::setHeader(QTextBlock block)
+{
+    //document->setFont(QFont(font().family(), 30));
+    //QTextBlockFormat blockFormat = QTextBlock::blockFormat();
+
+    QTextCursor cursor=QTextCursor(block);
+    QString header= prefix() + " LvsN plot" + "\n";
+    QTextDocumentFragment headerFrag
+            = QTextDocumentFragment::fromPlainText(header);
+    cursor.insertFragment(headerFrag);
+}
+
+void PlotLvN::setLegend(QTextBlock block)
+{
+    //document->setFont(QFont(font().family(), 16));
+    QTextCursor cursor=QTextCursor(block);
+    for ( int i=0 ; i<scatterData.x.size() ; i++ )
+    {
+        QString text = scatterData.pointLabel.at(i);
+        QString tag = text.left(2);
+        QString name1 = nameFromTag(tag);
+        QString insertString = tag + " = " + name1 + "\n";
+        qDebug() << text << tag << name1 << insertString;
+        QTextDocumentFragment frag
+                = QTextDocumentFragment::fromPlainText(insertString);
+        cursor.insertFragment(frag);
+    }
+    QTextDocumentFragment frag
+            = QTextDocumentFragment::fromPlainText("\n");
+    cursor.insertFragment(frag);
+}
+
+void PlotLvN::setGraph(QTextBlock block)
+{
+    populatePlot();
+
+    // register the plot document object (only needed once, no matter how many
+    // plots will be in the QTextDocument):
+    QCPDocumentObject *plotObjectHandler = new QCPDocumentObject(this);
+    document.documentLayout()->
+          registerHandler(QCPDocumentObject::PlotTextFormat, plotObjectHandler);
+    QTextCursor cursor=QTextCursor(block);
+    // insert the current plot at the cursor position.
+    // QCPDocumentObject::generatePlotFormat creates a
+    // vectorized snapshot of the passed plot (with the specified width
+    // and height) which gets inserted  into the text document.
+    cursor.insertText(QString(QChar::ObjectReplacementCharacter)
+                      , QCPDocumentObject::generatePlotFormat(&lvNPlot, width, height));
 }
 
 void PlotLvN::populatePlot()
@@ -88,54 +135,12 @@ void PlotLvN::populatePlot()
 
 }
 
-void PlotLvN::AddTextEditHeader()
-{
-    textEdit->setFont(QFont(font().family(), 30));
-    textEdit->insertPlainText(prefix() + " LvsN plot\n\n");
-    textEdit->setFont(QFont(font().family(), 16));
-    for ( int i=0 ; i<scatterData.x.size() ; i++ )
-    {
-        QString text = scatterData.pointLabel.at(i);
-        QString tag = text.left(2);
-        QString name1 = nameFromTag(tag);
-        QString insertString = tag + " = " + name1 + "\n";
-        qDebug() << text << tag << name1 << insertString;
-        textEdit->insertPlainText(insertString);
-    }
-    textEdit->insertPlainText("\n\n");
-}
-
-void PlotLvN::AddPlotToTextEdit()
-{
-    // register the plot document object (only needed once, no matter how many
-    // plots will be in the QTextDocument):
-    QCPDocumentObject *plotObjectHandler = new QCPDocumentObject(this);
-    textEdit->document()->documentLayout()->
-          registerHandler(QCPDocumentObject::PlotTextFormat, plotObjectHandler);
-
-    QTextCursor cursor = textEdit->textCursor();
-    // insert the current plot at the cursor position.
-    // QCPDocumentObject::generatePlotFormat creates a
-    // vectorized snapshot of the passed plot (with the specified width
-    // and height) which gets inserted  into the text document.
-    //double width = ui->cbUseCurrentSize->isChecked() ? 0 : ui->sbWidth->value();
-    //double height = ui->cbUseCurrentSize->isChecked() ? 0 : ui->sbHeight->value();
-    cursor.insertText(QString(QChar::ObjectReplacementCharacter)
-                      , QCPDocumentObject::generatePlotFormat(&lvNPlot, width, height));
-    textEdit->setTextCursor(cursor);
-    textEdit->setDocumentTitle("lvnp plot title");
-}
-
 void PlotLvN::writeToPdf()
 {
     QPdfWriter* pdfWriter = new QPdfWriter(workDir + "/" + prefix() + "_LvN75.pdf");
-    //QMargins margin = textEdit->contentsMargins();
-    //QMargins marginsF(margin);
-
-    //pdfWriter->setPageMargins(marginsF);
-    //pdfWriter->setPageSize(QPageSize(QPageSize::A3));
+    pdfWriter->setPageSize(QPageSize(QPageSize::A3));
     pdfWriter->setTitle(prefix() + "Liklyhood vrs N75");
-    textEdit->print(pdfWriter);
+    document.print(pdfWriter);
 }
 
 QString PlotLvN::nameFromTag(QString tag) const
