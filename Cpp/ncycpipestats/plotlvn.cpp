@@ -32,7 +32,7 @@ void PlotLvN::init()
 {
     resize(width, height);
     populateDocument();
-    bool worked = lvNPlot.savePdf(workDir + "fileninameSavePdf.pdf");
+    bool worked = lvNPlot.savePdf(workDir + "fileninameSavePdf.pdf", false, width, height);
     qDebug() << worked;
 }
 
@@ -132,7 +132,6 @@ void PlotLvN::populatePlot()
         textLabel->setPen(QPen(Qt::black)); // show black border around text
     }
     lvNPlot.replot();
-
 }
 
 void PlotLvN::writeToPdf()
