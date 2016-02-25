@@ -4,8 +4,8 @@
 #include <QFileInfo>
 #include <QStringList>
 
-//#include <QtWidgets/QApplication>
-//#include <QtWidgets/QMainWindow>
+#include <QtWidgets/QApplication>
+#include <QtWidgets/QMainWindow>
 //#include "chartview.h"
 
 #include "main.h"
@@ -14,12 +14,12 @@
 #include "cgalmetrics.h"
 #include "scatterdata.h"
 #include "plotlvn.h"
+#include "recipielist.h"
 
 int main(int argc, char *argv[])
 {
-
     QApplication a(argc, argv);
-
+    //QCoreApplication a(argc, argv);
     QString workDirectory(argv[1]);
     runProgram(workDirectory);
     return a.exec();
@@ -48,8 +48,8 @@ int main(int argc, char *argv[])
 
 void runProgram(QString workDirectory)
 {
-    QCoreApplication::setOrganizationName("NCYC");
-    QCoreApplication::setApplicationName("NcycPipeStats");
+    //QCoreApplication::setOrganizationName("NCYC");
+    //QCoreApplication::setApplicationName("NcycPipeStats");
 
     QSettings settings("ncyc", "ncycpipe");
     QDir* base_dir = new QDir(workDirectory);
@@ -57,24 +57,23 @@ void runProgram(QString workDirectory)
     QStringList cgalFilter;
     cgalFilter << "metric_*cgal.csv";
     base_dir->setNameFilters(cgalFilter);
-    QFileInfoList metrics=base_dir->entryInfoList();//metricFilter, QDir::Files, QDir::Name);
+    QFileInfoList metrics=base_dir->entryInfoList();
     CgalMetrics cgalStuff(metrics.at(0));
-
-    //CgalMetrics::CgalFolderData cgalData=cgalStuff.cgalData();
 
     QStringList quastFilter;
     quastFilter << "metric_*quast.csv";
     base_dir->setNameFilters(quastFilter);
-    metrics=base_dir->entryInfoList();//metricFilter, QDir::Files, QDir::Name);
+    metrics=base_dir->entryInfoList();
     QuastMetrics quastStuff(metrics.at(0));
 
-    //QuastMetrics::QuastFolderData quastData=quastStuff.folderData();
-    //ScatterData(CgalMetrics& cgal, QuastMetrics& quast);
+    QFileInfo recipiefileinfo(workDirectory + "/logdir/1.RECIPEFILE");
+    RecipieList recipieStuff(recipiefileinfo);
+
     ScatterData scatterData(cgalStuff, quastStuff);
-    PlotLvN scatterPlot(scatterData, workDirectory);
+    PlotLvN scatterPlot(scatterData, workDirectory, recipieStuff);
+    scatterPlot.writeToPdf();
     //scatterPlot.show();
 }
-
 
 
 

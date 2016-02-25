@@ -2,6 +2,7 @@
 #define MAIN_H
 
 #include <QString>
+#include <QtDebug>
 
 using namespace std;
 static const string programName = "NcycPipeStats";

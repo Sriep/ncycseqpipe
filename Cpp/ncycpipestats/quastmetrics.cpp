@@ -1,5 +1,6 @@
 #include <QTextStream>
 #include <QStringList>
+#include <QtDebug>
 #include "quastmetrics.h"
 
 QuastMetrics::QuastMetrics(QFileInfo quastDataFile)
@@ -39,9 +40,28 @@ void QuastMetrics::init()
         }
     }
     quastFile.close();
+    //dump();
 }
 
-const QuastMetrics::QuastFolderData QuastMetrics::folderData()
+void QuastMetrics::dump()
+{
+    qDebug() << "dumping quast metrics";
+    QuastFolderDataIterator i(quastData);
+    while (i.hasNext()) {
+        i.next();
+        qDebug() << i.key() << i.value() << "N75=" << i.value().value("N75");
+        //QuastAssemblyDataIterator j(i.value());
+        //while (j.hasNext())
+        //{
+        //    j.next();
+        //    qDebug() << j.key() << j.value();
+        //    //cout << j.key() << ": " << j.value() << endl;
+        //}
+    }
+    qDebug() << "finished dumping quast metircs";
+}
+
+QuastMetrics::QuastFolderData QuastMetrics::folderData() const
 {
     return quastData;
 }

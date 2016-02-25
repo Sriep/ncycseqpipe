@@ -4,10 +4,10 @@
 /**
  * @brief Base class for metrics produced in pipline
  */
-class PipeMetric
+class PipeData
 {
 public:
-    PipeMetric();
+    PipeData();
 };
 
 #endif // PIPEMETRIC_H
