@@ -8,11 +8,13 @@ declare -xr READS1=$2
 declare -xr READS2=$3
 declare -xr READSPB=$4
 declare -xr LOGPATH=$5
+declare -xr SLEEPTIME=$6
+
 
 #global varables
 source $CONFIGFILE
 source $SOURCEDIR/error.sh
-BATCHOPT=LSF #templine
+#BATCHOPT=LSF #templine
 declare -ax BSUBIDS
 declare -ax PIDS
 declare -xr SSH_SOURCEDIR=${HPC_DATA}${SOURCEDIR#$LOCAL_DATA}
@@ -35,7 +37,10 @@ declare -ax TOOL_LOCATION
 declare -ax TOOL_TAG
 declare -ax TOOL_PARAMTERS
 declare -xi num_tools=0
-debug_msg  ${LINENO} "$PREFIX starting assemble_strain_sh"
+
+debug_msg  ${LINENO} "$PREFIX sleeptime $SLEEPTIME"
+sleep ${SLEEPTIME}s
+debug_msg  ${LINENO} "$PREFIX finished sleeping"
 
 function compile_stats ()
 {
@@ -43,10 +48,11 @@ function compile_stats ()
   stats_file=${LOCAL_LOGPREFIX}stats/allstats.csv
   > $stats_file
   debug_msg  ${LINENO} "fstats file=$stats_file"
-  for f in ${LOCAL_LOGPREFIX}stats/*.log; do
+  for f in ${LOCAL_LOGPREFIX}stats/*sh.log; do
     echo -n $(basename $f)"," >> "$stats_file"
-    cat $f >> "$stats_file"
+    cat $f >> "${LOCAL_LOGPREFIX}stats/stats_file"
   done  
+  cat "${LOCAL_LOGPREFIX}stats/slurm_script.log" >> "$stats_file"
 }
 
 function display_tool_array ()
@@ -176,8 +182,8 @@ function main ()
   debug_msg  ${LINENO} "Finished assemble_strain_sh main for strain $PREFIX"
   compile_stats
   
-  > LOCAL_RESULTDIR/run_ncycpipestats.sh
-  echo /home/shepperp/software/ncycseqpipe/Cpp/ncycpipestats $LOCAL_RESULTDIR
+  > $LOCAL_RESULTDIR/run_ncycpipestats.sh
+  echo "/home/shepperp/software/ncycseqpipe/Cpp/ncycpipestats/ncycpipestats $LOCAL_RESULTDIR" >> "$LOCAL_RESULTDIR/run_ncycpipestats.sh"
 }
 
 main "$@"

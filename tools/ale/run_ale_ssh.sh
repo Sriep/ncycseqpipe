@@ -19,12 +19,16 @@ declare -r BAMFILE=$SSH_RESULTDIR/${PRFIX_STUB}_bow2.bam
 cd  $WORKDIR
 debug_msg  ${LINENO} "about to run ale"
 debug_msg  ${LINENO} "bamfile  $BAMFILE"
+debug_msg  ${LINENO} "WORKDIR  $WORKDIR"
+debug_msg  ${LINENO} "TEMPLATE  $TEMPLATE"
+template_basename=$(basename $TEMPLATE)
 
-ALE $BAMFILE $TEMPLATE $WORKDIR/$TEMPLATE.ale
+ALE $BAMFILE $TEMPLATE $WORKDIR/$template_basename.ale
 
 debug_msg  ${LINENO} "finished ale"
 #Give location of result files
-METRICS=$WORKDIR/$TEMPLATE.ale
+METRICS=$WORKDIR/$template_basename.ale
 
 #-------------------------- Assembly specific code here --------------------
 source $SOURCEDIR/tools/ssh_footer.sh
+

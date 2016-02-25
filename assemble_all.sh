@@ -12,7 +12,6 @@ declare -xr CONFIGFILE=$1
 source $CONFIGFILE
 declare -xr SOURCEDIR=$(dirname "$BASH_SOURCE")
 source $SOURCEDIR/error.sh
-debug_msg  ${LINENO} "working directory is $PWD"
 debug_msg  ${LINENO} "source directory is $SOURCEDIR"
 debug_msg  ${LINENO} "read in config file from $CONFIGFILE"
 readonly READSFILE 
@@ -20,6 +19,7 @@ debug_msg  ${LINENO} "Illumina reads from $READSFILE"
 if [[ -z $TOP_LOOP_SLEEP ]]; then 
   TOP_LOOP_SLEEP=1s
 fi
+debug_msg  ${LINENO} "top sleep time $TOP_LOOP_SLEEP"
 ## @fn save_pipe_config_information()
 ## @brief Set the minimum number of non-option parameters expected on
 ## the command line.
@@ -59,22 +59,21 @@ function save_strain_pipe_config_information ()
 
 function main ()
 {
-  echo before
-  ssh -i /home/shepperp/.ssh/id_rsa shepperp@SLURM.nbi.ac.uk echo "This is the first echo"
-  echo after
   save_pipe_config_information
   debug_msg  ${LINENO} "readsfile is $READSFILE"
   if [[ -n $READSFILE ]]; then
+    sleep_time=0
     while read -r col1 col2 col3 col4; do
       debug_msg  ${LINENO} "all: About to assemble  name $col1 \tread1 $col2 \tread2 $col3 \treadpb $col3"
       debug_msg  ${LINENO} "all: about to run $SOURCEDIR/assemble_strain.sh $col1 $col2 $col3 $col4 &"
       logdir="$LOCAL_DATA/$RESULTDIR/$col1/logdir"
       save_strain_pipe_config_information $col1 
       debug_msg  ${LINENO} "log dirctory for strian $col1 is $logdir/$num_runs"
-      "$SOURCEDIR/assemble_strain.sh" $col1 $col2 $col3 $col4 "$RESULTDIR/$col1/logdir/$num_runs" \
+      "$SOURCEDIR/assemble_strain.sh" $col1 $col2 $col3 $col4 "$RESULTDIR/$col1/logdir/$num_runs" $sleep_time\
         > "$logdir/$num_runs.assemble_all.stdout.log" \
-        2> "$logdir/$num_runs.assemble_all.stderr.log" & 
-        sleep $TOP_LOOP_SLEEP
+        2> "$logdir/$num_runs.assemble_all.stderr.log" &       
+      sleep_time=$(($sleep_time+$TOP_LOOP_SLEEP))
+      debug_msg  ${LINENO} "sleep time now $sleep_time"
     done < "$READSFILE"
   fi
   debug_msg  ${LINENO} "Sent of all strains to be assembled."
@@ -85,5 +84,5 @@ main "$@"
 
 #sudo bash -c "/home/shepperp/datashare/Piers/github/ncycseqpipe/assemble_all.sh /home/shepperp/datashare/Piers/github/ncycseqpipeHidden/input/ncycseqpipe93.cfg > /home/shepperp/93.log 2> /home/shepperp/93err.log &"
 #
-#sudo bash -c "/home/shepperp/datashare/Piers/github/ncycseqpipe/assemble_all.sh /home/shepperp/datashare/Piers/github/ncycseqpipeHidden/input/ncycseqpipe93group.cfg > /home/shepperp/93g.log 2> /home/shepperp/93gerr.log &"
+# sudo bash -c "/home/shepperp/datashare/Piers/github/ncycseqpipe/assemble_all.sh /home/shepperp/datashare/Piers/github/ncycseqpipeHidden/input/ncycseqpipe93group.cfg > /home/shepperp/93g.log 2> /home/shepperp/93gerr.log &"
 

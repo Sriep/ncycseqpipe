@@ -14,6 +14,6 @@ if [[ -n "$METRICS" ]]; then
 fi
 end=$(date +%s)
 runtime=$((end-start))
-echo -e "start: $start \tend: $end \ttaken $runtime" >> $LOGFILE
+echo -e "name $TOOL_NAME\tpreifx $PREFIX\tstart: $start\tend: $end\ttaken $runtime" >> $LOGFILE
 echo `basename "$0"`: FINISHED!! FINISHED!!
 echo finish ssh_footer.sh

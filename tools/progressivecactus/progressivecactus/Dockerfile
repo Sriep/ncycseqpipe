@@ -18,4 +18,3 @@ RUN make
 ENV PATH $PATH:/progressiveCactus/submodules/hal/bin:/progressiveCactus/bin
 ENV PYTHONPATH $PYTHONPATH:/progressiveCactus/submodules 
 ENTRYPOINT ["/progressiveCactus/bin/runProgressiveCactus.sh"]
-
