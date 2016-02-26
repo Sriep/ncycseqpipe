@@ -20,6 +20,8 @@ int main(int argc, char *argv[])
 {
     QApplication a(argc, argv);
     //QCoreApplication a(argc, argv);
+    //QCoreApplication::setOrganizationName("NCYC");
+    //QCoreApplication::setApplicationName("NcycPipeStats");
     QString workDirectory(argv[1]);
     runProgram(workDirectory);
     return a.exec();
@@ -48,9 +50,6 @@ int main(int argc, char *argv[])
 
 void runProgram(QString workDirectory)
 {
-    //QCoreApplication::setOrganizationName("NCYC");
-    //QCoreApplication::setApplicationName("NcycPipeStats");
-
     QSettings settings("ncyc", "ncycpipe");
     QDir* base_dir = new QDir(workDirectory);
 
@@ -72,7 +71,6 @@ void runProgram(QString workDirectory)
     ScatterData scatterData(cgalStuff, quastStuff);
     PlotLvN scatterPlot(scatterData, workDirectory, recipieStuff);
     scatterPlot.writeToPdf();
-    //scatterPlot.show();
 }
 
 

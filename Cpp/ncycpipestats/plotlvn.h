@@ -10,14 +10,12 @@
 #include "scatterdata.h"
 
 
-class PlotLvN : public QMainWindow
+class PlotLvN
 {
-     Q_OBJECT
 public:
     PlotLvN(ScatterData& scatterData
             , QString workDir
-            , RecipieList& recipie
-            , QWidget *parent = 0);
+            , RecipieList& recipie);
     void writeToPdf();
     virtual ~PlotLvN();
 private:

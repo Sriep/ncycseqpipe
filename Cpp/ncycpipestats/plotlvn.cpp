@@ -10,10 +10,9 @@
 #include "qcpdocumentobject.h"
 #include "plotlvn.h"
 
-PlotLvN::PlotLvN(ScatterData &scatterData, QString workDir, RecipieList &recipie, QWidget *parent)
-    : QMainWindow(parent)
-    , lvNPlot(this)
-    , document(this)
+PlotLvN::PlotLvN(ScatterData &scatterData, QString workDir, RecipieList &recipie)
+    : lvNPlot()
+    , document()
     , scatterData(scatterData)
     , workDir(workDir)
     , recipieList(recipie)
@@ -30,7 +29,6 @@ PlotLvN::~PlotLvN()
 
 void PlotLvN::init()
 {
-    resize(width, height);
     populateDocument();
     bool worked = lvNPlot.savePdf(workDir + "fileninameSavePdf.pdf", false, width, height);
     qDebug() << worked;
@@ -88,7 +86,7 @@ void PlotLvN::setGraph(QTextBlock block)
 
     // register the plot document object (only needed once, no matter how many
     // plots will be in the QTextDocument):
-    QCPDocumentObject *plotObjectHandler = new QCPDocumentObject(this);
+    QCPDocumentObject *plotObjectHandler = new QCPDocumentObject();//QCPDocumentObject(this);
     document.documentLayout()->
           registerHandler(QCPDocumentObject::PlotTextFormat, plotObjectHandler);
     QTextCursor cursor=QTextCursor(block);
@@ -128,7 +126,7 @@ void PlotLvN::populatePlot()
         textLabel->position->setType(QCPItemPosition::ptPlotCoords );
         textLabel->position->setCoords(scatterData.x.at(i), scatterData.y.at(i));
         textLabel->setText(scatterData.pointLabel.at(i).left(2));
-        textLabel->setFont(QFont(font().family(), 16)); // make font a bit larger
+        //textLabel->setFont(QFont(font().family(), 16)); // make font a bit larger
         textLabel->setPen(QPen(Qt::black)); // show black border around text
     }
     lvNPlot.replot();
