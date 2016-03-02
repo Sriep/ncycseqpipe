@@ -1,18 +1,20 @@
 #include <QPdfWriter>
 #include <QMargins>
 #include <QTextCursor>
+#include <QTextDocumentFragment>
+#include <QTextDocument>
 #include <QFont>
 #include <QPen>
+#include <QString>
 #include <QChar>
 #include <QPageSize>
 #include <QtDebug>
 #include <algorithm>
-#include "qcpdocumentobject.h"
+
 #include "plotlvn.h"
 
 PlotLvN::PlotLvN(ScatterData &scatterData, QString workDir, RecipieList &recipie)
-    : lvNPlot()
-    , document()
+    : document()
     , scatterData(scatterData)
     , workDir(workDir)
     , recipieList(recipie)
@@ -24,14 +26,13 @@ PlotLvN::PlotLvN(ScatterData &scatterData, QString workDir, RecipieList &recipie
 
 PlotLvN::~PlotLvN()
 {
-
 }
 
 void PlotLvN::init()
 {
-    populateDocument();
-    bool worked = lvNPlot.savePdf(workDir + "fileninameSavePdf.pdf", false, width, height);
-    qDebug() << worked;
+    //populateDocument();
+    //bool worked = lvNPlot.savePdf(workDir + "fileninameSavePdf.pdf", false, width, height);
+    //qDebug() << worked;
 }
 
 void PlotLvN::populateDocument()
@@ -45,26 +46,47 @@ void PlotLvN::populateDocument()
 
     cursor.movePosition(QTextCursor::End);
     cursor.insertBlock();
-    setGraph(document.lastBlock());
+    QTextBlockFormat graphFormat = cursor.blockFormat();
+    graphFormat.setPageBreakPolicy(QTextFormat::PageBreak_AlwaysAfter);
+    cursor.setBlockFormat(graphFormat);
+    addGraph(document.lastBlock());
+
+    cursor.movePosition(QTextCursor::End);
+    setData(cursor);
 }
 
 void PlotLvN::setHeader(QTextBlock block)
 {
-    //document->setFont(QFont(font().family(), 30));
-    //QTextBlockFormat blockFormat = QTextBlock::blockFormat();
-
     QTextCursor cursor=QTextCursor(block);
-    QString header= prefix() + " LvsN plot" + "\n";
+    QTextCharFormat headerCharF = block.charFormat();
+    headerCharF.setFontPointSize(30);
+    headerCharF.setFontWeight(QFont::Bold);
+    cursor.setBlockCharFormat(headerCharF);
+
+    QString header= prefix() + " LvsN plot: ";
     QTextDocumentFragment headerFrag
             = QTextDocumentFragment::fromPlainText(header);
     cursor.insertFragment(headerFrag);
+
+    headerFrag = QTextDocumentFragment::fromPlainText(scatterData.getName() + "\n");
+    cursor.insertFragment(headerFrag);
+
+    // http://doc.qt.io/qt-5/richtext-html-subset.html
+    //QString test = "<a name=\"test\"> Test link </a>";
+    //cursor.insertHtml(test);
+    //headerFrag = QTextDocumentFragment::fromPlainText(test);
+    //cursor.insertFragment(headerFrag);
 }
 
 void PlotLvN::setLegend(QTextBlock block)
 {
-    //document->setFont(QFont(font().family(), 16));
     QTextCursor cursor=QTextCursor(block);
-    for ( int i=0 ; i<scatterData.x.size() ; i++ )
+    QTextCharFormat headerCharF = block.charFormat();
+    headerCharF.setFontPointSize(16);
+    headerCharF.setFontWeight(QFont::Normal);
+    cursor.setBlockCharFormat(headerCharF);
+
+    for ( int i=0 ; i < scatterData.x.size() ; i++ )
     {
         QString text = scatterData.pointLabel.at(i);
         QString tag = text.left(2);
@@ -78,63 +100,40 @@ void PlotLvN::setLegend(QTextBlock block)
     QTextDocumentFragment frag
             = QTextDocumentFragment::fromPlainText("\n");
     cursor.insertFragment(frag);
+
+    //QString test = "<a href=\"#test\"> Should like to above </a>";
+    //QTextDocumentFragment testfrag
+    //        = QTextDocumentFragment::fromPlainText("test\n");
+    //cursor.insertFragment(testfrag);
 }
 
-void PlotLvN::setGraph(QTextBlock block)
+void PlotLvN::setData(QTextCursor cursor)
 {
-    populatePlot();
+    QTextTable* table=cursor.insertTable(scatterData.pointLabel.size()+1 ,3);
+    cursor.insertText("Assembler");
+    cursor.movePosition(QTextCursor::NextCell);
+    cursor.insertText("N75");
+    cursor.movePosition(QTextCursor::NextCell);
+    cursor.insertText("Liklyhood");
+    cursor.movePosition(QTextCursor::NextCell);
 
-    // register the plot document object (only needed once, no matter how many
-    // plots will be in the QTextDocument):
-    QCPDocumentObject *plotObjectHandler = new QCPDocumentObject();//QCPDocumentObject(this);
-    document.documentLayout()->
-          registerHandler(QCPDocumentObject::PlotTextFormat, plotObjectHandler);
-    QTextCursor cursor=QTextCursor(block);
-    // insert the current plot at the cursor position.
-    // QCPDocumentObject::generatePlotFormat creates a
-    // vectorized snapshot of the passed plot (with the specified width
-    // and height) which gets inserted  into the text document.
-    cursor.insertText(QString(QChar::ObjectReplacementCharacter)
-                      , QCPDocumentObject::generatePlotFormat(&lvNPlot, width, height));
-}
-
-void PlotLvN::populatePlot()
-{
-    lvNPlot.addGraph();
-    lvNPlot.graph(0)->setData(scatterData.x, scatterData.y);
-
-    lvNPlot.xAxis->setLabel("N75");
-    lvNPlot.yAxis->setLabel("Liklyhood");
-    auto upperX = std::max_element(scatterData.x.begin(), scatterData.x.end());
-    auto lowerX = std::min_element(scatterData.x.begin(), scatterData.x.end());
-    auto upperY = std::max_element(scatterData.y.begin(), scatterData.y.end());
-    auto lowerY = std::min_element(scatterData.y.begin(), scatterData.y.end());
-    lvNPlot.xAxis->setRange(*lowerX*0.0, *upperX*1.2);
-    lvNPlot.yAxis->setRange(*lowerY*1.05, *upperY*0.95);
-    lvNPlot.replot();
-
-    lvNPlot.graph(0)->setPen(QColor(50, 50, 50, 255));
-    lvNPlot.graph(0)->setLineStyle(QCPGraph::lsNone);
-    lvNPlot.graph(0)->setScatterStyle(QCPScatterStyle(QCPScatterStyle::ssDisc, 8));
-    lvNPlot.graph(0)->setName("Liklyhood vrs N75");
-
-    for ( int i=0 ; i<scatterData.x.size() ; i++ )
+    for ( int i=0 ; i < scatterData.x.size() ; i++ )
     {
-        QCPItemText *textLabel = new QCPItemText(&lvNPlot);
-        lvNPlot.addItem(textLabel);
-        textLabel->setPositionAlignment(Qt::AlignTop|Qt::AlignHCenter);
-        textLabel->position->setType(QCPItemPosition::ptPlotCoords );
-        textLabel->position->setCoords(scatterData.x.at(i), scatterData.y.at(i));
-        textLabel->setText(scatterData.pointLabel.at(i).left(2));
-        //textLabel->setFont(QFont(font().family(), 16)); // make font a bit larger
-        textLabel->setPen(QPen(Qt::black)); // show black border around text
+        cursor.insertText(scatterData.pointLabel.at(i));
+        cursor.movePosition(QTextCursor::NextCell);
+        cursor.insertText(QString::number(scatterData.x.at(i)));
+        cursor.movePosition(QTextCursor::NextCell);
+        cursor.insertText(QString::number(scatterData.y.at(i)));
+        cursor.movePosition(QTextCursor::NextCell);
     }
-    lvNPlot.replot();
+
 }
 
 void PlotLvN::writeToPdf()
 {
-    QPdfWriter* pdfWriter = new QPdfWriter(workDir + "/" + prefix() + "_LvN75.pdf");
+    populateDocument();
+    QString pdfFilename = workDir + "/" + prefix() + "_" + scatterData.getName() + ".pdf";
+    QPdfWriter* pdfWriter = new QPdfWriter(pdfFilename);
     pdfWriter->setPageSize(QPageSize(QPageSize::A3));
     pdfWriter->setTitle(prefix() + "Liklyhood vrs N75");
     document.print(pdfWriter);
