@@ -9,6 +9,7 @@ class PipeData
 {
 public:
     PipeData();
+
 protected:
     virtual QString assembly(QString filename);
 };

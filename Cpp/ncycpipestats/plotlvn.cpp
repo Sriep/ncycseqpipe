@@ -109,7 +109,7 @@ void PlotLvN::setLegend(QTextBlock block)
 
 void PlotLvN::setData(QTextCursor cursor)
 {
-    QTextTable* table=cursor.insertTable(scatterData.pointLabel.size()+1 ,3);
+    cursor.insertTable(scatterData.pointLabel.size()+1 ,3);
     cursor.insertText("Assembler");
     cursor.movePosition(QTextCursor::NextCell);
     cursor.insertText("N75");
@@ -126,7 +126,6 @@ void PlotLvN::setData(QTextCursor cursor)
         cursor.insertText(QString::number(scatterData.y.at(i)));
         cursor.movePosition(QTextCursor::NextCell);
     }
-
 }
 
 void PlotLvN::writeToPdf()

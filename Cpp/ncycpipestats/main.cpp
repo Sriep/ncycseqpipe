@@ -13,6 +13,7 @@
 #include "scatterdata.h"
 #include "cpplotlvn.h"
 #include "recipielist.h"
+#include "runtimes.h"
 
 //#include <QtCharts/QtCharts>
 //using namespace QtCharts;
@@ -60,6 +61,7 @@ void processMultipleDirs(const QString& workDirectory, QCommandLineParser& clp)
 void processSingleDir(const QString& workDirectory, QCommandLineParser& clp)
 {
     QDir* base_dir = new QDir(workDirectory);
+    QString strain=base_dir->dirName();
 
     base_dir->setNameFilters(QStringList("metric_*quast.csv"));
     QFileInfoList quastMetrics=base_dir->entryInfoList();
@@ -88,6 +90,16 @@ void processSingleDir(const QString& workDirectory, QCommandLineParser& clp)
             ScatterData aleScatter(aleStuff, quastStuff);
             CPPlotLvN aleScatterPlot(aleScatter, workDirectory, recipieStuff);
             aleScatterPlot.writeToPdf();
+        }
+
+
+        QString timesFilename = base_dir->absolutePath()
+                + "/logdir/1stats/allstats.csv";
+        QFileInfo timesFileInfo(timesFilename);
+        if (timesFileInfo.exists())
+        {
+            RunTimes runTimes(timesFileInfo, strain, workDirectory);
+            runTimes.writeToPdf();
         }
     }
 }

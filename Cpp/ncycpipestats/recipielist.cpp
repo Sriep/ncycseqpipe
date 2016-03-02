@@ -2,7 +2,7 @@
 #include <QStringList>
 #include "recipielist.h"
 
-RecipieList::RecipieList(QFileInfo recipieFile)
+RecipieList::RecipieList(const QFileInfo& recipieFile)
  : recipieFile(recipieFile)
 {
     init();

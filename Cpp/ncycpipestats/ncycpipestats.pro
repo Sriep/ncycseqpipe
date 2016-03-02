@@ -24,7 +24,10 @@ SOURCES += main.cpp \
     pipedata.cpp \
     recipielist.cpp \
     alemetrics.cpp \
-    cpplotlvn.cpp
+    cpplotlvn.cpp \
+    collectionpipedata.cpp \
+    strainpipedata.cpp \
+    runtimes.cpp
 
 HEADERS += \
     main.h \
@@ -38,5 +41,8 @@ HEADERS += \
     pipedata.h \
     recipielist.h \
     alemetrics.h \
-    cpplotlvn.h
+    cpplotlvn.h \
+    collectionpipedata.h \
+    strainpipedata.h \
+    runtimes.h
 
