@@ -2,6 +2,7 @@
 #include <QMargins>
 #include <QTextCursor>
 #include <QTextDocumentFragment>
+#include <QTextBlockFormat>
 #include <QTextDocument>
 #include <QFont>
 #include <QPen>
@@ -14,8 +15,7 @@
 #include "plotlvn.h"
 
 PlotLvN::PlotLvN(ScatterData &scatterData, QString workDir, RecipieList &recipie)
-    : document()
-    , scatterData(scatterData)
+    : scatterData(scatterData)
     , workDir(workDir)
     , recipieList(recipie)
 {
@@ -30,29 +30,56 @@ PlotLvN::~PlotLvN()
 
 void PlotLvN::init()
 {
-    //populateDocument();
-    //bool worked = lvNPlot.savePdf(workDir + "fileninameSavePdf.pdf", false, width, height);
-    //qDebug() << worked;
+
 }
 
 void PlotLvN::populateDocument()
-{
-    setHeader(document.firstBlock());
+{    
 
-    QTextCursor cursor(&document);
+
+    //TESTTESTSETS
+    // //http://doc.qt.io/qt-5/richtext-html-subset.html
+    //QString test = "<a name=\"test\"> Test link </a>";
+    //cursor.insertHtml(test);
+    //headerFrag = QTextDocumentFragment::fromPlainText(test);
+    //cursor.insertFragment(headerFrag);
+    //TESTTESTSETS
+
+    setHeader(firstBlock());
+
+    QTextCursor cursor(this);
     cursor.movePosition(QTextCursor::End);
     cursor.insertBlock();
-    setLegend(document.lastBlock());
+    setLegend(lastBlock());
 
     cursor.movePosition(QTextCursor::End);
     cursor.insertBlock();
-    QTextBlockFormat graphFormat = cursor.blockFormat();
-    graphFormat.setPageBreakPolicy(QTextFormat::PageBreak_AlwaysAfter);
-    cursor.setBlockFormat(graphFormat);
-    addGraph(document.lastBlock());
+
+    QTextBlockFormat format = cursor.blockFormat();
+    format.setPageBreakPolicy(QTextFormat::PageBreak_AlwaysAfter);
+    cursor.setBlockFormat(format);
+
+    addGraph(lastBlock());
 
     cursor.movePosition(QTextCursor::End);
     setData(cursor);
+
+    //TESTTESTSETS
+    //test = "<a href=\"#test\"> Should like to above </a>";
+    //cursor.insertHtml(test);
+    //QTextDocumentFragment testfrag
+    //        = QTextDocumentFragment::fromPlainText("test\n");
+    //cursor.insertFragment(testfrag);
+    //TESTTESTSETS
+}
+
+QTextDocumentFragment PlotLvN::contents()
+{
+    if (isEmpty()) populateDocument();
+    QTextCursor cursor(this);
+    cursor.movePosition(QTextCursor::Start, QTextCursor::MoveAnchor);
+    cursor.movePosition(QTextCursor::End, QTextCursor::KeepAnchor);
+    return cursor.selection();
 }
 
 void PlotLvN::setHeader(QTextBlock block)
@@ -70,12 +97,6 @@ void PlotLvN::setHeader(QTextBlock block)
 
     headerFrag = QTextDocumentFragment::fromPlainText(scatterData.getName() + "\n");
     cursor.insertFragment(headerFrag);
-
-    // http://doc.qt.io/qt-5/richtext-html-subset.html
-    //QString test = "<a name=\"test\"> Test link </a>";
-    //cursor.insertHtml(test);
-    //headerFrag = QTextDocumentFragment::fromPlainText(test);
-    //cursor.insertFragment(headerFrag);
 }
 
 void PlotLvN::setLegend(QTextBlock block)
@@ -88,7 +109,7 @@ void PlotLvN::setLegend(QTextBlock block)
 
     for ( int i=0 ; i < scatterData.x.size() ; i++ )
     {
-        QString text = scatterData.pointLabel.at(i);
+        QString text = scatterData.label.at(i);
         QString tag = text.left(2);
         QString name1 = nameFromTag(tag);
         QString insertString = tag + " = " + name1 + "\n";
@@ -101,15 +122,11 @@ void PlotLvN::setLegend(QTextBlock block)
             = QTextDocumentFragment::fromPlainText("\n");
     cursor.insertFragment(frag);
 
-    //QString test = "<a href=\"#test\"> Should like to above </a>";
-    //QTextDocumentFragment testfrag
-    //        = QTextDocumentFragment::fromPlainText("test\n");
-    //cursor.insertFragment(testfrag);
 }
 
 void PlotLvN::setData(QTextCursor cursor)
 {
-    cursor.insertTable(scatterData.pointLabel.size()+1 ,3);
+    cursor.insertTable(scatterData.label.size()+1 ,3);
     cursor.insertText("Assembler");
     cursor.movePosition(QTextCursor::NextCell);
     cursor.insertText("N75");
@@ -119,7 +136,7 @@ void PlotLvN::setData(QTextCursor cursor)
 
     for ( int i=0 ; i < scatterData.x.size() ; i++ )
     {
-        cursor.insertText(scatterData.pointLabel.at(i));
+        cursor.insertText(scatterData.label.at(i));
         cursor.movePosition(QTextCursor::NextCell);
         cursor.insertText(QString::number(scatterData.x.at(i)));
         cursor.movePosition(QTextCursor::NextCell);
@@ -130,12 +147,12 @@ void PlotLvN::setData(QTextCursor cursor)
 
 void PlotLvN::writeToPdf()
 {
-    populateDocument();
+    if (isEmpty()) populateDocument();
     QString pdfFilename = workDir + "/" + prefix() + "_" + scatterData.getName() + ".pdf";
     QPdfWriter* pdfWriter = new QPdfWriter(pdfFilename);
     pdfWriter->setPageSize(QPageSize(QPageSize::A3));
     pdfWriter->setTitle(prefix() + "Liklyhood vrs N75");
-    document.print(pdfWriter);
+    print(pdfWriter);
 }
 
 QString PlotLvN::nameFromTag(QString tag) const
@@ -168,11 +185,12 @@ QString PlotLvN::nameFromTag(QString tag) const
 
 QString PlotLvN::prefix() const
 {
-    QString text = scatterData.pointLabel.at(0);
+    QString text = scatterData.label.at(0);
     text = text.right(text.size()-2);
     text = text.left(text.size()-1);
     return text;
 }
+
 
 
 

@@ -1,15 +1,26 @@
 #include <QTextStream>
 #include "alemetrics.h"
 
+AleMetrics::AleMetrics()
+    :aleDataFile()
+{
+
+}
+
 AleMetrics::AleMetrics(QFileInfo aleDataFile)
     : aleDataFile(aleDataFile)
 {
-    init();
+    if (aleDataFile.exists()) init();
 }
 
 const QMap<QString, double> AleMetrics::aleData() const
 {
     return aleFolderData;
+}
+
+bool AleMetrics::valid() const
+{
+    return aleDataFile.exists();
 }
 
 void AleMetrics::init()

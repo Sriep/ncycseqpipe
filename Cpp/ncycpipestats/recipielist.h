@@ -4,7 +4,7 @@
 #include <QVector>
 #include "pipedata.h"
 
-class RecipieList : public PipeData
+class RecipieList
 {
 public:
     RecipieList() {}
@@ -32,6 +32,7 @@ public:
     };
 
     QVector<Recipie> recipiesData() const;
+    bool valid() const;
 private:
     void init();
 

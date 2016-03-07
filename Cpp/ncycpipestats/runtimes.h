@@ -12,6 +12,7 @@
 class RunTimes : public PipeData
 {
 public:
+    RunTimes();
     RunTimes(const QFileInfo& timesLogFile
              , const QString& strain
              , const QString &workdir);
@@ -35,6 +36,9 @@ public:
     };
     QVector<RunTimeData> getTimingsData() const;
     void writeToPdf();
+    bool valid() const;
+    QTextFrame* getTextFrame();
+    QTextDocumentFragment  contents();
 
 private:
     void init();

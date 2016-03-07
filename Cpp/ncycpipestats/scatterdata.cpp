@@ -14,7 +14,7 @@ ScatterData::ScatterData(CgalMetrics& cgal, QuastMetrics& quast)
         {
             y.append(c_iter.value().totalLikelihoodValue);
             x.append(quastData.value(c_iter.key()).value("N75").toDouble());
-            pointLabel.append(c_iter.key());
+            label.append(c_iter.key());
         }
     }
 }
@@ -33,12 +33,27 @@ ScatterData::ScatterData(AleMetrics &ale, QuastMetrics &quast)
         {
             y.append(c_iter.value());
             x.append(quastData.value(c_iter.key()).value("N75").toDouble());
-            pointLabel.append(c_iter.key());
+            label.append(c_iter.key());
         }
     }
 }
 
-const QString ScatterData::getName() const
+QString ScatterData::pointLabel(int position) const
+{
+    QStringList frags = label.at(position).split("_", QString::SkipEmptyParts);
+    QString anchor = label.at(position).left(2);
+    switch (frags.size())
+    {
+    case 1 :
+        return anchor;
+    case 2 :
+        return anchor + "." + frags.at(1);
+    default :
+        return label.at(position);
+    };
+}
+
+QString ScatterData::getName() const
 {
     return name;
 }

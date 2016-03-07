@@ -5,12 +5,22 @@
 CgalMetrics::CgalMetrics(QFileInfo cgalDataFile)
     : cgalDataFile(cgalDataFile)
 {
-    init();
+    if (cgalDataFile.exists()) init();
+}
+
+CgalMetrics::CgalMetrics()
+    : cgalDataFile()
+{
 }
 
 const CgalMetrics::CgalFolderData CgalMetrics::cgalData() const
 {
     return cgalFolderData;
+}
+
+bool CgalMetrics::valid() const
+{
+    return cgalDataFile.exists();
 }
 
 void CgalMetrics::init()

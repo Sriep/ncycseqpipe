@@ -3,16 +3,25 @@
 #include <QString>
 #include <QVector>
 
-#include "pipedata.h"
+#include <memory>
 #include "strainpipedata.h"
 
-class CollectionPipeData : public PipeData
+class CollectionPipeData : public  QTextDocument
 {
 public:
-    CollectionPipeData(const QString& directory);
-
+    CollectionPipeData();
+    CollectionPipeData(const QFileInfo &directory);
+    virtual ~CollectionPipeData();
+    void writeToPdf();
+    bool valid() const;
 private:
-    QVector<StrainPipeData> strainsData;
+    void init();
+    void populate();
+    void header(QTextBlock block);
+    static bool validDataDir(const QFileInfo& finfo);
+    QVector<StrainPipeData*> strainsData;
+    //QVector<std::unique_ptr<StrainPipeData>> strainsData;
+    QFileInfo directory;
 };
 
 #endif // COLLECTIONPIPEDATA_H

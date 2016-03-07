@@ -1,6 +1,7 @@
 #include <QTextCursor>
 #include <QFont>
 #include <QtDebug>
+#include <QAbstractTextDocumentLayout>
 
 #include "qcpdocumentobject.h"
 #include "cpplotlvn.h"
@@ -25,16 +26,19 @@ void CPPlotLvN::addGraph(QTextBlock block)
 
     // register the plot document object (only needed once, no matter how many
     // plots will be in the QTextDocument):
-    QCPDocumentObject *plotObjectHandler = new QCPDocumentObject();//QCPDocumentObject(this);
-    document.documentLayout()->
+    QCPDocumentObject *plotObjectHandler = new QCPDocumentObject();
+    QTextDocument::documentLayout()->
           registerHandler(QCPDocumentObject::PlotTextFormat, plotObjectHandler);
+
     QTextCursor cursor=QTextCursor(block);
     // insert the current plot at the cursor position.
     // QCPDocumentObject::generatePlotFormat creates a
     // vectorized snapshot of the passed plot (with the specified width
     // and height) which gets inserted  into the text document.
     cursor.insertText(QString(QChar::ObjectReplacementCharacter)
-                      , QCPDocumentObject::generatePlotFormat(&lvNPlot, width, height));
+                      , QCPDocumentObject::generatePlotFormat(&lvNPlot
+                                                              , width
+                                                              , height));
 
     QString filename = workDir + "/graph" + prefix() + "_" + scatterData.getName();
     lvNPlot.savePdf(filename + ".pdf" ,false , width, height);
@@ -70,7 +74,7 @@ void CPPlotLvN::populatePlot()
         textLabel->setPositionAlignment(Qt::AlignTop|Qt::AlignHCenter);
         textLabel->position->setType(QCPItemPosition::ptPlotCoords );
         textLabel->position->setCoords(scatterData.x.at(i), scatterData.y.at(i));
-        textLabel->setText(scatterData.pointLabel.at(i).left(2));
+        textLabel->setText(scatterData.pointLabel(i));
         //textLabel->setFont(QFont(font().family(), 16)); // make font a bit larger
         textLabel->setPen(QPen(Qt::black)); // show black border around text
     }

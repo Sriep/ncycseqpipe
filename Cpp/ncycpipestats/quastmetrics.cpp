@@ -66,6 +66,11 @@ QuastMetrics::QuastFolderData QuastMetrics::folderData() const
     return quastData;
 }
 
+bool QuastMetrics::valid() const
+{
+    return quastDataFile.exists();
+}
+
 /*
 QuastMetrics::QuastAssemblyData QuastMetrics::readQuastDataLine(QStringList header, QStringList data)
 {

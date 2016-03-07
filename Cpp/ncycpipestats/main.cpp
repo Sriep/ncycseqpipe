@@ -2,11 +2,12 @@
 #include <QSettings>
 #include <QDir>
 #include <QFileInfo>
+#include <QtDebug>
 #include <QStringList>
+#include <QTextDocumentWriter>
 #include <QtWidgets/QApplication>
 
 #include "main.h"
-#include "options.h"
 #include "quastmetrics.h"
 #include "cgalmetrics.h"
 #include "alemetrics.h"
@@ -14,6 +15,8 @@
 #include "cpplotlvn.h"
 #include "recipielist.h"
 #include "runtimes.h"
+#include "strainpipedata.h"
+#include "collectionpipedata.h"
 
 //#include <QtCharts/QtCharts>
 //using namespace QtCharts;
@@ -45,8 +48,10 @@ int main(int argc, char *argv[])
 
 void processMultipleDirs(const QString& workDirectory, QCommandLineParser& clp)
 {
-   // QString workDirectory = clp.value(multipleDirs);
-    QDir* base_dir = new QDir(workDirectory);
+
+
+    // QString workDirectory = clp.value(multipleDirs);
+    /*QDir* base_dir = new QDir(workDirectory);
     QFileInfoList dirsInfo = base_dir->entryInfoList(QDir::Dirs);
     for (int i = 0; i < dirsInfo.size(); ++i)
     {
@@ -55,7 +60,25 @@ void processMultipleDirs(const QString& workDirectory, QCommandLineParser& clp)
             //QString dirName=dirs.at(i).absoluteFilePath;
             processSingleDir(dirsInfo.at(i).absoluteFilePath(), clp);
         }
-    }
+    }*/
+    QFileInfo wdfi(workDirectory);
+    CollectionPipeData collection(wdfi);
+    collection.writeToPdf();
+
+    QTextDocumentWriter writer;
+    writer.setFormat("HTML");
+    writer.setFileName(workDirectory + "collection.html");
+    writer.write(&collection);
+
+    writer.setFormat("plaintext");
+    writer.setFileName(workDirectory + "collection.txt");
+    writer.write(&collection);
+
+    writer.setFormat("ODF");
+    writer.setFileName(workDirectory + "collection.odf");
+    writer.write(&collection);
+
+
 }
 
 void processSingleDir(const QString& workDirectory, QCommandLineParser& clp)
@@ -63,15 +86,21 @@ void processSingleDir(const QString& workDirectory, QCommandLineParser& clp)
     QDir* base_dir = new QDir(workDirectory);
     QString strain=base_dir->dirName();
 
-    base_dir->setNameFilters(QStringList("metric_*quast.csv"));
-    QFileInfoList quastMetrics=base_dir->entryInfoList();
-    QuastMetrics quastStuff(quastMetrics.at(0));
-
+    QFileInfo wdinfo(workDirectory);
+    StrainPipeData strainData(wdinfo);
+    if (strainData.valid()) strainData.writeToPdf();
+    return;
+/*
     QFileInfo recipiefileinfo(workDirectory + "/logdir/1.RECIPEFILE");
     RecipieList recipieStuff(recipiefileinfo);
 
+    base_dir->setNameFilters(QStringList("metric_*quast.csv"));
+    QFileInfoList quastMetrics=base_dir->entryInfoList();
+
     if (!quastMetrics.empty() && recipiefileinfo.exists())
     {
+        QuastMetrics quastStuff(quastMetrics.at(0));
+
         base_dir->setNameFilters(QStringList("metric_*cgal.csv"));
         QFileInfoList cgalMetrics=base_dir->entryInfoList();
         if (!cgalMetrics.empty())
@@ -101,7 +130,7 @@ void processSingleDir(const QString& workDirectory, QCommandLineParser& clp)
             RunTimes runTimes(timesFileInfo, strain, workDirectory);
             runTimes.writeToPdf();
         }
-    }
+    }*/
 }
 
 void configCommandLineParser(QCommandLineParser& clp)

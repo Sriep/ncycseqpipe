@@ -8,8 +8,11 @@
 class AleMetrics : public PipeData
 {
 public:
+    AleMetrics();
     AleMetrics(QFileInfo aleDataFile);
     const QMap<QString, double> aleData() const;
+
+    bool valid() const;
 private:
     void init();
 

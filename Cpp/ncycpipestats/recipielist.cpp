@@ -5,12 +5,17 @@
 RecipieList::RecipieList(const QFileInfo& recipieFile)
  : recipieFile(recipieFile)
 {
-    init();
+    if (recipieFile.exists()) init();
 }
 
 QVector<RecipieList::Recipie> RecipieList::recipiesData() const
 {
     return recipies;
+}
+
+bool RecipieList::valid() const
+{
+    return recipieFile.exists();
 }
 
 void RecipieList::init()

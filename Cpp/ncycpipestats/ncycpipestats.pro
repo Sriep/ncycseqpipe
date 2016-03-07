@@ -14,7 +14,6 @@ CONFIG  += c++11
 TEMPLATE = app
 
 SOURCES += main.cpp \
-    options.cpp \
     quastmetrics.cpp \
     cgalmetrics.cpp \
     qcustomplot.cpp \
@@ -31,7 +30,6 @@ SOURCES += main.cpp \
 
 HEADERS += \
     main.h \
-    options.h \
     quastmetrics.h \
     cgalmetrics.h \
     qcustomplot.h \

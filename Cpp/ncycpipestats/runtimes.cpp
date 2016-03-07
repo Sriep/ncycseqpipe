@@ -8,6 +8,12 @@
 #include <ctime>
 #include "runtimes.h"
 
+RunTimes::RunTimes()
+    : timesLogFile()
+{
+
+}
+
 RunTimes::RunTimes(const QFileInfo& timesLogFile
                    , const QString& strain
                    , const QString& workdir)
@@ -16,7 +22,7 @@ RunTimes::RunTimes(const QFileInfo& timesLogFile
     , strain(strain)
     , workdir(workdir)
 {
-    init();
+    if (timesLogFile.exists()) init();
 }
 
 void RunTimes::init()
@@ -54,7 +60,6 @@ void RunTimes::init()
 void RunTimes::populateDocument()
 {
     setHeader(document.firstBlock());
-
     QTextCursor cursor(&document);
     cursor.movePosition(QTextCursor::End);
     setData(cursor);
@@ -123,12 +128,32 @@ QVector<RunTimes::RunTimeData> RunTimes::getTimingsData() const
 
 void RunTimes::writeToPdf()
 {
-    populateDocument();
+    if (document.isEmpty()) populateDocument();
     QString pdfFilename = workdir + "/" + strain + "_Timings.pdf";
     QPdfWriter* pdfWriter = new QPdfWriter(pdfFilename);
     pdfWriter->setPageSize(QPageSize(QPageSize::A3));
     pdfWriter->setTitle(strain + "Timeings for tools run in pipeline");
     document.print(pdfWriter);
+}
+
+bool RunTimes::valid() const
+{
+    return timesLogFile.exists();
+}
+
+QTextFrame* RunTimes::getTextFrame()
+{
+    if (document.isEmpty()) populateDocument();
+    return document.rootFrame();
+}
+
+QTextDocumentFragment RunTimes::contents()
+{
+    if (document.isEmpty()) populateDocument();
+    QTextCursor cursor(&document);
+    cursor.movePosition(QTextCursor::Start, QTextCursor::MoveAnchor);
+    cursor.movePosition(QTextCursor::End, QTextCursor::KeepAnchor);
+    return cursor.selection();
 }
 
 
