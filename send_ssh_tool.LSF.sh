@@ -26,6 +26,7 @@ function send_ssh_tool ()
               $READS1 \
               $READS2 \
               $READSPB \
+              ${TOOL_TYPE[$index]} \
               ${TOOL_TAG[$index]} \
               ${TOOL_NAME[$index]} \
               ${LOGPREFIX} \

@@ -1,7 +1,7 @@
 #!/bin/bash 
 # 
-declare -xr SOURCEDIR="$(dirname $BASH_SOURCE)/.."
-source $SOURCEDIR/local_header.sh
+declare -r SOURCEDIR="$1"
+source $SOURCEDIR/tools/local_header.sh
 # PREFIX - Name of strain to assemble
 # READS1 - First set of paired end reads, relative to $LOCAL_READSDIR
 # READS2 - Second set of paired end reads, relative to $LOCAL_READSDIR
@@ -32,5 +32,5 @@ CONTIGS=$WORKDIR/$PREFIX-6.fa
 SCAFFOLDS=$WORKDIR/$PREFIX-8.fa
 #-------------------------- Footer --------------------
 
-source $SOURCEDIR/local_footer.sh
+source $SOURCEDIR/tools/local_footer.sh
 

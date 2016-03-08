@@ -42,9 +42,6 @@ cp $WORKDIR/${PRFIX_STUB}_${TOOL_TAG}.bam $SSH_RESULTDIR/${PRFIX_STUB}_${TOOL_TA
 cp $WORKDIR/${PRFIX_STUB}_${TOOL_TAG}.bam.bai $SSH_RESULTDIR/${PRFIX_STUB}_${TOOL_TAG}.bai
 
 #-------------------------- Assembly specific code here --------------------
+source $SOURCEDIR/tools/ssh_footer.sh
 
-#cp $METRICS_CSV $SSH_RESULTDIR/m_${PRFIX_STUB}_${TOOL_TAG}
-
-#cp $CONTIGS $SSH_RESULTDIR/${ASSEMBLY_TAG}c${PREFIX}i.fasta
-#cp $SCAFFOLDS $SSH_RESULTDIR/${ASSEMBLY_TAG}s${PREFIX}i.fasta
 echo `basename "$0"`: FINISHED!! FINISHED!!

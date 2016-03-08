@@ -1,7 +1,7 @@
 #!/bin/bash
 # 
-declare -xr SOURCEDIR="$(dirname $BASH_SOURCE)/.."
-source $SOURCEDIR/local_header.sh
+declare -r SOURCEDIR="$1"
+source $SOURCEDIR/tools/local_header.sh
 # PREFIX - Name of strain to assemble
 # READS1 - First set of paired end reads, relative to $LOCAL_READSDIR
 # READS2 - Second set of paired end reads, relative to $LOCAL_READSDIR
@@ -34,7 +34,10 @@ remove_docker_container ale$PREFIX
 
 debug_msg  ${LINENO} "finished ale"
 #Give location of result files
-METRICS=$WORKDIR/$TEMPLATE.ale
+firstline=$(head -n 1 "$WORKDIR/$TEMPLATE.ale")
+outfile="$WORKDIR/$TEMPLATE.csv"
+echo $firstline > $outfile
+METRICS="$outfile"
 
 #-------------------------- Assembly specific code here --------------------
-source $SOURCEDIR/local_footer.sh
+source $SOURCEDIR/tools/local_footer.sh

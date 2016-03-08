@@ -85,4 +85,6 @@ main "$@"
 #sudo bash -c "/home/shepperp/datashare/Piers/github/ncycseqpipe/assemble_all.sh /home/shepperp/datashare/Piers/github/ncycseqpipeHidden/input/ncycseqpipe93.cfg > /home/shepperp/93.log 2> /home/shepperp/93err.log &"
 #
 # sudo bash -c "/home/shepperp/datashare/Piers/github/ncycseqpipe/assemble_all.sh /home/shepperp/datashare/Piers/github/ncycseqpipeHidden/input/ncycseqpipe93group.cfg > /home/shepperp/93g.log 2> /home/shepperp/93gerr.log &"
+#
+# sudo bash -c "/home/shepperp/datashare/Piers/github/ncycseqpipe/assemble_all.sh /home/shepperp/datashare/Piers/github/ncycseqpipeHidden/input/ncycseqpipeTB.cfg > /home/shepperp/tbg.log 2> /home/shepperp/tbgerr.log &"
 

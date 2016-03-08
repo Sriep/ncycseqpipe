@@ -1,8 +1,8 @@
 #!/bin/bash 
 # 
 declare -xr SOURCEDIR="$(dirname $BASH_SOURCE)/.."
-source $SOURCEDIR/local_header.sh
-PROGNAME=$(basename $0)
+declare -r SOURCEDIR="$1"
+source $SOURCEDIR/tools/local_header.sh
 # PREFIX - Name of strain to assemble
 # READS1 - First set of paired end reads, relative to $LOCAL_READSDIR
 # READS2 - Second set of paired end reads, relative to $LOCAL_READSDIR
@@ -41,7 +41,7 @@ remove_docker_container sspace-longread$PREFIX
 SCAFFOLDS=$WORKDIR/scaffolds.fasta
 #-------------------------- Footer --------------------
 
-source $SOURCEDIR/local_footer.sh
+source $SOURCEDIR/tools/local_footer.sh
 
 #Usage SSPACE-LongRead scaffolder version 1-1
 #perl SSPACE-LongRead.pl -c <contig-sequences> -p <pacbio-reads>

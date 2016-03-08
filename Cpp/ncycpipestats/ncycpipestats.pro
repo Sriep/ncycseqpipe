@@ -9,16 +9,11 @@ QT       += gui
 QT       += widgets
 
 TARGET = ncycpipestats
-
-#CONFIG   += console
-#CONFIG   -= app_bundle
-#/home/shepperp/Qt/5.5/gcc_64/bin/qmake ncycpipestats.pro
 CONFIG  += c++11
 
 TEMPLATE = app
 
 SOURCES += main.cpp \
-    options.cpp \
     quastmetrics.cpp \
     cgalmetrics.cpp \
     qcustomplot.cpp \
@@ -26,11 +21,15 @@ SOURCES += main.cpp \
     qcpdocumentobject.cpp \
     scatterdata.cpp \
     pipedata.cpp \
-    recipielist.cpp
+    recipielist.cpp \
+    alemetrics.cpp \
+    cpplotlvn.cpp \
+    collectionpipedata.cpp \
+    strainpipedata.cpp \
+    runtimes.cpp
 
 HEADERS += \
     main.h \
-    options.h \
     quastmetrics.h \
     cgalmetrics.h \
     qcustomplot.h \
@@ -38,5 +37,10 @@ HEADERS += \
     qcpdocumentobject.h \
     scatterdata.h \
     pipedata.h \
-    recipielist.h
+    recipielist.h \
+    alemetrics.h \
+    cpplotlvn.h \
+    collectionpipedata.h \
+    strainpipedata.h \
+    runtimes.h
 

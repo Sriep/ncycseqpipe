@@ -8,5 +8,5 @@ RUN yum install -y \
 RUN wget http://spades.bioinf.spbau.ru/release3.6.2/SPAdes-3.6.2-Linux.tar.gz
 RUN tar -xzf SPAdes-3.6.2-Linux.tar.gz
 WORKDIR /SPAdes-3.6.2-Linux/bin/
-ENV PATH /SPAdes-3.6.2-Linux/bin:$PATH
+ENV PATH $PATH:/SPAdes-3.6.2-Linux/bin
 ENTRYPOINT ["./dipspades.py"]

@@ -27,7 +27,10 @@ ALE $BAMFILE $TEMPLATE $WORKDIR/$template_basename.ale
 
 debug_msg  ${LINENO} "finished ale"
 #Give location of result files
-METRICS=$WORKDIR/$template_basename.ale
+firstline=$(head -n 1 "$WORKDIR/$template_basename.ale")
+outfile="$WORKDIR/$template_basename.csv"
+echo $firstline > $outfile
+METRICS="$outfile"
 
 #-------------------------- Assembly specific code here --------------------
 source $SOURCEDIR/tools/ssh_footer.sh

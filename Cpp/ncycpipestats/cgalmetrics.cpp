@@ -5,12 +5,22 @@
 CgalMetrics::CgalMetrics(QFileInfo cgalDataFile)
     : cgalDataFile(cgalDataFile)
 {
-    init();
+    if (cgalDataFile.exists()) init();
+}
+
+CgalMetrics::CgalMetrics()
+    : cgalDataFile()
+{
 }
 
 const CgalMetrics::CgalFolderData CgalMetrics::cgalData() const
 {
     return cgalFolderData;
+}
+
+bool CgalMetrics::valid() const
+{
+    return cgalDataFile.exists();
 }
 
 void CgalMetrics::init()
@@ -25,9 +35,10 @@ void CgalMetrics::init()
         QStringList splitLine=line.split(seperator);
         if (1 == splitLine.size())
         {
-            QString fileName=splitLine.at(0);
-            QStringList splitFN=fileName.split('_');
-            nextAssembly=splitFN.at(1);
+            nextAssembly=assembly(line);
+            //QString fileName=splitLine.at(0);
+            //QStringList splitFN=fileName.split('_');
+            //nextAssembly=splitFN.at(1);
         }
         else if (6 == splitLine.size())
         {

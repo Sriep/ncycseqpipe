@@ -41,7 +41,7 @@ CONTIGS=$WORKDIR/out/Contigs.fasta
 #SCAFFOLDS=$WORKDIR/$PREFIX.scafSeq
 #-------------------------- Assembly specific code here --------------------
 
-source $SOURCEDIR/ssh_footer.sh
+source $SOURCEDIR/tools/ssh_footer.sh
 
 #DEBUG
 #source /home/shepperp/datashare/Piers/github/ncycseqpipeHidden/input/ncycseqpipe.cfg

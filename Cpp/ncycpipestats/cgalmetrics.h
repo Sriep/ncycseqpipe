@@ -15,7 +15,7 @@ public:
      * @param cgalDataFile
      */
     CgalMetrics(QFileInfo cgalDataFile);
-
+    CgalMetrics();
     /**
      * @brief The CGAL ouput ﬁle contains following values
      */
@@ -59,6 +59,8 @@ public:
     typedef QMap<QString, CgalData> CgalFolderData;
     typedef QMapIterator<QString, CgalData> CgalDataIterator;
     const CgalFolderData cgalData() const;
+
+    bool valid() const;
 private:
     void init();
 

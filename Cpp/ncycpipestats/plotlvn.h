@@ -1,49 +1,47 @@
 #ifndef PLOTLVN_H
 #define PLOTLVN_H
-#include <QVector>
-#include <QMainWindow>
-#include <QWidget>
-#include <QTextEdit>
 #include <QTextDocument>
+#include <QTextDocumentFragment>
+#include <QTextBlock>
 #include <QString>
-#include "qcustomplot.h"
 #include "scatterdata.h"
 
+class QTextFrame;
 
-class PlotLvN : public QMainWindow
+class PlotLvN : public QTextDocument
 {
-     Q_OBJECT
 public:
     PlotLvN(ScatterData& scatterData
             , QString workDir
-            , RecipieList& recipie
-            , QWidget *parent = 0);
+            , RecipieList& recipie);
+
+    QTextDocumentFragment  contents();
     void writeToPdf();
     virtual ~PlotLvN();
-private:
-    void init();
+protected:
     void populateDocument();
-    void setHeader(QTextBlock block);
-    void setLegend(QTextBlock block);
-    void setGraph(QTextBlock block);
-    void populatePlot();
-    void addTextEditHeader();
-    void addPlotToTextEdit();
-
+    virtual void addGraph(QTextBlock block) = 0;
     QString nameFromTag(QString tag) const;
     QString prefix() const;
 
-    QCustomPlot lvNPlot;
-    QTextDocument document;
-    QTextBlock* header;
-    QTextBlock* legend;
-    QTextBlock* graph;
+    //QTextDocument document;
     ScatterData& scatterData;
     QString workDir;
-    RecipieList& recipieList;
 
     int width;
     int height;
+private:
+    void init();
+    void setHeader(QTextBlock block);
+    void setLegend(QTextBlock block);
+    void setData(QTextCursor cursor);
+    void addTextEditHeader();
+    void addPlotToTextEdit();
+
+    RecipieList& recipieList;    
+    //QTextBlock* header;
+    //QTextBlock* legend;
+    //QTextBlock* graph;
 };
 
 #endif // PLOTLVN_H

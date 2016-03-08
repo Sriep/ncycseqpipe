@@ -10,6 +10,8 @@ function send_tools ()
       declare -ri index=$2
       outlog="${LOCAL_LOGPREFIX}.run_${TOOL_NAME[$index]}_local.sh.log"
       errlog="${LOCAL_LOGPREFIX}.run_${TOOL_NAME[$index]}_local.sh.err.log"
+      script_sh=$SOURCEDIR/tools/${TOOL_NAME[$index]}/run_${TOOL_NAME[$index]}_local.sh
+      debug_msg  ${LINENO}  "script is $script_sh"
       debug_msg  ${LINENO}  "In send_local_assembly function tool name ${TOOL_NAME[$index]} file ${TOOL_NAME[$index]}/run_${TOOL_NAME[$index]}_local.sh"     
       if [[ "$PARALLEL" == "&" ]]; then
         # /usr/bin/time -o output.time.txt -p date 
@@ -17,12 +19,14 @@ function send_tools ()
         # ( time ./sleep.sh )  2> timeout1.txt
         #( time 
         #sudo bash -c "/home/shepperp/datashare/Piers/github/ncycseqpipe/utNCYC22.sh &"
-        $SOURCEDIR/tools/${TOOL_NAME[$index]}/run_${TOOL_NAME[$index]}_local.sh \
+        $script_sh \
+          "$SOURCEDIR" \
           "$CONFIGFILE" \
           "$TOOLPREFIX" \
           "$READS1" \
           "$READS2" \
           "$READSPB" \
+          "${TOOL_TYPE[$index]}" \
           "${TOOL_TAG[$index]}" \
           "${TOOL_NAME[$index]}" \
           "${LOCAL_LOGPREFIX}stats/" \
@@ -35,12 +39,14 @@ function send_tools ()
           #set +u; process_num=$!; set -u
       else
         #( time 
-        $SOURCEDIR/tools/${TOOL_NAME[$index]}/run_${TOOL_NAME[$index]}_local.sh \
+        $script_sh \
+          "$SOURCEDIR" \
           "$CONFIGFILE" \
           "$TOOLPREFIX" \
           "$READS1" \
           "$READS2" \
           "$READSPB" \
+          "${TOOL_TYPE[$index]}" \
           "${TOOL_TAG[$index]}" \
           "${TOOL_NAME[$index]}" \
           "${LOCAL_LOGPREFIX}stats/" \

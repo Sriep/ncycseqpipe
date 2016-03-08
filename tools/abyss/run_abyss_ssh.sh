@@ -21,16 +21,15 @@ debug_msg  ${LINENO} " about to run ssh abyss on $PREFIX with parameters $PARAME
 debug_msg  ${LINENO} "arguments ${args[@]/#/}"
 
 abyss-pe \
-		${args[0]}  ${args[1]} ${args[2]} ${args[3]} ${args[4]} \
-    ${args[5]}  ${args[6]} ${args[7]} ${args[8]} ${args[9]} \
+		k=80 j=10 \
 		name=$WORKDIR/$PREFIX \
 		in="$SSH_READSDIR/$READS1 $SSH_READSDIR/$READS2"
 
 #abyss-pe \
-#		${args[0]}  ${args[1]} ${args[2]} ${args[3]} ${args[4]} 
-#    ${args[5]}  ${args[6]} ${args[7]} ${args[8]} ${args[9]} 
-
-
+#		${args[0]}  ${args[1]} ${args[2]} ${args[3]} ${args[4]} \
+#    ${args[5]}  ${args[6]} ${args[7]} ${args[8]} ${args[9]} \
+#		name=$WORKDIR/$PREFIX \
+#		in="$SSH_READSDIR/$READS1 $SSH_READSDIR/$READS2"
 
 #Give location of result files
 CONTIGS=$WORKDIR/$PREFIX-6.fa

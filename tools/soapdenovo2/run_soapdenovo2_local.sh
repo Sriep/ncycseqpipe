@@ -1,6 +1,6 @@
 #!/bin/bash
-declare -xr SOURCEDIR="$(dirname $BASH_SOURCE)/.."
-source $SOURCEDIR/local_header.sh
+declare -r SOURCEDIR="$1"
+source $SOURCEDIR/tools/local_header.sh
 
 #-------------------------- Assembly specific code here --------------------
 
@@ -40,4 +40,4 @@ CONTIGS=$WORKDIR/$PREFIX.contig
 SCAFFOLDS=$WORKDIR/$PREFIX.scafSeq
 #-------------------------- Assembly specific code here --------------------
 
-source $SOURCEDIR/local_footer.sh
+source $SOURCEDIR/tools/local_footer.sh

@@ -4,11 +4,11 @@
 #include <QVector>
 #include "pipedata.h"
 
-class RecipieList : public PipeData
+class RecipieList
 {
 public:
     RecipieList() {}
-    RecipieList(QFileInfo recipieFile);
+    RecipieList(const QFileInfo &recipieFile);
 
     struct Recipie
     {
@@ -18,7 +18,11 @@ public:
         QString tag;
         QString parameters;
         Recipie() {}
-        Recipie(QString s1, QString s2="", QString s3="", QString s4="", QString s5="")
+        Recipie(const QString& s1
+                , const QString& s2=""
+                , const QString& s3=""
+                , const QString& s4=""
+                , const QString& s5="")
             : instructionType(s1)
             ,name(s2)
             ,location(s3)
@@ -28,6 +32,7 @@ public:
     };
 
     QVector<Recipie> recipiesData() const;
+    bool valid() const;
 private:
     void init();
 

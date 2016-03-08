@@ -17,9 +17,10 @@ docker build -t sriep/progressivecactus $SOURCEDIR/tools/progressivecactus/progr
 docker build -t sriep/quast-3.2 $SOURCEDIR/tools/quast-3.2/quast-3.2
 docker build -t sriep/ragout $SOURCEDIR/tools/ragout/ragout
 docker build -t sriep/ray-2.3.1 $SOURCEDIR/tools/ray-2.3.1/ray-2.3.1
-docker build -t sriep/scaffmatch-3.6.2 $SOURCEDIR/tools/scaffmatch-3.6.2/scaffmatch-3.6.2
+docker build -t sriep/scaffmatch-0.9 $SOURCEDIR/tools/scaffmatch-0.9/scaffmatch-0.9
 docker build -t sriep/soapdenovo2 $SOURCEDIR/tools/soapdenovo2/soapdenovo2
-docker build -t sriep/wgs-8.3rc2/spades-3.6.2 $SOURCEDIR/tools/spades-3.6.2/spades-3.6.2
+docker build -t sriep/spades-3.6.2 $SOURCEDIR/tools/spades-3.6.2/spades-3.6.2
+docker build -t sriep/spades-3.7.0 $SOURCEDIR/tools/spades-3.7.0/spades-3.7.0
 docker build -t sriep/sspace-longread-1.1 $SOURCEDIR/tools/sspace-longread-1.1/sspace-longread-1.1
 docker build -t sriep/wgs-8.3rc2 $SOURCEDIR/tools/wgs-8.3rc2/wgs-8.3rc2
 
@@ -36,7 +37,7 @@ docker push sriep/progressivecactus
 docker push sriep/quast-3.2
 docker push sriep/ragout
 docker push sriep/ray-2.3.1
-docker push sriep/scaffmatch-3.6.2
+docker push sriep/scaffmatch-0.9
 docker push sriep/soapdenovo2
 docker push sriep/spades-3.6.2
 docker push sriep/sspace-longread-1.1 

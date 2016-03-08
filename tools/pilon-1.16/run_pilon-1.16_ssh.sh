@@ -47,7 +47,7 @@ java -jar $PILONPATH/pilon-1.16.jar \
 #METRICS_CSV=$WORKDIR/out.txt
 debug_msg  ${LINENO} "Finished run_pilon1.16"
 #-------------------------- Assembly specific code here --------------------
-
+source $SOURCEDIR/tools/ssh_footer.sh
 #cp $METRICS_CSV $SSH_RESULTDIR/m_${PRFIX_STUB}_${TOOL_TAG}
 #source $SOURCEDIR/tools/ssh_footer.sh
 #cp $CONTIGS $SSH_RESULTDIR/${ASSEMBLY_TAG}c${PREFIX}i.fasta

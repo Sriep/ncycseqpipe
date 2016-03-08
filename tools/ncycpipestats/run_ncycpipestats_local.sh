@@ -1,7 +1,7 @@
 #!/bin/bash 
 # 
-declare -xr SOURCEDIR="$(dirname $BASH_SOURCE)/.."
-source $SOURCEDIR/local_header.sh
+declare -r SOURCEDIR="$1"
+source $SOURCEDIR/tools/local_header.sh
 # PREFIX - Name of strain to assemble
 # READS1 - First set of paired end reads, relative to $LOCAL_READSDIR
 # READS2 - Second set of paired end reads, relative to $LOCAL_READSDIR
@@ -29,5 +29,5 @@ debug_msg  ${LINENO} "/home/shepperp/software/ncycseqpipe/Cpp/ncycpipestats/ncyc
 # docker run --name ncycp -v /home/shepperp/datashare/Piers/assemblies/UnitTest1/NCYC22:/results sriep/ncycpipestats ncycpipestats  /results
 # docker run --name ncycp -v /home/shepperp/datashare/Piers/assemblies/UnitTest1/NCYC22:/results --entrypoint="ncycpipestats" sriep/ncycpipestats   /results
 #-------------------------- Footer --------------------
-source $SOURCEDIR/local_footer.sh
+source $SOURCEDIR/tools/local_footer.sh
 

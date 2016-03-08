@@ -48,11 +48,11 @@ function compile_stats ()
   stats_file=${LOCAL_LOGPREFIX}stats/allstats.csv
   > $stats_file
   debug_msg  ${LINENO} "fstats file=$stats_file"
-  for f in ${LOCAL_LOGPREFIX}stats/*sh.log; do
+  for f in ${LOCAL_LOGPREFIX}stats/*.log; do
     echo -n $(basename $f)"," >> "$stats_file"
-    cat $f >> "${LOCAL_LOGPREFIX}stats/stats_file"
+    cat $f >> "$stats_file"
   done  
-  cat "${LOCAL_LOGPREFIX}stats/slurm_script.log" >> "$stats_file"
+  #cat "${LOCAL_LOGPREFIX}stats/slurm_script.log" >> "$stats_file"
 }
 
 function display_tool_array ()
@@ -183,14 +183,8 @@ function main ()
   compile_stats
   
   > $LOCAL_RESULTDIR/run_ncycpipestats.sh
-  echo "/home/shepperp/software/ncycseqpipe/Cpp/ncycpipestats/ncycpipestats $LOCAL_RESULTDIR" >> "$LOCAL_RESULTDIR/run_ncycpipestats.sh"
+  echo "/home/shepperp/software/ncycseqpipe/Cpp/ncycpipestats/ncycpipestats -s $LOCAL_RESULTDIR" >> "$LOCAL_RESULTDIR/run_ncycpipestats.sh"
 }
 
 main "$@"
 
-#docker rm $(docker ps -a -q)
-# /home/shepperp/datashare/Piers/github/ncycseqpipe/assemble_strain.sh NCYC22 NCYC22/NCYC22.FP.fastq NCYC22/NCYC22.RP.fastq
-#PREFIX=NCYC22
-#READS1=NCYC22/NCYC22.FP.fastq
-#READS2=N
-#hi there

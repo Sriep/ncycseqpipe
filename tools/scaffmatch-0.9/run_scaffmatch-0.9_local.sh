@@ -1,8 +1,7 @@
 #!/bin/bash 
 # 
-declare -xr SOURCEDIR="$(dirname $BASH_SOURCE)/.."
-source $SOURCEDIR/local_header.sh
-PROGNAME=$(basename $0)
+declare -r SOURCEDIR="$1"
+source $SOURCEDIR/tools/local_header.sh
 # PREFIX - Name of strain to assemble
 # READS1 - First set of paired end reads, relative to $LOCAL_READSDIR
 # READS2 - Second set of paired end reads, relative to $LOCAL_READSDIR
@@ -42,7 +41,7 @@ remove_docker_container skaffmatch$PREFIX
 SCAFFOLDS=$WORKDIR/scaffolds.fa
 #-------------------------- Footer --------------------
 
-source $SOURCEDIR/local_footer.sh
+source $SOURCEDIR/tools/local_footer.sh
 
 #declare  CONFIGFILE=/home/shepperp/datashare/Piers/github/ncycseqpipeHidden/input/ncycseqpipe.cfg
 #declare SSH_CONFIGFILE
