@@ -10,7 +10,7 @@ RUN sudo apt-get update && sudo apt-get install -y \
 	 gcc-multilib \ 
 	 apt-utils \ 
 	 expat \ 
-	 libexpat-dev 
+	 libexpat-dev \
 	cpanminus 
 RUN cpanm CPAN::Meta \
  Digest::SHA \ 

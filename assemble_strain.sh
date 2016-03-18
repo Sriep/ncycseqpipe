@@ -94,8 +94,9 @@ function parse_recipe_file ()
           filename=$LOCAL_DATA/$RESULTDIR/$PREFIX/metric_${PREFIX}_${TOOL_TAG[$recipie_line]}
           debug_msg  ${LINENO} "filename is $filename"
           tempfile=$(mktemp)
+          debug_msg  ${LINENO} "temp file $tempfile"
           for f in $LOCAL_DATA/$RESULTDIR/$PREFIX/*/m_*_"${TOOL_TAG[recipie_line]}"; do
-            #debug_msg  ${LINENO} "loop file: $f"
+            debug_msg  ${LINENO} "loop file: $f"
             echo "$f" >> $tempfile
             cat "$f" >> $tempfile
           done

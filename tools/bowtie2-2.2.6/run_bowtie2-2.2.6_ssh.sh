@@ -16,9 +16,14 @@ source $SOURCEDIR/tools/ssh_header.sh
 #-------------------------- Assembly specific code here --------------------
 debug_msg  ${LINENO} "BOWTIE2 ssh: about to run ssh bowtie2 on $TEMPLATE"
 
-
-debug_msg  ${LINENO} "bowtie2-build $TEMPLATE $WORKDIR/$PREFIX"
-bowtie2-build $TEMPLATE $WORKDIR/$PRFIX_STUB
+if [[ "${TEMPLATE///}" = "$TEMPLATE" ]] ; then
+  target=${args[0]}${args[1]}${PREFIX}i
+else
+  target=$TARGET
+fi
+debug_msg  ${LINENO}  "target is $target"
+debug_msg  ${LINENO} "bowtie2-build $target $WORKDIR/$PREFIX"
+bowtie2-build $target $WORKDIR/$PRFIX_STUB
 
 debug_msg  ${LINENO} "about to run bowtie"
 bowtie2   --mm \

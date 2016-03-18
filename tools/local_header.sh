@@ -11,6 +11,9 @@ declare -r WORKDIR=$LOCAL_WORKDIR/$PREFIX/$TOOL_NAME-local
 declare -r READSDIR=$LOCAL_DATA/$READDIR
 declare -r TEMPLATE=$LOCAL_RESULTDIR.fasta
 mkdir -p $LOCAL_RESULTDIR
+if [[ -d "$WORKDIR" ]]; then
+  rm -r $WORKDIR
+fi
 mkdir -p $WORKDIR
 
 declare LOGFILE=${LOGPREFIX}_${PREFIX}_${TOOL_NAME}_local.log

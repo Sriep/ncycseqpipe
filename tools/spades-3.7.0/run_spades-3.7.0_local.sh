@@ -12,6 +12,7 @@ source $SOURCEDIR/tools/local_header.sh
 # READSDIR - Directory where paired end reads are located
 #-------------------------- Assembly specific code here --------------------
 BASHDIR=$(dirname $BASH_SOURCE)
+#BASHDIR=$SOURCEDIR/tools/spades-3.7.0
 
 echo $PREFIX SPADES: about to run spades on strain $PREFIX
 
@@ -34,7 +35,7 @@ docker run \
   --name spades$PREFIX  \
   -v $READSDIR:/reads:ro \
   -v $WORKDIR:/results \
-    sriep/spades-3.6.2 \
+    sriep/spades-3.7.0 \
       --dataset /results/$PREFIX.yaml \
       -o /results 
 remove_docker_container spades$PREFIX

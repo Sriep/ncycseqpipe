@@ -1,6 +1,10 @@
 FROM ubuntu:latest
 #bowtie2 2.2.6
 MAINTAINER Piers Shepperson
+RUN \
+  apt-get update && \
+  apt-get install -y python python-dev python-pip python-virtualenv && \
+  rm -rf /var/lib/apt/lists/*	
 RUN sudo apt-get update && sudo apt-get install -y \
 	python2.7 \
 	python-pip \

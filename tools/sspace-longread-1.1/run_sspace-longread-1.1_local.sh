@@ -1,7 +1,6 @@
 #!/bin/bash 
 # 
-declare -xr SOURCEDIR="$(dirname $BASH_SOURCE)/.."
-declare -r SOURCEDIR="$1"
+declare SOURCEDIR="$1"
 source $SOURCEDIR/tools/local_header.sh
 # PREFIX - Name of strain to assemble
 # READS1 - First set of paired end reads, relative to $LOCAL_READSDIR
@@ -13,6 +12,7 @@ source $SOURCEDIR/tools/local_header.sh
 # WORKDIR - Directory in which to put tempory work files
 # READSDIR - Directory where paired end reads are located
 #-------------------------- Assembly specific code here --------------------
+debug_msg  ${LINENO} "SOURCEDIR=$1"
 readonly TARGET=${args[0]}${args[1]}${PREFIX}i
 debug_msg  ${LINENO}  "target is $RAGOUT_TARGET"
 
