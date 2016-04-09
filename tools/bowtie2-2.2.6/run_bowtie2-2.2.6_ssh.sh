@@ -14,13 +14,17 @@ source $SOURCEDIR/tools/ssh_header.sh
 # WORKDIR - Directory in which to put tempory work files
 # READSDIR - Directory where paired end reads are located
 #-------------------------- Assembly specific code here --------------------
-debug_msg  ${LINENO} "BOWTIE2 ssh: about to run ssh bowtie2 on $TEMPLATE"
+debug_msg  ${LINENO} "BOWTIE2 ssh: template is  $TEMPLATE"
+debug_msg  ${LINENO} "BOWTIE2 ssh: uc TARGET is  $TARGET"
 
-if [[ "${TEMPLATE///}" = "$TEMPLATE" ]] ; then
-  target=${args[0]}${args[1]}${PREFIX}i
+if [[ "${PREFIX///}" == "$PREFIX" ]] ; then
+  target=$SSH_RESULTDIR/${args[0]}${args[1]}${PREFIX}i.fasta
+  debug_msg  ${LINENO} "In first part of if statmet"
 else
-  target=$TARGET
+    target="$TEMPLATE"
+    debug_msg  ${LINENO} "In else part of if statment"
 fi
+
 debug_msg  ${LINENO}  "target is $target"
 debug_msg  ${LINENO} "bowtie2-build $target $WORKDIR/$PREFIX"
 bowtie2-build $target $WORKDIR/$PRFIX_STUB

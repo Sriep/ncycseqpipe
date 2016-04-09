@@ -1,5 +1,5 @@
-#!/bin/bash
-#
+#!/bin/bash 
+# 
 declare -r SOURCEDIR="$1"
 source $SOURCEDIR/tools/local_header.sh
 # PREFIX - Name of strain to assemble
@@ -14,8 +14,8 @@ source $SOURCEDIR/tools/local_header.sh
 debug_msg  ${LINENO}  "spec file template for runCA is $PARAMETERS"
 cp $PARAMETERS $WORKDIR/$PREFIX.spc
 
-if  [[ "$READSPB" == $NONE ]]; then
-  debug_msg  ${LINENO}  "about to run fastqToCA PBREADS=none"
+if  [[ "$READS1" != $NONE ]]; then
+  debug_msg  ${LINENO}  "about to run fastqToCA"
   docker run --name fastqtoca$PREFIX \
                   --volume=$READSDIR:/reads:ro \
                   --entrypoint="fastqToCA" \
@@ -32,23 +32,9 @@ if  [[ "$READSPB" == $NONE ]]; then
   debug_msg  ${LINENO}  "just finished echoing   $WORKDIR/$PREFIX.IlluminaReads.frg"
   echo "#  Frag file/s for illumna assembly assembly." > $WORKDIR/$PREFIX.spc
   echo /results/$PREFIX.IlluminaReads.frg >> $WORKDIR/$PREFIX.spc
-else
-  debug_msg  ${LINENO}  "about to run fastqToCA PBREADS=exists"
-  docker run --name fastqtoca$PREFIX \
-                  --volume=$READSDIR:/reads:ro \
-                  --entrypoint="fastqToCA" \
-                  sriep/wgs-8.3rc2 \
-                    -libraryname l1 \
-                    -technology pacbio-corrected \
-                    -type sanger  \
-                    -reads /reads/$READSPB \
-                    > $WORKDIR/$PREFIX.PacBio.frg
-  remove_docker_container fastqtoca$PREFIX
-  debug_msg  ${LINENO}  "here is $WORKDIR/$PREFIX.PacBio.frg"
-  cat $WORKDIR/$PREFIX.PacBio.frg
-  debug_msg  ${LINENO}  "just finished echoing   $WORKDIR/$PREFIX.IlluminaReads.frg"
-  echo "#  Frag file/s for PacBio assembly assembly." > $WORKDIR/$PREFIX.spc
-  echo /results/$PREFIX.PacBio.frg >> $WORKDIR/$PREFIX.spc
+fi
+if [[ "$READSPB" != $NONE ]]; then
+  debug_msg  ${LINENO} "PB reads not implimented yet"
 fi
 
 debug_msg  ${LINENO}  "about to cat spec file $WORKDIR/$PREFIX.spc"
@@ -64,7 +50,8 @@ docker run  \
             sriep/wgs-8.3rc2 \
               -d /results \
               -p $PREFIX \
-              -s /results/$PREFIX.spc
+              -s /results/$PREFIX.spc              
+#              /results/$PREFIX.IlluminaReads.frg
 remove_docker_container runca$PREFIX
 
 CONTIGS=$WORKDIR/9-terminator/$PREFIX.ctg.fasta

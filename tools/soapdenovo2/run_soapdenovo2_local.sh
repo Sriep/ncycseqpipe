@@ -8,8 +8,8 @@ source $SOURCEDIR/tools/local_header.sh
 debug_msg  ${LINENO} "SOAP2: about to run soap on strain $PREFIX"
 
 > $WORKDIR/config_file
-cat $SOURCEDIR/soapdenovo2/tools/soap_config_head.txt >> $WORKDIR/config_file
-cat $SOURCEDIR/soapdenovo2/tools/soap_config_lib_head.txt >> $WORKDIR/config_file
+cat $SOURCEDIR/tools/soapdenovo2/soap_config_head.txt >> $WORKDIR/config_file
+cat $SOURCEDIR/tools/soapdenovo2/soap_config_lib_head.txt >> $WORKDIR/config_file
 echo q1=/reads/$READS1 >> $WORKDIR/config_file
 echo q2=/reads/$READS2 >> $WORKDIR/config_file
 

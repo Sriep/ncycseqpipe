@@ -184,6 +184,7 @@ function main ()
   compile_stats
   
   > $LOCAL_RESULTDIR/run_ncycpipestats.sh
+  echo "#!/bin/bash" >> "$LOCAL_RESULTDIR/run_ncycpipestats.sh"
   echo "/home/shepperp/software/ncycseqpipe/Cpp/ncycpipestats/ncycpipestats -s $LOCAL_RESULTDIR" >> "$LOCAL_RESULTDIR/run_ncycpipestats.sh"
 }
 

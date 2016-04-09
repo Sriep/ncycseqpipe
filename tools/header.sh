@@ -30,8 +30,6 @@ debug_msg ${LINENO}  "TOOL_TAG=$TOOL_TAG"
 debug_msg ${LINENO}  "TOOL_NAME=$TOOL_NAME"
 debug_msg ${LINENO}  "LOGPREFIX=$LOGPREFIX"
 debug_msg ${LINENO}  "PARAMETERS=$PARAMETERS"
-debug_msg ${LINENO}  "argument doller ten=$10"
-
 readonly PRFIX_STUB=$(basename $PREFIX)
 
 declare CONTIGS=

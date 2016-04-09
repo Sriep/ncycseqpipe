@@ -16,7 +16,7 @@ readonly TARGET=${args[0]}${args[1]}${PREFIX}i
 debug_msg  ${LINENO}  "target is $TARGET"
 debug_msg  ${LINENO}  "cp $LOCAL_RESULTDIR/$TARGET.fasta $WORKDIR/contigs.fasta"
 
-cp $LOCAL_RESULTDIR/$TARGET.fasta $WORKDIR/contigs.fasta
+#cp $LOCAL_RESULTDIR/$TARGET.fasta $WORKDIR/contigs.fasta
 
 #https://github.com/kakitone/finishingTool/blob/master/README.md
 oldcontigs=$LOCAL_RESULTDIR/$TARGET.fasta
@@ -30,33 +30,35 @@ rawreadsfasta="$WORKDIR/raw_reads.fasta"
 perl -pe 's/>[^\$]*$/">Seg" . ++$n ."\n"/ge' $outputfasta > $rawreadsfasta
 
 docker run \
-	--name sriep/finishersc$PREFIX  \
+	--name finishersc$PREFIX  \
 	--volume=$WORKDIR:/results \
   --volume=$LOCAL_RESULTDIR:/data \
 	sriep/finishersc finisherSC.py \
     ${args[2]} ${args[3]} \
-      \results  \
+      /results  \
       MUMmer3.23 
       
 docker run \
-	--name sriep/finishersc$PREFIX  \
+	--name xPhaser$PREFIX  \
 	--volume=$WORKDIR:/results \
   --volume=$LOCAL_RESULTDIR:/data \
 	sriep/finishersc  experimental/xPhaser.py \
-      \results  \
+      /results  \
       MUMmer3.23       
       
 docker run \
-	--name sriep/finishersc$PREFIX  \
+	--name tSolver$PREFIX  \
 	--volume=$WORKDIR:/results \
   --volume=$LOCAL_RESULTDIR:/data \
 	sriep/finishersc  experimental/tSolver.py  \
-      \results  \
+      /results  \
       MUMmer3.23     
       
 remove_docker_container finisherrc$PREFIX
+remove_docker_container xPhaser$PREFIX
+remove_docker_container tSolver$PREFIX
 
-cp $WORKDIR/improved3.fasta $LOCAL_RESULTDIR/${TOOL_TAG}s${PRFIX_STUB}${args[0]}_fphaser.fasta
+cp $WORKDIR/improved3.fasta $LOCAL_RESULTDIR/${TOOL_TAG}s${PRFIX_STUB}${args[0]}.fasta
 cp $WORKDIR/improved4.fasta $LOCAL_RESULTDIR/${TOOL_TAG}s${PRFIX_STUB}${args[0]}_fphaser.fasta
 cp $WORKDIR/tademResolved.fasta $LOCAL_RESULTDIR/${TOOL_TAG}s${PRFIX_STUB}${args[0]}_ftandemr.fasta
 

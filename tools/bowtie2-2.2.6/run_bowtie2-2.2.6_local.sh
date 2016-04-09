@@ -71,16 +71,6 @@ docker run --name sort$prefix_tail  \
     /results/${PRFIX_STUB}_${TOOL_TAG}
 remove_docker_container sort$prefix_tail        
 
-#debug_msg  ${LINENO} "about to run bowtie"
-#bowtie2   --mm \
-#          --no-mixed \
-#          -x $WORKDIR/$PRFIX_STUB \
-#          -1 $SSH_READSDIR/$READS1 \
-#          -2 $SSH_READSDIR/$READS2 \
-#          > $WORKDIR/${PRFIX_STUB}_${TOOL_TAG}.sam 
-#samtools view -bS $WORKDIR/${PRFIX_STUB}_${TOOL_TAG}.sam  \
-# | samtools sort /dev/stdin $WORKDIR/${PRFIX_STUB}_${TOOL_TAG}
-
 debug_msg  ${LINENO} "about to run samtools index"
 docker run \
 	--name index$prefix_tail  \
@@ -92,10 +82,6 @@ docker run \
     /results/${PRFIX_STUB}_${TOOL_TAG}.bam
 remove_docker_container index$prefix_tail 
 
-#samtools index $WORKDIR/${PRFIX_STUB}_${TOOL_TAG}.bam
-
-#Give location of result files
-#METRICS_CSV=$WORKDIR/${PRFIX_STUB}_${TOOL_TAG}.bam
 debug_msg  ${LINENO} "About to copy result files"
 mv $WORKDIR/${PRFIX_STUB}_${TOOL_TAG}.sam $LOCAL_RESULTDIR/${PRFIX_STUB}_${TOOL_TAG}.sam
 #
@@ -104,8 +90,4 @@ cp $WORKDIR/${PRFIX_STUB}_${TOOL_TAG}.bam.bai $LOCAL_RESULTDIR/${PRFIX_STUB}_${T
 
 #-------------------------- Assembly specific code here --------------------
 
-#cp $METRICS_CSV $SSH_RESULTDIR/m_${PRFIX_STUB}_${TOOL_TAG}
-
-#cp $CONTIGS $SSH_RESULTDIR/${ASSEMBLY_TAG}c${PREFIX}i.fasta
-#cp $SCAFFOLDS $SSH_RESULTDIR/${ASSEMBLY_TAG}s${PREFIX}i.fasta
-echo `basename "$0"`: FINISHED!! FINISHED!!
+source $SOURCEDIR/tools/local_footer.sh
