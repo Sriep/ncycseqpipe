@@ -38,29 +38,29 @@ docker run \
       /results  \
       MUMmer3.23 
       
-docker run \
-	--name xPhaser$PREFIX  \
-	--volume=$WORKDIR:/results \
-  --volume=$LOCAL_RESULTDIR:/data \
-	sriep/finishersc  experimental/xPhaser.py \
-      /results  \
-      MUMmer3.23       
+#docker run \
+#	--name xPhaser$PREFIX  \
+#	--volume=$WORKDIR:/results \
+#  --volume=$LOCAL_RESULTDIR:/data \
+#	sriep/finishersc  experimental/xPhaser.py \
+#      /results  \
+#      MUMmer3.23       
       
-docker run \
-	--name tSolver$PREFIX  \
-	--volume=$WORKDIR:/results \
-  --volume=$LOCAL_RESULTDIR:/data \
-	sriep/finishersc  experimental/tSolver.py  \
-      /results  \
-      MUMmer3.23     
+#docker run \
+#	--name tSolver$PREFIX  \
+#	--volume=$WORKDIR:/results \
+#  --volume=$LOCAL_RESULTDIR:/data \
+#	sriep/finishersc  experimental/tSolver.py  \
+#      /results  \
+#      MUMmer3.23     
       
-remove_docker_container finisherrc$PREFIX
-remove_docker_container xPhaser$PREFIX
-remove_docker_container tSolver$PREFIX
+remove_docker_container finishersc$PREFIX
+#remove_docker_container xPhaser$PREFIX
+#remove_docker_container tSolver$PREFIX
 
 cp $WORKDIR/improved3.fasta $LOCAL_RESULTDIR/${TOOL_TAG}s${PRFIX_STUB}${args[0]}.fasta
-cp $WORKDIR/improved4.fasta $LOCAL_RESULTDIR/${TOOL_TAG}s${PRFIX_STUB}${args[0]}_fphaser.fasta
-cp $WORKDIR/tademResolved.fasta $LOCAL_RESULTDIR/${TOOL_TAG}s${PRFIX_STUB}${args[0]}_ftandemr.fasta
+#cp $WORKDIR/improved4.fasta $LOCAL_RESULTDIR/${TOOL_TAG}s${PRFIX_STUB}${args[0]}_fphaser.fasta
+#cp $WORKDIR/tademResolved.fasta $LOCAL_RESULTDIR/${TOOL_TAG}s${PRFIX_STUB}${args[0]}_ftandemr.fasta
 
 SCAFFOLDS=$WORKDIR/improved3.fasta
 #-------------------------- Footer --------------------

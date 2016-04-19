@@ -53,38 +53,29 @@ function run_ragout ()
   mv  $workdir/${result}.fasta $LOCAL_RESULTDIR/${result}.fasta
 }
 
-run_ragout yc as ds fs ss
-run_ragout yc as ds fs
-run_ragout yc as ds ss
-run_ragout yc as fs ss
-run_ragout yc ds fs ss
-run_ragout yc as ds
-run_ragout yc as fs
-run_ragout yc as ss
-run_ragout yc ds fs
-run_ragout yc ds ss
-run_ragout yc fs ss
+run_ragout yc as ds fs ss hs gs cs
+run_ragout yc as ds fs ss hs cs
+run_ragout yc as fs ss cs
+run_ragout yc ds fs cs
+run_ragout yc as cs
+run_ragout yc cs
 
-run_ragout ac yc as ds fs ss
 
-run_ragout ac yc as ds fs 
-run_ragout ac yc as ds ss 
-run_ragout ac yc as fs ss
-run_ragout ac yc ds fs ss 
-run_ragout ac as ds fs ss
-#
-run_ragout ac yc as ds
-run_ragout ac yc as fs
-run_ragout ac yc as ss
-run_ragout ac yc ds ss
-run_ragout ac yc ds fs
-run_ragout ac yc fs ss
+run_ragout ac yc as ds fs ss hs gs cs 
+run_ragout ac yc as ds fs ss hs cs 
+run_ragout ac yc ds fs ss hs cs 
+run_ragout ac yc as fs cs 
+run_ragout ac yc as cs 
+run_ragout ac yc cs 
+run_ragout ac cs 
 
-run_ragout ac as ds fs
-run_ragout ac as ds ss
-run_ragout ac as fs ss
-
-run_ragout ac ds fs ss
+run_ragout cs yc as ds fs ss hs gs  
+run_ragout cs ac as ds fs ss hs  
+run_ragout cs yc ds fs ss hs  
+run_ragout cs yc as ss hs gs  
+run_ragout cs yc as fs  
+run_ragout cs yc as 
+run_ragout cs as 
 
 #-------------------------- Assembly specific code here --------------------
 source $SOURCEDIR/tools/local_footer.sh

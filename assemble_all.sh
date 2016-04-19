@@ -69,7 +69,7 @@ function main ()
       logdir="$LOCAL_DATA/$RESULTDIR/$col1/logdir"
       save_strain_pipe_config_information $col1 
       debug_msg  ${LINENO} "log dirctory for strian $col1 is $logdir/$num_runs"
-      "$SOURCEDIR/assemble_strain.sh" $col1 $col2 $col3 $col4 "$RESULTDIR/$col1/logdir/$num_runs" $sleep_time\
+      "$SOURCEDIR/assemble_strain.sh" $col1 $col2 $col3 $col4 "$RESULTDIR/$col1/logdir/$num_runs" $sleep_time \
         > "$logdir/$num_runs.assemble_strain.stdout.log" \
         2> "$logdir/$num_runs.assemble_strain.stderr.log" &       
       sleep_time=$(($sleep_time+$TOP_LOOP_SLEEP))
